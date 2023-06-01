@@ -13,7 +13,7 @@ projects around the NHL and the NHL data sets.
 You can install NHL-py-api using pip:
 
 ```shell
-pip install nhl-py-api
+pip install nhl-api-py
 ```
 
 - - -
