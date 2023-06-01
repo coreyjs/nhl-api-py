@@ -1,32 +1,28 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
-name = "NHLPy"
-version = "0.0.1"
-authors = [
-    {name="Corey Schaf", email="cschaf@gmail.com"}
-]
-description = "NHL API Wrapper"
+[tool.poetry]
+name = "nhl-api-py"
+version = "0.1.1"
+description = "NHL API Wrapper.  For standings, team stats and outcomes."
+authors = ["Corey Schaf <cschaf@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.7"
+packages = [{include = "nhlpy"}]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 
-[pyproject.optional-dependencies]
-test = [
-    "pytest >=7.1.3,<8.0.0",
-    "coverage[toml] >= 6.5.0,< 8.0",
-    "mypy ==0.982",
-    "ruff ==0.0.138",
-    "black == 23.1.0",
-    "httpx >=0.23.0,<0.24.0"
-]
+[tool.poetry.dependencies]
+python = "^3.10"
+httpx = "*"
 
-all = [
-    "httpx >=0.23.0"
-]
+[tool.poetry.group.dev.dependencies]
+pytest="^7.1.3"
+pytest-mock = "*"
+mypy = "*"
+ruff = "*"
+black = "*"
+ipykernel = "*"
