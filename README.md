@@ -1,6 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/nhl-api-py.svg)](https://badge.fury.io/py/nhl-api-py)
 
-
 # NHL-py-api
 
 NHL-py-api is a Python package that provides a simple wrapper around the 
