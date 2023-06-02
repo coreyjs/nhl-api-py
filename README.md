@@ -8,7 +8,7 @@ NHL API, allowing you to easily access and retrieve NHL data in your Python
 applications.
 
 Note: This is very early, I created this to help me with some machine learning
-projects around the NHL and the NHL data sets.
+projects around the NHL and the NHL data sets.  Special thanks to https://github.com/erunion/sport-api-specifications/tree/master/nhl.
 
 
 ## Installation
@@ -39,6 +39,12 @@ client.teams.get_team_stats(id=1)
 # Standings
 client.standings.get_standings(season="20222023", detailed_record=False)
 client.standings.get_standing_types()
+
+# Player Stats
+client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="statsSingleSeason")
+client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="goalsByGameSituation")
+client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="yearByYear")
+
 ```
 
 - - - 

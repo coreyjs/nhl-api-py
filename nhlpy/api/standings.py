@@ -14,4 +14,18 @@ class Standings(BaseNHLAPIClient):
         return self._get(resource=f'standings?{modifier}{detailed}').json()
 
     def get_standing_types(self) -> dict:
+        """
+        Returns a list of standing types that can be used in get_standings_by_standing_type()
+        :return:
+        """
         return self._get(resource='standingsTypes').json()
+
+    def get_standings_by_standing_type(self, standing_type: str) -> dict:
+        """
+
+        :param standing_type: string, full list found in get_standing_types() with the following options:
+            regularSeason, wildCard,divisionLeaders, wildCardWithLeaders, preseason,
+            postseason, byDivision, byConference, byLeague
+        :return:
+        """
+        return self._get(resource=f'standings/{standing_type}').json()

@@ -1,1 +1,1 @@
-from .nhlclient import NHLClient
+from .nhl_client import NHLClient

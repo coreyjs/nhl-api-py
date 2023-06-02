@@ -22,5 +22,11 @@ class Teams(BaseNHLAPIClient):
     def get_team_previous_game(self, id: int) -> dict:
         return self._get(resource=f"teams/{id}?expand=team.schedule.previous").json()
 
-    def get_team_stats(self, id: int) -> dict:
+    def get_team_with_stats(self, id: int) -> dict:
         return self._get(resource=f"teams/{id}?expand=team.stats").json()
+
+    def get_team_roster(self, id: int) -> dict:
+        return self._get(resource=f"teams/{id}/roster").json()
+
+    def get_team_stats(self, id: int) -> dict:
+        return self._get(resource=f"teams/{id}/stats").json()
