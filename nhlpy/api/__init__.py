@@ -1,5 +1,6 @@
 import httpx
 
+
 class BaseNHLAPIClient:
     def __init__(self) -> None:
         self.base_url = "https://statsapi.web.nhl.com"
