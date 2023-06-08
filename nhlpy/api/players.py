@@ -1,4 +1,3 @@
-from typing import Optional
 from nhlpy.api import BaseNHLAPIClient
 
 
