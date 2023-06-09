@@ -7,5 +7,5 @@ class BaseNHLAPIClient:
         self.api_ver = "/api/v1/"
 
     def _get(self, resource: str) -> httpx.request:
-        r: httpx.request = httpx.get(f"{self.base_url}{self.api_ver}{resource}")
+        r: httpx.request = httpx.get(url=f"{self.base_url}{self.api_ver}{resource}")
         return r
