@@ -48,7 +48,32 @@ client.players.get_player_stats(person_id=8477949, season="20222023", stat_type=
 client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="goalsByGameSituation")
 client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="yearByYear")
 
+# Schedule
+client.schedule.get_schedule(season="20222023")
+
+# Games
+client.games.get_game_types()
+client.games.get_game_play_types()
+client.games.get_game_status_codes()
+client.games.get_game_live_feed(game_id=2020020001)
+client.games.get_game_live_feed_diff_after_timestamp(game_id=2020020001, timestamp=1633070400)
+client.games.get_game_boxscore(game_id=2020020001)
+client.games.get_game_linescore(game_id=2020020001)
+client.games.get_game_content(game_id=2020020001)
+
+# Players
+client.players.get_player(person_id=8477949)
+client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="statsSingleSeason")
+client.players.get_player_stat_types()
+
+# Helpers - Common use cases, data extraction, etc.  For easier dataframe .  These return data that has been parsed
+# out, with some additional calculations as well.
+standings_list = nhl_client.helpers.league_standings(season="20222023")
+standings_df = pd.DataFrame(standings_list)
+standings_df.head(20)
 ```
+
+
 
 - - - 
 
