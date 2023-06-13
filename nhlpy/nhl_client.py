@@ -1,4 +1,4 @@
-from nhlpy.api import core, teams, standings, schedule, players, games
+from nhlpy.api import core, teams, standings, schedule, players, games, helpers
 
 
 class NHLClient:
@@ -18,3 +18,4 @@ class NHLClient:
         self.schedule = schedule.Schedule()
         self.players = players.Players()
         self.games = games.Games()
+        self.helpers = helpers.Helpers()
