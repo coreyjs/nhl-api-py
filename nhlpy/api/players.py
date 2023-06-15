@@ -8,7 +8,7 @@ class Players(BaseNHLAPIClient):
         :param person_id:
         :return:
         """
-        return self._get(resource=f"people/{person_id}").json()
+        return self._get(resource=f"people/{person_id}").json()["people"]
 
     def get_player_stats(
         self, person_id: str, season: str = None, stat_type: str = "statsSingleSeason"
@@ -32,7 +32,7 @@ class Players(BaseNHLAPIClient):
         query = f"stats={stat_type}" if stat_type else ""
         return self._get(
             resource=f"people/{person_id}/stats?season={season}&{query}"
-        ).json()
+        ).json()["stats"]
 
     def get_player_stat_types(self) -> dict:
         """

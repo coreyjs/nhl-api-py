@@ -2,6 +2,7 @@ import warnings
 from typing import Union, List
 from nhlpy.api import BaseNHLAPIClient
 
+
 class Games(BaseNHLAPIClient):
     """
     This class is used to access the NHL API for game data.
@@ -58,16 +59,19 @@ class Games(BaseNHLAPIClient):
         """
         return self._get(resource=f"game/{game_id}/feed/live").json()
 
-    def get_game_live_feed_diff_after_timestamp(self, game_id: Union[str, int], timestamp: str) -> dict:
+    def get_game_live_feed_diff_after_timestamp(
+        self, game_id: Union[str, int], timestamp: str
+    ) -> dict:
         """
         Returns the difference in the live feed game data, from since the given timestamp: param.
         :param game_id:
         :param timestamp:
         :return:
         """
-        warnings.warn("This endpoint is still experimental and may not work as expected")
+        warnings.warn(
+            "This endpoint is still experimental and may not work as expected"
+        )
         return self._get(resource=f"game/{game_id}/feed/live/diffPath").json()
-
 
     def get_game_boxscore(self, game_id: Union[str, int]) -> List[dict]:
         """

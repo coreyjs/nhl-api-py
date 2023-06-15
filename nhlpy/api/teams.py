@@ -7,7 +7,8 @@ class Teams(BaseNHLAPIClient):
         Returns a list of all teams.
         :return: dict
         """
-        return self._get(resource="/teams").json()
+        response: dict = self._get(resource="/teams").json()
+        return response["teams"]
 
     def get_by_id(
         self,
@@ -20,10 +21,10 @@ class Teams(BaseNHLAPIClient):
         :param roster: bool, Should include the roster for the team
         :return: dict
         """
-        query = ""
+        query: str = ""
         if roster:
             query += "?expand=team.roster"
-        return self._get(resource=f"teams/{id}{query}").json()
+        return self._get(resource=f"teams/{id}{query}").json()["teams"]
 
     def get_team_next_game(self, id: int) -> dict:
         """
@@ -31,7 +32,9 @@ class Teams(BaseNHLAPIClient):
         :param id: int, NHL team id
         :return: dict
         """
-        return self._get(resource=f"teams/{id}?expand=team.schedule.next").json()
+        return self._get(resource=f"teams/{id}?expand=team.schedule.next").json()[
+            "teams"
+        ]
 
     def get_team_previous_game(self, id: int) -> dict:
         """
@@ -39,7 +42,9 @@ class Teams(BaseNHLAPIClient):
         :param id: int, NHL team id
         :return: dict
         """
-        return self._get(resource=f"teams/{id}?expand=team.schedule.previous").json()
+        return self._get(resource=f"teams/{id}?expand=team.schedule.previous").json()[
+            "teams"
+        ]
 
     def get_team_with_stats(self, id: int) -> dict:
         """
@@ -47,7 +52,7 @@ class Teams(BaseNHLAPIClient):
         :param id: int, NHL team id
         :return: dict
         """
-        return self._get(resource=f"teams/{id}?expand=team.stats").json()
+        return self._get(resource=f"teams/{id}?expand=team.stats").json()["teams"]
 
     def get_team_roster(self, id: int) -> dict:
         """
@@ -55,7 +60,7 @@ class Teams(BaseNHLAPIClient):
         :param id: int, NHL team id
         :return: dict
         """
-        return self._get(resource=f"teams/{id}/roster").json()
+        return self._get(resource=f"teams/{id}/roster").json()["roster"]
 
     def get_team_stats(self, id: int) -> dict:
         """
@@ -63,4 +68,4 @@ class Teams(BaseNHLAPIClient):
         :param id:
         :return: dict
         """
-        return self._get(resource=f"teams/{id}/stats").json()
+        return self._get(resource=f"teams/{id}/stats").json()["stats"]
