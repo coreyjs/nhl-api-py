@@ -2,6 +2,13 @@ from nhlpy.api import BaseNHLAPIClient
 
 
 class Standings(BaseNHLAPIClient):
+    def get_standing_types(self) -> dict:
+        """
+        Returns a list of standing types that can be used in get_standings_by_standing_type()
+        :return: dict of standing types
+        """
+        return self._get(resource="standingsTypes").json()
+
     def get_standings(self, season: str = None, detailed_record: bool = False) -> dict:
         """
         Gets the standings for the season supplied via season: param.
@@ -11,16 +18,11 @@ class Standings(BaseNHLAPIClient):
             head-to-head records against divisions and conferences.
         :return: dict
         """
-        modifier = f"season={season}&" if season else ""
-        detailed = "expand=standings.record&" if detailed_record else ""
-        return self._get(resource=f"standings?{modifier}{detailed}").json()
+        modifier: str = f"season={season}&" if season else ""
+        detailed: str = "expand=standings.record&" if detailed_record else ""
 
-    def get_standing_types(self) -> dict:
-        """
-        Returns a list of standing types that can be used in get_standings_by_standing_type()
-        :return: dict of standing types
-        """
-        return self._get(resource="standingsTypes").json()
+        response: dict = self._get(resource=f"standings?{modifier}{detailed}").json()
+        return response["records"]
 
     def get_standings_by_standing_type(
         self, season: str, standing_type: str, detailed_records: bool = False
@@ -34,6 +36,9 @@ class Standings(BaseNHLAPIClient):
             postseason, byDivision, byConference, byLeague
         :return: dict
         """
-        query = f"season={season}&"
-        detailed = "expand=standings.record&" if detailed_records else ""
-        return self._get(resource=f"standings/{standing_type}?{query}{detailed}").json()
+        query: str = f"season={season}&"
+        detailed: str = "expand=standings.record&" if detailed_records else ""
+        response: dict = self._get(
+            resource=f"standings/{standing_type}?{query}{detailed}"
+        ).json()
+        return response["records"]

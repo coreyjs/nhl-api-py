@@ -1,6 +1,54 @@
-from typing import List
+import warnings
+from typing import List, Optional
 
 from nhlpy.api.standings import Standings
+from nhlpy.api.schedule import Schedule
+from nhlpy.api.games import Games
+
+
+def _parse_team_specific_game_data(
+    game_item: dict, team_side: str, game_boxscore_data: dict
+) -> None:
+    """
+    Parser helper method
+    :param team_side:
+    :param game_boxscore_data:
+    :return:
+    """
+    game_item[f"{team_side}_pim"] = game_boxscore_data[team_side]["teamStats"][
+        "teamSkaterStats"
+    ]["pim"]
+    game_item[f"{team_side}_shots"] = game_boxscore_data[team_side]["teamStats"][
+        "teamSkaterStats"
+    ]["shots"]
+    game_item[f"{team_side}_pp_percent"] = float(
+        game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"][
+            "powerPlayPercentage"
+        ]
+    )
+    game_item[f"{team_side}_pp_goals"] = game_boxscore_data[team_side]["teamStats"][
+        "teamSkaterStats"
+    ]["powerPlayGoals"]
+    game_item[f"{team_side}_pp_opps"] = game_boxscore_data[team_side]["teamStats"][
+        "teamSkaterStats"
+    ]["powerPlayOpportunities"]
+    game_item[f"{team_side}_fo_win_percent"] = float(
+        game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"][
+            "faceOffWinPercentage"
+        ]
+    )
+    game_item[f"{team_side}_shots_blocked"] = game_boxscore_data[team_side][
+        "teamStats"
+    ]["teamSkaterStats"]["blocked"]
+    game_item[f"{team_side}_shots_takeaways"] = game_boxscore_data[team_side][
+        "teamStats"
+    ]["teamSkaterStats"]["takeaways"]
+    game_item[f"{team_side}_shots_giveaways"] = game_boxscore_data[team_side][
+        "teamStats"
+    ]["teamSkaterStats"]["giveaways"]
+    game_item[f"{team_side}_shots_hits"] = game_boxscore_data[team_side]["teamStats"][
+        "teamSkaterStats"
+    ]["hits"]
 
 
 class Helpers:
@@ -61,3 +109,55 @@ class Helpers:
                 team["expected_wins"] = team["py_expectation"] * team["games_played"]
                 teams.append(team)
         return teams
+
+    def get_all_game_results(
+        self,
+        season: str,
+        detailed_game_data: bool = False,
+        game_type: str = "R",
+        team_ids: Optional[List[int]] = None,
+    ) -> List[dict]:
+        """
+
+        :param season:
+        :param detailed_game_data: If True, will return the full game data for each game.  If False, will only return simple game data.
+        :param game_type:
+        :param team_ids:
+        :return:
+        """
+        warnings.warn(
+            "This endpoint will query the schedule API to get the games, and then sequentially query the boxscore API"
+            " for each game.  This is a slow endpoint, do not call this while in a loop, or multiple times in succession"
+        )
+        games = []
+        game_dates = Schedule().get_schedule(
+            season=season, game_type=game_type, team_ids=team_ids
+        )["dates"]
+        for d in game_dates:
+            date = d["date"]
+            for game in d["games"]:
+                game_data = {
+                    "date": date,
+                    "home_score": game["teams"]["home"]["score"],
+                    "away_score": game["teams"]["away"]["score"],
+                    "game_id": game["gamePk"],
+                    "game_type": game["gameType"],
+                    "away_id": game["teams"]["away"]["team"]["id"],
+                    "away_name": game["teams"]["away"]["team"]["name"],
+                    "home_id": game["teams"]["home"]["team"]["id"],
+                    "home_name": game["teams"]["home"]["team"]["name"],
+                }
+                games.append(game_data)
+
+        if detailed_game_data:
+            game_client = Games()
+            for game in games:
+                data = game_client.get_game_boxscore(game_id=game["game_id"])["teams"]
+                _parse_team_specific_game_data(
+                    game_item=game, team_side="away", game_boxscore_data=data
+                )
+                _parse_team_specific_game_data(
+                    game_item=game, team_side="home", game_boxscore_data=data
+                )
+
+        return games
