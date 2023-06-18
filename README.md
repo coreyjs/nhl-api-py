@@ -66,11 +66,15 @@ client.players.get_player(person_id=8477949)
 client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="statsSingleSeason")
 client.players.get_player_stat_types()
 
-# Helpers - Common use cases, data extraction, etc.  For easier dataframe .  These return data that has been parsed
+# Helpers - Common use cases, data extraction, etc.  For easier dataframe initialization.  
+#  These return data that has been parsed
 # out, with some additional calculations as well.
 standings_list = nhl_client.helpers.league_standings(season="20222023")
 standings_df = pd.DataFrame(standings_list)
 standings_df.head(20)
+
+game_results = nhl_client.helpers.get_all_game_results(season="20222023", detailed_game_data=True, game_type="R", team_ids=[7])
+
 ```
 
 
