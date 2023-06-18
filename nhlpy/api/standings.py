@@ -9,7 +9,7 @@ class Standings(BaseNHLAPIClient):
         """
         return self._get(resource="standingsTypes").json()
 
-    def get_standings(self, season: str = None, detailed_record: bool = False) -> dict:
+    def get_standings(self, season: str, detailed_record: bool = False) -> dict:
         """
         Gets the standings for the season supplied via season: param.
         :param season:
@@ -18,8 +18,8 @@ class Standings(BaseNHLAPIClient):
             head-to-head records against divisions and conferences.
         :return: dict
         """
-        modifier: str = f"season={season}&" if season else ""
-        detailed: str = "expand=standings.record&" if detailed_record else ""
+        modifier: str = f"season={season}"
+        detailed: str = "&expand=standings.record&" if detailed_record else ""
 
         response: dict = self._get(resource=f"standings?{modifier}{detailed}").json()
         return response["records"]
