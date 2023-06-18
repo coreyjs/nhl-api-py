@@ -3,13 +3,13 @@ from unittest import mock
 
 @mock.patch("httpx.get")
 def test_get_standings(h_m, nhl_client):
-    nhl_client.standings.get_standings()
+    nhl_client.standings.get_standings(season="20222023")
     h_m.assert_called_once_with(url="https://statsapi.web.nhl.com/api/v1/standings?")
 
 
 @mock.patch("httpx.get")
 def test_get_standings_with_details(h_m, nhl_client):
-    nhl_client.standings.get_standings(detailed_record=True)
+    nhl_client.standings.get_standings(season="20222023", detailed_record=True)
     h_m.assert_called_once_with(
         url="https://statsapi.web.nhl.com/api/v1/standings?expand=standings.record&"
     )
