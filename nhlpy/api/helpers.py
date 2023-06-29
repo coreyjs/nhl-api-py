@@ -51,6 +51,13 @@ def _parse_team_specific_game_data(
     ]["hits"]
 
 
+def _get_shooter(event) -> (int, str):
+    for player in event["players"]:
+        if player["playerType"] == "Shooter":
+            return player["player"]["id"], player["player"]["fullName"]
+    return None, None
+
+
 class Helpers:
     def pythagorean_expectation(
         self, goals_for: int, goals_against: int, exponent: float = 2.37
@@ -161,3 +168,42 @@ class Helpers:
                 )
 
         return games
+
+    def parse_shot_data_by_game(self, game_id: str) -> List[dict]:
+        """
+        Returns a list of all shots for a given game, by player.
+        :param game_id:
+        :return:
+        """
+        shot_data = []
+        game_data = Games().get_game_live_feed(game_id=game_id)
+        home_team = game_data["gameData"]["teams"]["home"]["id"]
+        away_team = game_data["gameData"]["teams"]["away"]["id"]
+        game_start = game_data["gameData"]["datetime"]["dateTime"]
+
+        for event_type in game_data["liveData"]["plays"]["allPlays"]:
+            if event_type["result"]["event"] != "Shot":
+                continue
+            player_id, player_name = _get_shooter(event_type)
+            shot = {
+                "game_id": game_id,
+                "game_start": game_start,
+                "player_id": player_id,
+                "player_name": player_name,
+                "player_side": "HOME"
+                if home_team == event_type["team"]["id"]
+                else "AWAY",
+                "shot_type": event_type["result"]["secondaryType"],
+                "home_team": home_team,
+                "away_team": away_team,
+                "event": event_type["result"]["event"],
+                "event_type_id": event_type["result"]["eventTypeId"],
+                "event_descr": event_type["result"]["description"],
+                "period": event_type["about"]["period"],
+                "period_time": event_type["about"]["periodTime"],
+                "x_cord": event_type["coordinates"]["x"],
+                "y_cord": event_type["coordinates"]["y"]
+            }
+            shot_data.append(shot)
+
+        return shot_data
