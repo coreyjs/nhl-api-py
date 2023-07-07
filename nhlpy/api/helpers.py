@@ -183,7 +183,7 @@ class Helpers:
         game_start = game_data["gameData"]["datetime"]["dateTime"]
 
         for event_type in game_data["liveData"]["plays"]["allPlays"]:
-            if event_type["result"]["event"] != "Shot":
+            if event_type["result"]["event"] not in ["Shot", "Goal"]:
                 continue
             player_id, player_name = _get_shooter(event_type)
             try:
