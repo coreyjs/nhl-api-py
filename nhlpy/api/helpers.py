@@ -1,3 +1,4 @@
+import logging
 import warnings
 from typing import List, Optional
 
@@ -185,25 +186,31 @@ class Helpers:
             if event_type["result"]["event"] != "Shot":
                 continue
             player_id, player_name = _get_shooter(event_type)
-            shot = {
-                "game_id": game_id,
-                "game_start": game_start,
-                "player_id": player_id,
-                "player_name": player_name,
-                "player_side": "HOME"
-                if home_team == event_type["team"]["id"]
-                else "AWAY",
-                "shot_type": event_type["result"]["secondaryType"],
-                "home_team": home_team,
-                "away_team": away_team,
-                "event": event_type["result"]["event"],
-                "event_type_id": event_type["result"]["eventTypeId"],
-                "event_descr": event_type["result"]["description"],
-                "period": event_type["about"]["period"],
-                "period_time": event_type["about"]["periodTime"],
-                "x_cord": event_type["coordinates"]["x"],
-                "y_cord": event_type["coordinates"]["y"]
-            }
-            shot_data.append(shot)
+            try:
+                shot = {
+                    "game_id": game_id,
+                    "game_start": game_start,
+                    "player_id": player_id,
+                    "player_name": player_name,
+                    "player_side": "HOME"
+                    if home_team == event_type["team"]["id"]
+                    else "AWAY",
+                    "shot_type": event_type["result"].get("secondaryType", "Wrist Shot"),
+                    "home_team": home_team,
+                    "away_team": away_team,
+                    "event": event_type["result"]["event"],
+                    "event_type_id": event_type["result"]["eventTypeId"],
+                    "event_descr": event_type["result"]["description"],
+                    "period": event_type["about"]["period"],
+                    "period_time": event_type["about"]["periodTime"],
+                    "x_cord": event_type["coordinates"]["x"],
+                    "y_cord": event_type["coordinates"]["y"],
+                }
+                shot_data.append(shot)
+            except KeyError as e:
+                logging.warning(
+                    f"KeyError: {e.args[0]}, game_id: {game_id}, eventCode: {event_type['result']['eventCode']}"
+                )
+                continue
 
         return shot_data
