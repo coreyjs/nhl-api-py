@@ -181,6 +181,8 @@ class Helpers:
         home_team = game_data["gameData"]["teams"]["home"]["id"]
         away_team = game_data["gameData"]["teams"]["away"]["id"]
         game_start = game_data["gameData"]["datetime"]["dateTime"]
+        season = game_data["gameData"]["game"]["season"]
+        game_type = game_data["gameData"]["game"]["type"]
 
         for event_type in game_data["liveData"]["plays"]["allPlays"]:
             if event_type["result"]["event"] not in ["Shot", "Goal"]:
@@ -189,6 +191,8 @@ class Helpers:
             try:
                 shot = {
                     "game_id": game_id,
+                    "season": season,
+                    "game_type": game_type,
                     "game_start": game_start,
                     "player_id": player_id,
                     "player_name": player_name,
