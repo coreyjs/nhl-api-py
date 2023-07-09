@@ -1,6 +1,6 @@
 import logging
 import warnings
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from nhlpy.api.standings import Standings
 from nhlpy.api.schedule import Schedule
@@ -53,10 +53,40 @@ def _parse_team_specific_game_data(
 
 
 def _get_shooter(event) -> (int, str):
+    """
+    Returns the shooter's id and name, helper method to parse the event data
+    :param event:
+    :return:
+    """
     for player in event["players"]:
         if player["playerType"] == "Shooter":
             return player["player"]["id"], player["player"]["fullName"]
     return None, None
+
+
+def _get_goal_scorer(event) -> (int, str):
+    """
+    Returns the goal scorer's id and name, helper method to parse the event data
+    :param event:
+    :return:
+    """
+    for player in event["players"]:
+        if player["playerType"] == "Scorer":
+            return player["player"]["id"], player["player"]["fullName"]
+    return None, None
+
+
+def _get_assists(event) -> List[Tuple[int, str]]:
+    """
+    Returns a list of assists, helper method to parse the event data
+    :param event:
+    :return:
+    """
+    assists = []
+    for player in event["players"]:
+        if player["playerType"] == "Assist":
+            assists.append((player["player"]["id"], player["player"]["fullName"]))
+    return assists
 
 
 class Helpers:
@@ -172,12 +202,18 @@ class Helpers:
 
     def parse_shot_data_by_game(self, game_id: str) -> List[dict]:
         """
-        Returns a list of all shots for a given game, by player.
+        Returns a list of all shots for a given game, by player.  This includes goals and shots that were saved.  Goals
+        will have the assists information also.
         :param game_id:
         :return:
         """
         shot_data = []
         game_data = Games().get_game_live_feed(game_id=game_id)
+
+        if "gameData" not in game_data:
+            logging.warning(f"Game {game_id} not found")
+            return shot_data
+
         home_team = game_data["gameData"]["teams"]["home"]["id"]
         away_team = game_data["gameData"]["teams"]["away"]["id"]
         game_start = game_data["gameData"]["datetime"]["dateTime"]
@@ -187,7 +223,13 @@ class Helpers:
         for event_type in game_data["liveData"]["plays"]["allPlays"]:
             if event_type["result"]["event"] not in ["Shot", "Goal"]:
                 continue
-            player_id, player_name = _get_shooter(event_type)
+
+            player_id, player_name = (
+                _get_shooter(event_type)
+                if event_type == "Shot"
+                else _get_goal_scorer(event_type)
+            )
+
             try:
                 shot = {
                     "game_id": game_id,
@@ -199,17 +241,26 @@ class Helpers:
                     "player_side": "HOME"
                     if home_team == event_type["team"]["id"]
                     else "AWAY",
-                    "shot_type": event_type["result"].get("secondaryType", "Wrist Shot"),
+                    "shot_type": event_type["result"].get(
+                        "secondaryType", "Wrist Shot"
+                    ),
                     "home_team": home_team,
                     "away_team": away_team,
                     "event": event_type["result"]["event"],
                     "event_type_id": event_type["result"]["eventTypeId"],
-                    "event_descr": event_type["result"]["description"],
+                    "event_description": event_type["result"]["description"],
                     "period": event_type["about"]["period"],
                     "period_time": event_type["about"]["periodTime"],
                     "x_cord": event_type["coordinates"]["x"],
                     "y_cord": event_type["coordinates"]["y"],
                 }
+
+                if shot["event"] == "Goal":
+                    assists = _get_assists(event_type)
+                    for i, p in enumerate(assists):
+                        shot[f"assist_{i+1}_player_id"] = p[0]
+                        shot[f"assist_{i+1}_player_name"] = p[1]
+
                 shot_data.append(shot)
             except KeyError as e:
                 logging.warning(
