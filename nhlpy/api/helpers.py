@@ -226,7 +226,7 @@ class Helpers:
 
             player_id, player_name = (
                 _get_shooter(event_type)
-                if event_type == "Shot"
+                if event_type["result"]["event"] == "Shot"
                 else _get_goal_scorer(event_type)
             )
 
