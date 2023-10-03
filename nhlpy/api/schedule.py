@@ -4,10 +4,15 @@ from nhlpy.api import BaseNHLAPIClient
 
 class Schedule(BaseNHLAPIClient):
     def get_schedule(
-        self, season: Optional[str] = None, game_type: str = None, team_ids: Optional[List[int]] = None
+        self,
+        season: Optional[str] = None,
+        game_type: str = None,
+        date: str = None,
+        team_ids: Optional[List[int]] = None,
     ) -> dict:
         """
 
+        :param date: Exact date in formate of YYYY-MM-DD
         :param season: str - Season in format of 20202021
         :param game_type: str - Game type, R (default) for regular season, P for playoffs,
         PR for preseason, A for all-star.  This can also be a comma separated list of game types such as "R,P,PR".
@@ -30,5 +35,8 @@ class Schedule(BaseNHLAPIClient):
 
         if game_type:
             query_p.append(f"gameType={game_type}")
+
+        if date:
+            query_p.append(f"date={date}")
 
         return self._get(resource=f"schedule?{ '&'.join(query_p) }").json()
