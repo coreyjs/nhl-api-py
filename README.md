@@ -52,7 +52,9 @@ client.players.get_player_stats(person_id=8477949, season="20222023", stat_type=
 client.schedule.get_schedule(season="20222023")
 
 # Get Todays Games
-client.schedule.get_schedule()
+client.schedule.get_schedule(season="20222023")
+client.schedule.get_schedule(date="2021-10-01")
+client.schedule.get_schedule(season="20222023", team_id=7)
 
 # Games
 client.games.get_game_types()
