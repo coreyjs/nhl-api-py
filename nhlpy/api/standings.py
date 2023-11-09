@@ -24,9 +24,7 @@ class Standings(BaseNHLAPIClient):
         response: dict = self._get(resource=f"standings?{modifier}{detailed}").json()
         return response["records"]
 
-    def get_standings_by_standing_type(
-        self, season: str, standing_type: str, detailed_records: bool = False
-    ) -> dict:
+    def get_standings_by_standing_type(self, season: str, standing_type: str, detailed_records: bool = False) -> dict:
         """
 
         :param detailed_records:  bool, indicates whether or not to return detailed records for each team
@@ -38,7 +36,5 @@ class Standings(BaseNHLAPIClient):
         """
         query: str = f"season={season}&"
         detailed: str = "expand=standings.record&" if detailed_records else ""
-        response: dict = self._get(
-            resource=f"standings/{standing_type}?{query}{detailed}"
-        ).json()
+        response: dict = self._get(resource=f"standings/{standing_type}?{query}{detailed}").json()
         return response["records"]

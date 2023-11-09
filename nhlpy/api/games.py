@@ -42,8 +42,8 @@ class Games(BaseNHLAPIClient):
         Returns a live feed for the game with the id supplied.  WARNING, this tends to be a large response.
         :param game_id: int, NHL game id,
 
-            GameIDS are in the format {Season}{GameType}{GameNumber}.  For example, the first game of the 2020-2021 season
-            would be 2020020001.  This is also the gamePk field that can be found in the team schedule endpoints.
+            GameIDS are in the format {Season}{GameType}{GameNumber}.  For example, the first game of the 2020-2021
+            season would be 2020020001.  This is also the gamePk field that can be found in the team schedule endpoints.
 
             For playoffs the {GameNumber} portion will be formatted as RRMG where RR is the round (01, 02, 03, 04),
             M is the matchup and G is the game out of 7.  So 2022030412 is the 2022-2023 NHL season, 03 means playoffs
@@ -59,18 +59,14 @@ class Games(BaseNHLAPIClient):
         """
         return self._get(resource=f"game/{game_id}/feed/live").json()
 
-    def get_game_live_feed_diff_after_timestamp(
-        self, game_id: Union[str, int], timestamp: str
-    ) -> dict:
+    def get_game_live_feed_diff_after_timestamp(self, game_id: Union[str, int], timestamp: str) -> dict:
         """
         Returns the difference in the live feed game data, from since the given timestamp: param.
         :param game_id:
         :param timestamp:
         :return:
         """
-        warnings.warn(
-            "This endpoint is still experimental and may not work as expected"
-        )
+        warnings.warn("This endpoint is still experimental and may not work as expected")
         return self._get(resource=f"game/{game_id}/feed/live/diffPath").json()
 
     def get_game_boxscore(self, game_id: Union[str, int]) -> List[dict]:

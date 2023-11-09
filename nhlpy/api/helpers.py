@@ -7,49 +7,33 @@ from nhlpy.api.schedule import Schedule
 from nhlpy.api.games import Games
 
 
-def _parse_team_specific_game_data(
-    game_item: dict, team_side: str, game_boxscore_data: dict
-) -> None:
+def _parse_team_specific_game_data(game_item: dict, team_side: str, game_boxscore_data: dict) -> None:
     """
     Parser helper method
     :param team_side:
     :param game_boxscore_data:
     :return:
     """
-    game_item[f"{team_side}_pim"] = game_boxscore_data[team_side]["teamStats"][
-        "teamSkaterStats"
-    ]["pim"]
-    game_item[f"{team_side}_shots"] = game_boxscore_data[team_side]["teamStats"][
-        "teamSkaterStats"
-    ]["shots"]
+    game_item[f"{team_side}_pim"] = game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"]["pim"]
+    game_item[f"{team_side}_shots"] = game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"]["shots"]
     game_item[f"{team_side}_pp_percent"] = float(
-        game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"][
-            "powerPlayPercentage"
-        ]
+        game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"]["powerPlayPercentage"]
     )
-    game_item[f"{team_side}_pp_goals"] = game_boxscore_data[team_side]["teamStats"][
-        "teamSkaterStats"
-    ]["powerPlayGoals"]
-    game_item[f"{team_side}_pp_opps"] = game_boxscore_data[team_side]["teamStats"][
-        "teamSkaterStats"
-    ]["powerPlayOpportunities"]
+    game_item[f"{team_side}_pp_goals"] = game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"]["powerPlayGoals"]
+    game_item[f"{team_side}_pp_opps"] = game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"][
+        "powerPlayOpportunities"
+    ]
     game_item[f"{team_side}_fo_win_percent"] = float(
-        game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"][
-            "faceOffWinPercentage"
-        ]
+        game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"]["faceOffWinPercentage"]
     )
-    game_item[f"{team_side}_shots_blocked"] = game_boxscore_data[team_side][
-        "teamStats"
-    ]["teamSkaterStats"]["blocked"]
-    game_item[f"{team_side}_shots_takeaways"] = game_boxscore_data[team_side][
-        "teamStats"
-    ]["teamSkaterStats"]["takeaways"]
-    game_item[f"{team_side}_shots_giveaways"] = game_boxscore_data[team_side][
-        "teamStats"
-    ]["teamSkaterStats"]["giveaways"]
-    game_item[f"{team_side}_shots_hits"] = game_boxscore_data[team_side]["teamStats"][
-        "teamSkaterStats"
-    ]["hits"]
+    game_item[f"{team_side}_shots_blocked"] = game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"]["blocked"]
+    game_item[f"{team_side}_shots_takeaways"] = game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"][
+        "takeaways"
+    ]
+    game_item[f"{team_side}_shots_giveaways"] = game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"][
+        "giveaways"
+    ]
+    game_item[f"{team_side}_shots_hits"] = game_boxscore_data[team_side]["teamStats"]["teamSkaterStats"]["hits"]
 
 
 def _get_shooter(event) -> (int, str):
@@ -90,9 +74,7 @@ def _get_assists(event) -> List[Tuple[int, str]]:
 
 
 class Helpers:
-    def pythagorean_expectation(
-        self, goals_for: int, goals_against: int, exponent: float = 2.37
-    ):
+    def pythagorean_expectation(self, goals_for: int, goals_against: int, exponent: float = 2.37):
         """
         Calculates the pythagorean expectation for a team based on the goals for and goals against.
         :param goals_for:
@@ -100,9 +82,7 @@ class Helpers:
         :param exponent:
         :return:
         """
-        return goals_for**exponent / (
-            goals_for**exponent + goals_against**exponent
-        )
+        return goals_for**exponent / (goals_for**exponent + goals_against**exponent)
 
     def league_standings(self, season: str, py_exp_ex: float = 2.37) -> List[dict]:
         """
@@ -116,9 +96,7 @@ class Helpers:
         :param season: Season in format of 20202021
         :return:
         """
-        schedule_data: dict = Standings().get_standings(
-            season=season, detailed_record=True
-        )
+        schedule_data: dict = Standings().get_standings(season=season, detailed_record=True)
         records = schedule_data["records"]
         teams = []
         for division in records:
@@ -158,19 +136,18 @@ class Helpers:
         """
 
         :param season:
-        :param detailed_game_data: If True, will return the full game data for each game.  If False, will only return simple game data.
+        :param detailed_game_data: If True, will return the full game data for each game.
+            If False, will only return simple game data.
         :param game_type:
         :param team_ids:
         :return:
         """
         warnings.warn(
             "This endpoint will query the schedule API to get the games, and then sequentially query the boxscore API"
-            " for each game.  This is a slow endpoint, do not call this while in a loop, or multiple times in succession"
+            " for each game.  This is a slow endpoint, DO NOT call this while in a loop, or multiple times in succession"
         )
         games = []
-        game_dates = Schedule().get_schedule(
-            season=season, game_type=game_type, team_ids=team_ids
-        )["dates"]
+        game_dates = Schedule().get_schedule(season=season, game_type=game_type, team_ids=team_ids)["dates"]
         for d in game_dates:
             date = d["date"]
             for game in d["games"]:
@@ -191,12 +168,8 @@ class Helpers:
             game_client = Games()
             for game in games:
                 data = game_client.get_game_boxscore(game_id=game["game_id"])["teams"]
-                _parse_team_specific_game_data(
-                    game_item=game, team_side="away", game_boxscore_data=data
-                )
-                _parse_team_specific_game_data(
-                    game_item=game, team_side="home", game_boxscore_data=data
-                )
+                _parse_team_specific_game_data(game_item=game, team_side="away", game_boxscore_data=data)
+                _parse_team_specific_game_data(game_item=game, team_side="home", game_boxscore_data=data)
 
         return games
 
@@ -225,9 +198,7 @@ class Helpers:
                 continue
 
             player_id, player_name = (
-                _get_shooter(event_type)
-                if event_type["result"]["event"] == "Shot"
-                else _get_goal_scorer(event_type)
+                _get_shooter(event_type) if event_type["result"]["event"] == "Shot" else _get_goal_scorer(event_type)
             )
 
             try:
@@ -238,12 +209,8 @@ class Helpers:
                     "game_start": game_start,
                     "player_id": player_id,
                     "player_name": player_name,
-                    "player_side": "HOME"
-                    if home_team == event_type["team"]["id"]
-                    else "AWAY",
-                    "shot_type": event_type["result"].get(
-                        "secondaryType", "Wrist Shot"
-                    ),
+                    "player_side": "HOME" if home_team == event_type["team"]["id"] else "AWAY",
+                    "shot_type": event_type["result"].get("secondaryType", "Wrist Shot"),
                     "home_team": home_team,
                     "away_team": away_team,
                     "event": event_type["result"]["event"],
