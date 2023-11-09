@@ -10,9 +10,7 @@ class Players(BaseNHLAPIClient):
         """
         return self._get(resource=f"people/{person_id}").json()["people"]
 
-    def get_player_stats(
-        self, person_id: str, season: str = None, stat_type: str = "statsSingleSeason"
-    ) -> dict:
+    def get_player_stats(self, person_id: str, season: str = None, stat_type: str = "statsSingleSeason") -> dict:
         """
         This returns a players statistics based on the param stat_type: and season:  An example of this
         may be client.players.get_player_stats(stat_type="yearByYear", season="20202021").  In some instances season:
@@ -30,9 +28,7 @@ class Players(BaseNHLAPIClient):
         :return:
         """
         query = f"stats={stat_type}" if stat_type else ""
-        return self._get(
-            resource=f"people/{person_id}/stats?season={season}&{query}"
-        ).json()["stats"]
+        return self._get(resource=f"people/{person_id}/stats?season={season}&{query}").json()["stats"]
 
     def get_player_stat_types(self) -> dict:
         """
