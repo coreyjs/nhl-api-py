@@ -3,6 +3,8 @@
 
 # NHL-API-PY
 
+# This is now broked due to the NHL updating their API.  Work is in progress to update this lib.
+
 NHL-api-py is a Python package that provides a simple wrapper around the 
 NHL API, allowing you to easily access and retrieve NHL data in your Python 
 applications.
