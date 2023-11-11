@@ -4,7 +4,9 @@
 # NHL-API-PY
 
 
-## This is updated with the new, also undocumented, NHL API.  More endpoints will be flushed out and completed as they
+## This is being updated with the new, also undocumented, NHL API.  
+
+More endpoints will be flushed out and completed as they
 are discovered. If you find any, please submit a PR.
 
 
