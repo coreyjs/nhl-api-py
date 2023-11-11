@@ -3,40 +3,43 @@ from nhlpy.api import BaseNHLAPIClient
 
 
 class Schedule(BaseNHLAPIClient):
-    def get_schedule(
-        self,
-        season: Optional[str] = None,
-        game_type: str = None,
-        date: str = None,
-        team_ids: Optional[List[int]] = None,
-    ) -> dict:
+    def get_schedule(self, date: Optional[str] = None) -> dict:
         """
-
-        :param date: Exact date in formate of YYYY-MM-DD
-        :param season: str - Season in format of 20202021
-        :param game_type: str - Game type, R (default) for regular season, P for playoffs,
-        PR for preseason, A for all-star.  This can also be a comma separated list of game types such as "R,P,PR".
-        :param team_ids: List[int] - List of team ids
-
-
-            example:
-            c.schedule.get_schedule(season="20222023", team_ids=[7], game_type='PR')
-            c.schedule.get_schedule()
-
+        Get the schedule for the NHL for the given date.  If no date is supplied it will
+        default to today.
+        :param date:  In format YYYY-MM-DD.  If no date is supplied, it will default to "Today".  Which in case
+            of the NHL could be today or yesterday depending on how early you call it.
         :return: dict
         """
-        query_p = []
+        res = date if date else "now"
 
-        if season:
-            query_p.append(f"season={season}")
+        return self._get(resource=f"schedule/{res}").json()
 
-        if team_ids:
-            query_p.append(f"teamId={','.join(str(t) for t in team_ids)}")
+    def get_schedule_by_team_by_month(self, team_abbr: str, month: Optional[str] = None) -> List[dict]:
+        """
+        Get the schedule for the team (team_abbr) for the given month.  If no month is supplied it will
+        :param team_abbr: The 3 letter abbreviation of the team.  BUF, TOR, etc
+        :param month: In format YYYY-MM.  2021-10, 2021-11, etc.  Defaults to "now" otherwise.
+        :return:
+        """
+        resource = f"club-schedule/{team_abbr}/month/{month if month else 'now'}"
+        return self._get(resource=resource).json()["games"]
 
-        if game_type:
-            query_p.append(f"gameType={game_type}")
+    def get_schedule_by_team_by_week(self, team_abbr: str) -> List[dict]:
+        """
+        This returns the schedule for the team (team_abbr) for the current week.
+        :param team_abbr: The 3 letter abbreviation of the team.  BUF, TOR, etc
+        :return:
+        """
+        resource = f"club-schedule/{team_abbr}/week/now"
+        return self._get(resource=resource).json()["games"]
 
-        if date:
-            query_p.append(f"date={date}")
-
-        return self._get(resource=f"schedule?{ '&'.join(query_p) }").json()
+    def get_season_schedule(self, team_abbr: str, season: str) -> dict:
+        """
+        This returns the schedule for the team (team_abbr) for the current season.  This also
+        contains all the metadata from the base api request.
+        :param team_abbr: Team abbreviation.  BUF, TOR, etc
+        :param season: Season in format YYYYYYYY.  20202021, 20212022, etc
+        :return:
+        """
+        return self._get(resource=f"club-schedule-season/{team_abbr}/{season}").json()

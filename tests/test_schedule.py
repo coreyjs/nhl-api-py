@@ -2,30 +2,42 @@ from unittest import mock
 
 
 @mock.patch("httpx.get")
-def test_get_schedule(h_m, nhl_client):
-    nhl_client.schedule.get_schedule()
-    h_m.assert_called_once_with(url="https://statsapi.web.nhl.com/api/v1/schedule?")
-
-
-@mock.patch("httpx.get")
-def test_get_schedule_with_season(h_m, nhl_client):
-    nhl_client.schedule.get_schedule(season="20222023")
-    h_m.assert_called_once_with(url="https://statsapi.web.nhl.com/api/v1/schedule?season=20222023")
-
-
-@mock.patch("httpx.get")
-def test_get_schedule_with_season_and_game_type(h_m, nhl_client):
-    nhl_client.schedule.get_schedule(season="20222023", game_type="PR")
-    h_m.assert_called_once_with(url="https://statsapi.web.nhl.com/api/v1/schedule?season=20222023&gameType=PR")
-
-
-@mock.patch("httpx.get")
-def test_get_schedule_with_game_type(h_m, nhl_client):
-    nhl_client.schedule.get_schedule(game_type="PR")
-    h_m.assert_called_once_with(url="https://statsapi.web.nhl.com/api/v1/schedule?gameType=PR")
-
-
-@mock.patch("httpx.get")
 def test_get_schedule_with_date(h_m, nhl_client):
-    nhl_client.schedule.get_schedule(date="2022-10-01")
-    h_m.assert_called_once_with(url="https://statsapi.web.nhl.com/api/v1/schedule?date=2022-10-01")
+    nhl_client.schedule.get_schedule(date="2021-01-01")
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/schedule/2021-01-01"
+
+
+@mock.patch("httpx.get")
+def test_get_schedule_with_no_date(h_m, nhl_client):
+    nhl_client.schedule.get_schedule()
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/schedule/now"
+
+
+@mock.patch("httpx.get")
+def test_get_schedule_by_team_by_month_with_month(h_m, nhl_client):
+    nhl_client.schedule.get_schedule_by_team_by_month(team_abbr="BUF", month="2023-11")
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/club-schedule/BUF/month/2023-11"
+
+
+@mock.patch("httpx.get")
+def test_get_schedule_by_team_by_month_with_no_month(h_m, nhl_client):
+    nhl_client.schedule.get_schedule_by_team_by_month(team_abbr="BUF")
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/club-schedule/BUF/month/now"
+
+
+@mock.patch("httpx.get")
+def test_get_schedule_by_team_by_week(h_m, nhl_client):
+    nhl_client.schedule.get_schedule_by_team_by_week(team_abbr="BUF")
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/club-schedule/BUF/week/now"
+
+
+@mock.patch("httpx.get")
+def test_get_season_schedule(h_m, nhl_client):
+    nhl_client.schedule.get_season_schedule(team_abbr="BUF", season="20202021")
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/club-schedule-season/BUF/20202021"
