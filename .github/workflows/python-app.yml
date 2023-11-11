@@ -77,9 +77,9 @@ jobs:
       - run: poetry run pytest
 
       # run a check for black
-      - name: black
+      - name: poetry run black . --check
         run: poetry run black . --check
 
       # run a lint check with ruff
-      - name: ruff
+      - name: poetry run ruff .
         run: poetry run ruff .

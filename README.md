@@ -43,54 +43,37 @@ Available methods:
 ```python
 client.schedule.get_schedule() # returns today's games
 client.schedule.get_schedule(date="2023-11-10") # returns games for supplied date
+client.schedule.get_schedule_by_team_by_month(team_abbr="BUF", month="2023-11") # returns games for supplied team and month
+client.schedule.get_schedule_by_team_by_week(team_abbr="BUF") # returns games for supplied team for current week
+client.schedule.get_season_schedule(team_abbr="BUF", season="20222023") # returns games for supplied team for supplied season
+```
 
 
-# Standings
-# client.standings.get_standings(season="20222023", detailed_record=False)
-# client.standings.get_standing_types()
+## Standings
+```python
 
-# Player Stats
-# client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="statsSingleSeason")
-# client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="goalsByGameSituation")
-# client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="yearByYear")
 
-# Schedule
-client.schedule.get_schedule(season="20222023")
+client.standings.get_standings(date="2023-11-10") # returns standings for supplied date
+client.standings.get_standings(season="20222023") # returns standings for supplied season
+client.standings.season_standing_manifest() # returns information about every season, start date, end date, etc.
 
-# Get Todays Games
-client.schedule.get_schedule(season="20222023")
-client.schedule.get_schedule(date="2021-10-01")
-client.schedule.get_schedule(season="20222023", team_id=7)
+```
 
-# Games
-# client.games.get_game_types()
-# client.games.get_game_play_types()
-# client.games.get_game_status_codes()
-# client.games.get_game_live_feed(game_id=2020020001)
-# client.games.get_game_live_feed_diff_after_timestamp(game_id=2020020001, timestamp=1633070400)
-# client.games.get_game_boxscore(game_id=2020020001)
-# client.games.get_game_linescore(game_id=2020020001)
-# client.games.get_game_content(game_id=2020020001)
 
-# Players
-# client.players.get_player(person_id=8477949)
-# client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="statsSingleSeason")
-# client.players.get_player_stat_types()
+## Teams
+```python
 
-# Helpers - Common use cases, data extraction, etc.  For easier dataframe initialization.  
-#  These return data that has been parsed
-# out, with some additional calculations as well.
-# standings_list = nhl_client.helpers.league_standings(season="20222023")
-# standings_df = pd.DataFrame(standings_list)
-# standings_df.head(20)
-# 
-# game_results = nhl_client.helpers.get_all_game_results(season="20222023", detailed_game_data=True, game_type="R", team_ids=[7])
+client.teams.team_stats_summary()
+client.teams.team_stats_summary(lang='fr')
 
 ```
 
 
 
+
 - - - 
+
+# Below is out of date, will be updated soon.
 
 As mentioned at the top, I created a notebook to go over some of the available methods in more detail.  Below is an export md of that notebook, with out cell executions.
 
