@@ -1,11 +1,5 @@
 from nhlpy.nhl_client import NHLClient
-from nhlpy.api import core, teams, standings, schedule, players, games
-
-
-def test_nhl_client_responds_to_core():
-    c = NHLClient()
-    assert c.core is not None
-    assert isinstance(c.core, core.Core)
+from nhlpy.api import teams, standings, schedule
 
 
 def test_nhl_client_responds_to_teams():
@@ -24,15 +18,3 @@ def test_nhl_client_responds_to_schedule():
     c = NHLClient()
     assert c.schedule is not None
     assert isinstance(c.schedule, schedule.Schedule)
-
-
-def test_nhl_client_responds_to_players():
-    c = NHLClient()
-    assert c.players is not None
-    assert isinstance(c.players, players.Players)
-
-
-def test_nhl_client_responds_to_games():
-    c = NHLClient()
-    assert c.games is not None
-    assert isinstance(c.games, games.Games)

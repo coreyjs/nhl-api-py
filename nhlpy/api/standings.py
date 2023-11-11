@@ -4,7 +4,7 @@ from nhlpy.api import BaseNHLAPIClient
 
 
 class Standings(BaseNHLAPIClient):
-    def get_standings(self, date: Optional[str] = None, season: Optional[str] = None, cache = True) -> dict:
+    def get_standings(self, date: Optional[str] = None, season: Optional[str] = None, cache=True) -> dict:
         """
         Gets the standings for the season supplied via season: param.
         :param date: str, Date in format YYYY-MM-DD.  If no date is supplied, it will default to "Today".
@@ -19,16 +19,18 @@ class Standings(BaseNHLAPIClient):
         if season:
             if cache:
                 # load json from data/seasonal_information_manifest.json
-                import json, os
-                with open(os.path.join(os.getcwd(), 'nhlpy/data/seasonal_information_manifest.json'), 'r') as f:
-                    seasons = json.load(f)['seasons']
+                import json
+                import os
+
+                with open(os.path.join(os.getcwd(), "nhlpy/data/seasonal_information_manifest.json"), "r") as f:
+                    seasons = json.load(f)["seasons"]
             else:
                 seasons = self.season_standing_manifest()
 
-            season_data = next((s for s in seasons if s['id'] == int(season)), None)
+            season_data = next((s for s in seasons if s["id"] == int(season)), None)
             if not season_data:
-                raise ValueError(f"Invalid Season Id.")
-            date = season_data['standingsEnd']
+                raise ValueError(f"Invalid Season Id {season}")
+            date = season_data["standingsEnd"]
 
         res = date if date else "now"
 
@@ -40,19 +42,19 @@ class Standings(BaseNHLAPIClient):
 
         :example
             [{
-			"id": 20232024,
-			"conferencesInUse": true,
-			"divisionsInUse": true,
-			"pointForOTlossInUse": true,
-			"regulationWinsInUse": true,
-			"rowInUse": true,
-			"standingsEnd": "2023-11-10",
-			"standingsStart": "2023-10-10",
-			"tiesInUse": false,
-			"wildcardInUse": true
-		}]
+                        "id": 20232024,
+                        "conferencesInUse": true,
+                        "divisionsInUse": true,
+                        "pointForOTlossInUse": true,
+                        "regulationWinsInUse": true,
+                        "rowInUse": true,
+                        "standingsEnd": "2023-11-10",
+                        "standingsStart": "2023-10-10",
+                        "tiesInUse": false,
+                        "wildcardInUse": true
+                }]
 
         :return: dict
         """
 
-        return self._get(resource=f"standings-season").json()['seasons']
+        return self._get(resource="standings-season").json()["seasons"]

@@ -34,7 +34,6 @@ class Schedule(BaseNHLAPIClient):
         resource = f"club-schedule/{team_abbr}/week/now"
         return self._get(resource=resource).json()["games"]
 
-
     def get_season_schedule(self, team_abbr: str, season: str) -> dict:
         """
         This returns the schedule for the team (team_abbr) for the current season.  This also
