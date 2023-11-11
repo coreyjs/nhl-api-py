@@ -3,6 +3,9 @@
 
 # NHL-API-PY
 
+## This is updated with the new, also undocumented, NHL API.  More endpoints will be flushed out and completed as they
+are discovered. If you find any, please submit a PR.
+
 NHL-api-py is a Python package that provides a simple wrapper around the 
 NHL API, allowing you to easily access and retrieve NHL data in your Python 
 applications.
@@ -32,21 +35,22 @@ client = NHLClient()
 ```
 
 Available methods:
+
+## Schedule
+
 ```python
-client.teams.all()
-client.teams.get_by_id(id=1, roster=False)
-client.teams.get_team_next_game(id=1)
-client.teams.get_team_previous_game(id=1)
-client.teams.get_team_stats(id=1)
+client.schedule.get_schedule() # returns today's games
+client.schedule.get_schedule(date="2023-11-10") # returns games for supplied date
+
 
 # Standings
-client.standings.get_standings(season="20222023", detailed_record=False)
-client.standings.get_standing_types()
+# client.standings.get_standings(season="20222023", detailed_record=False)
+# client.standings.get_standing_types()
 
 # Player Stats
-client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="statsSingleSeason")
-client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="goalsByGameSituation")
-client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="yearByYear")
+# client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="statsSingleSeason")
+# client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="goalsByGameSituation")
+# client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="yearByYear")
 
 # Schedule
 client.schedule.get_schedule(season="20222023")
@@ -57,28 +61,28 @@ client.schedule.get_schedule(date="2021-10-01")
 client.schedule.get_schedule(season="20222023", team_id=7)
 
 # Games
-client.games.get_game_types()
-client.games.get_game_play_types()
-client.games.get_game_status_codes()
-client.games.get_game_live_feed(game_id=2020020001)
-client.games.get_game_live_feed_diff_after_timestamp(game_id=2020020001, timestamp=1633070400)
-client.games.get_game_boxscore(game_id=2020020001)
-client.games.get_game_linescore(game_id=2020020001)
-client.games.get_game_content(game_id=2020020001)
+# client.games.get_game_types()
+# client.games.get_game_play_types()
+# client.games.get_game_status_codes()
+# client.games.get_game_live_feed(game_id=2020020001)
+# client.games.get_game_live_feed_diff_after_timestamp(game_id=2020020001, timestamp=1633070400)
+# client.games.get_game_boxscore(game_id=2020020001)
+# client.games.get_game_linescore(game_id=2020020001)
+# client.games.get_game_content(game_id=2020020001)
 
 # Players
-client.players.get_player(person_id=8477949)
-client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="statsSingleSeason")
-client.players.get_player_stat_types()
+# client.players.get_player(person_id=8477949)
+# client.players.get_player_stats(person_id=8477949, season="20222023", stat_type="statsSingleSeason")
+# client.players.get_player_stat_types()
 
 # Helpers - Common use cases, data extraction, etc.  For easier dataframe initialization.  
 #  These return data that has been parsed
 # out, with some additional calculations as well.
-standings_list = nhl_client.helpers.league_standings(season="20222023")
-standings_df = pd.DataFrame(standings_list)
-standings_df.head(20)
-
-game_results = nhl_client.helpers.get_all_game_results(season="20222023", detailed_game_data=True, game_type="R", team_ids=[7])
+# standings_list = nhl_client.helpers.league_standings(season="20222023")
+# standings_df = pd.DataFrame(standings_list)
+# standings_df.head(20)
+# 
+# game_results = nhl_client.helpers.get_all_game_results(season="20222023", detailed_game_data=True, game_type="R", team_ids=[7])
 
 ```
 

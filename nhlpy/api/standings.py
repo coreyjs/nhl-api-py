@@ -1,40 +1,58 @@
+from typing import List, Optional
+
 from nhlpy.api import BaseNHLAPIClient
 
 
 class Standings(BaseNHLAPIClient):
-    def get_standing_types(self) -> dict:
-        """
-        Returns a list of standing types that can be used in get_standings_by_standing_type()
-        :return: dict of standing types
-        """
-        return self._get(resource="standingsTypes").json()
-
-    def get_standings(self, season: str, detailed_record: bool = False) -> dict:
+    def get_standings(self, date: Optional[str] = None, season: Optional[str] = None, cache = True) -> dict:
         """
         Gets the standings for the season supplied via season: param.
-        :param season:
-        :param detailed_record: Detailed information for each team including
-            home and away records, record in shootouts, last ten games, and split
-            head-to-head records against divisions and conferences.
+        :param date: str, Date in format YYYY-MM-DD.  If no date is supplied, it will default to "Today".
+        :param season: The season to return the final standings from.  This takes precedence over date.
+        :param cache: bool, Load from hard file of data instead of making api call.  Possible the cache gets out
+            of date if I dont update this yearly.
         :return: dict
         """
-        modifier: str = f"season={season}"
-        detailed: str = "&expand=standings.record&" if detailed_record else ""
 
-        response: dict = self._get(resource=f"standings?{modifier}{detailed}").json()
-        return response["records"]
+        # We need to look up the last date of the season and use that as the date, since it doesnt seem to take
+        # season as a param.
+        if season:
+            if cache:
+                # load json from data/seasonal_information_manifest.json
+                import json, os
+                with open(os.path.join(os.getcwd(), 'nhlpy/data/seasonal_information_manifest.json'), 'r') as f:
+                    seasons = json.load(f)['seasons']
+            else:
+                seasons = self.season_standing_manifest()
 
-    def get_standings_by_standing_type(self, season: str, standing_type: str, detailed_records: bool = False) -> dict:
+            season_data = next((s for s in seasons if s['id'] == int(season)), None)
+            if not season_data:
+                raise ValueError(f"Invalid Season Id.")
+            date = season_data['standingsEnd']
+
+        res = date if date else "now"
+
+        return self._get(resource=f"standings/{res}").json()
+
+    def season_standing_manifest(self) -> List[dict]:
         """
+        Returns information about what seems like every season.  Start date, end date, etc.
 
-        :param detailed_records:  bool, indicates whether or not to return detailed records for each team
-        :param season: str, Season in the format of 20202021
-        :param standing_type: str, full list found in get_standing_types() with the following options:
-            regularSeason, wildCard,divisionLeaders, wildCardWithLeaders, preseason,
-            postseason, byDivision, byConference, byLeague
+        :example
+            [{
+			"id": 20232024,
+			"conferencesInUse": true,
+			"divisionsInUse": true,
+			"pointForOTlossInUse": true,
+			"regulationWinsInUse": true,
+			"rowInUse": true,
+			"standingsEnd": "2023-11-10",
+			"standingsStart": "2023-10-10",
+			"tiesInUse": false,
+			"wildcardInUse": true
+		}]
+
         :return: dict
         """
-        query: str = f"season={season}&"
-        detailed: str = "expand=standings.record&" if detailed_records else ""
-        response: dict = self._get(resource=f"standings/{standing_type}?{query}{detailed}").json()
-        return response["records"]
+
+        return self._get(resource=f"standings-season").json()['seasons']
