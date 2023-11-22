@@ -35,4 +35,15 @@ or using pipx
 
 2) `poetry install --with dev`
 
-3) `poetry shell` to run commands such as `pytest`
+3) `poetry shell`
+
+```python
+
+$ poetry shell
+
+# You can then run the following
+$ pytest
+$ ruff .
+$ black .
+
+```

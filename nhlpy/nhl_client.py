@@ -1,4 +1,4 @@
-from nhlpy.api import teams, standings, schedule
+from nhlpy.api import teams, standings, schedule, game_center
 
 
 class NHLClient:
@@ -8,14 +8,11 @@ class NHLClient:
     You can instantiate this class and then access the various endpoints of the API,
     such as:
         client = NHLClient()
-        client.teams.all()
     """
 
     def __init__(self) -> None:
-        # self.core = core.Core()
         self.teams = teams.Teams()
         self.standings = standings.Standings()
         self.schedule = schedule.Schedule()
-        # self.players = players.Players()
-        # self.games = games.Games()
+        self.game_center = game_center.GameCenter()
         # self.helpers = helpers.Helpers()
