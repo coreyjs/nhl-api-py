@@ -1,8 +1,12 @@
 from typing import Optional, List
-from nhlpy.api import BaseNHLAPIClient
+
+from nhlpy.http_client import HttpClient
 
 
-class Schedule(BaseNHLAPIClient):
+class Schedule:
+    def __init__(self, http_client: HttpClient) -> None:
+        self.client = http_client
+
     def get_schedule(self, date: Optional[str] = None) -> dict:
         """
         Get the schedule for the NHL for the given date.  If no date is supplied it will
@@ -13,7 +17,7 @@ class Schedule(BaseNHLAPIClient):
         """
         res = date if date else "now"
 
-        return self._get(resource=f"schedule/{res}").json()
+        return self.client.get(resource=f"schedule/{res}").json()
 
     def get_schedule_by_team_by_month(self, team_abbr: str, month: Optional[str] = None) -> List[dict]:
         """
@@ -23,7 +27,7 @@ class Schedule(BaseNHLAPIClient):
         :return:
         """
         resource = f"club-schedule/{team_abbr}/month/{month if month else 'now'}"
-        return self._get(resource=resource).json()["games"]
+        return self.client.get(resource=resource).json()["games"]
 
     def get_schedule_by_team_by_week(self, team_abbr: str) -> List[dict]:
         """
@@ -32,7 +36,7 @@ class Schedule(BaseNHLAPIClient):
         :return:
         """
         resource = f"club-schedule/{team_abbr}/week/now"
-        return self._get(resource=resource).json()["games"]
+        return self.client.get(resource=resource).json()["games"]
 
     def get_season_schedule(self, team_abbr: str, season: str) -> dict:
         """
@@ -42,4 +46,14 @@ class Schedule(BaseNHLAPIClient):
         :param season: Season in format YYYYYYYY.  20202021, 20212022, etc
         :return:
         """
-        return self._get(resource=f"club-schedule-season/{team_abbr}/{season}").json()
+        return self.client.get(resource=f"club-schedule-season/{team_abbr}/{season}").json()
+
+    def schedule_calendar(self, date: str) -> dict:
+        """
+        This returns the schedule for the given date in a calendar format.  Im not really sure
+        how this is diff from the other endppoints.
+        https://api-web.nhle.com/v1/schedule-calendar/2023-11-08
+        :param date: In format 2023-11-23
+        :return:
+        """
+        return self.client.get(resource=f"schedule-calendar/{date}").json()

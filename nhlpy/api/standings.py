@@ -1,9 +1,10 @@
 from typing import List, Optional
 
-from nhlpy.api import BaseNHLAPIClient
 
+class Standings:
+    def __init__(self, http_client):
+        self.client = http_client
 
-class Standings(BaseNHLAPIClient):
     def get_standings(self, date: Optional[str] = None, season: Optional[str] = None, cache=True) -> dict:
         """
         Gets the standings for the season supplied via season: param.
@@ -34,7 +35,7 @@ class Standings(BaseNHLAPIClient):
 
         res = date if date else "now"
 
-        return self._get(resource=f"standings/{res}").json()
+        return self.client.get(resource=f"standings/{res}").json()
 
     def season_standing_manifest(self) -> List[dict]:
         """
@@ -57,4 +58,4 @@ class Standings(BaseNHLAPIClient):
         :return: dict
         """
 
-        return self._get(resource="standings-season").json()["seasons"]
+        return self.client.get(resource="standings-season").json()["seasons"]
