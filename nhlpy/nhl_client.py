@@ -8,11 +8,9 @@ class NHLClient:
     You can instantiate this class and then access the various endpoints of the API,
     such as:
         client = NHLClient()
-        client.teams.all()
     """
 
     def __init__(self) -> None:
-        # self.core = core.Core()
         self.teams = teams.Teams()
         self.standings = standings.Standings()
         self.schedule = schedule.Schedule()

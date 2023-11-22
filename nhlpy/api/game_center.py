@@ -33,4 +33,4 @@ class GameCenter(BaseNHLAPIClient):
         Get the current score of all games in progress.  I think, not totally sure.
         :return: dict
         """
-        return self._get(resource=f"score/now").json()
+        return self._get(resource="score/now").json()
