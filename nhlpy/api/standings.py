@@ -24,8 +24,8 @@ class Standings:
                 # load json from data/seasonal_information_manifest.json
                 import json
 
-                with importlib.resources.open_text("nhlpy.data", "seasonal_information_manifest.json") as f:
-                    seasons = json.load(f)["seasons"]
+                data_resource = importlib.resources.files("nhlpy") / "data"
+                seasons = json.loads((data_resource / "seasonal_information_manifest.json").read_text())["seasons"]
             else:
                 seasons = self.season_standing_manifest()
 
