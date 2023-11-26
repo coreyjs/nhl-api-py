@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "nhl-api-py"
-version = "2.1.1"
+version = "2.1.2"
 description = "NHL API.  For standings, team stats, outcomes, player information.  Contains each individual API endpoint as well as convience methods for easy data loading in Pandas or any ML applications."
 authors = ["Corey Schaf <cschaf@gmail.com>"]
 readme = "README.md"
@@ -25,9 +25,9 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Application Frameworks",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
-
-[tool.poetry.include]
-package = ["nhlpy/data/*"]
+include = [
+    "nhlpy/data/*",
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"

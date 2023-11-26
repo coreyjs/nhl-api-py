@@ -1,3 +1,5 @@
+import importlib.resources
+
 from typing import List, Optional
 
 
@@ -21,9 +23,8 @@ class Standings:
             if cache:
                 # load json from data/seasonal_information_manifest.json
                 import json
-                import os
 
-                with open(os.path.join(os.getcwd(), "nhlpy/data/seasonal_information_manifest.json"), "r") as f:
+                with importlib.resources.open_text("nhlpy.data", "seasonal_information_manifest.json") as f:
                     seasons = json.load(f)["seasons"]
             else:
                 seasons = self.season_standing_manifest()
