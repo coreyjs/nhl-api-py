@@ -26,8 +26,12 @@ class Teams:
         :return: dict
         """
 
-        with importlib.resources.open_text("nhlpy.data", "teams_20232024.json") as f:
-            return json.load(f)
+        # with importlib.resources.files("nhlpy.data", "teams_20232024.json") as f:
+        #     return json.load(f)['teams']
+
+        data_resource = importlib.resources.files("nhlpy") / "data"
+        teams_info = json.loads((data_resource / "teams_20232024.json").read_text())["teams"]
+        return teams_info
 
     def roster(self, team_abbr: str, season: str) -> dict:
         """
