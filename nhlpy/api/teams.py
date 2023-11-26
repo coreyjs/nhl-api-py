@@ -28,3 +28,12 @@ class Teams:
 
         with importlib.resources.open_text("nhlpy.data", "teams_20232024.json") as f:
             return json.load(f)
+
+    def roster(self, team_abbr: str, season: str) -> dict:
+        """
+        Returns the roster for the given team and season.
+        :param team_abbr: Team abbreviation.  BUF, TOR, etc
+        :param season: Season in format YYYYYYYY.  20202021, 20212022, etc
+        :return:
+        """
+        return self.client.get(resource=f"roster/{team_abbr}/{season}").json()
