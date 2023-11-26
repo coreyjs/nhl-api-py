@@ -1,5 +1,5 @@
 import json
-import os
+import importlib.resources
 
 from typing import List
 
@@ -26,5 +26,5 @@ class Teams:
         :return: dict
         """
 
-        with open(os.path.join(os.getcwd(), "nhlpy/data/teams_20232024.json"), "r") as f:
+        with importlib.resources.open_text("nhlpy.data", "teams_20232024.json") as f:
             return json.load(f)
