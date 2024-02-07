@@ -1,6 +1,6 @@
 import json
 import importlib.resources
-
+from warnings import warn
 from typing import List
 
 from nhlpy.http_client import HttpClient
@@ -12,12 +12,18 @@ class Teams:
         self.base_url = "https://api.nhle.com"
         self.api_ver = "/stats/rest/"
 
+    # todo deprecate this
     def team_stats_summary(self, lang="en") -> List[dict]:
         """
-        I really dont know what this endpoint does.  It returns a list of dicts with team stats.
+        I really don't know what this endpoint does.  It returns a list of dicts with team stats.
         :param lang: Language param.  'en' for English, 'fr' for French
         :return:
         """
+        warn(
+            "This endpoint will be deprecated in the future.  Use stats.team_summary() instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return self.client.get_by_url(full_resource=f"{self.base_url}{self.api_ver}{lang}/team/summary").json()["data"]
 
     def teams_info(self) -> dict:
@@ -41,3 +47,10 @@ class Teams:
         :return:
         """
         return self.client.get(resource=f"roster/{team_abbr}/{season}").json()
+
+    def all_franchises(self) -> List[dict]:
+        """
+        Returns a list of all past and current NHL franchises.  This includes ones long forgotten.
+        :return:
+        """
+        return self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/franchise").json()["data"]

@@ -23,13 +23,14 @@ class HttpClient:
 
         return r
 
-    def get_by_url(self, full_resource: str) -> httpx.request:
+    def get_by_url(self, full_resource: str, query_params: dict = None) -> httpx.request:
         """
         Private method to make a get request to any HTTP resource.  This wraps the lib httpx functionality.
+        :param query_params:
         :param full_resource:  The full resource to get.
         :return:
         """
-        r: httpx.request = httpx.get(url=full_resource, follow_redirects=True)
+        r: httpx.request = httpx.get(url=full_resource, params=query_params, follow_redirects=True)
 
         if self._config.verbose:
             logging.info(f"API URL: {r.url}")

@@ -1,4 +1,4 @@
-from nhlpy.api import teams, standings, schedule, game_center, stats
+from nhlpy.api import teams, standings, schedule, game_center, stats, misc
 from nhlpy.http_client import HttpClient
 from nhlpy.config import ClientConfig
 
@@ -25,3 +25,4 @@ class NHLClient:
         self.schedule = schedule.Schedule(http_client=self._http_client)
         self.game_center = game_center.GameCenter(http_client=self._http_client)
         self.stats = stats.Stats(http_client=self._http_client)
+        self.misc = misc.Misc(http_client=self._http_client)
