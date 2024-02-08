@@ -1,0 +1,239 @@
+{
+	"data": [
+		{
+			"id": 1,
+			"fullName": "Montréal Canadiens",
+			"teamCommonName": "Canadiens",
+			"teamPlaceName": "Montréal"
+		},
+		{
+			"id": 2,
+			"fullName": "Montreal Wanderers",
+			"teamCommonName": "Wanderers",
+			"teamPlaceName": "Montreal"
+		},
+		{
+			"id": 3,
+			"fullName": "St. Louis Eagles",
+			"teamCommonName": "Eagles",
+			"teamPlaceName": "St. Louis"
+		},
+		{
+			"id": 4,
+			"fullName": "Hamilton Tigers",
+			"teamCommonName": "Tigers",
+			"teamPlaceName": "Hamilton"
+		},
+		{
+			"id": 5,
+			"fullName": "Toronto Maple Leafs",
+			"teamCommonName": "Maple Leafs",
+			"teamPlaceName": "Toronto"
+		},
+		{
+			"id": 6,
+			"fullName": "Boston Bruins",
+			"teamCommonName": "Bruins",
+			"teamPlaceName": "Boston"
+		},
+		{
+			"id": 7,
+			"fullName": "Montreal Maroons",
+			"teamCommonName": "Maroons",
+			"teamPlaceName": "Montreal"
+		},
+		{
+			"id": 8,
+			"fullName": "Brooklyn Americans",
+			"teamCommonName": "Americans",
+			"teamPlaceName": "Brooklyn"
+		},
+		{
+			"id": 9,
+			"fullName": "Philadelphia Quakers",
+			"teamCommonName": "Quakers",
+			"teamPlaceName": "Philadelphia"
+		},
+		{
+			"id": 10,
+			"fullName": "New York Rangers",
+			"teamCommonName": "Rangers",
+			"teamPlaceName": "New York"
+		},
+		{
+			"id": 11,
+			"fullName": "Chicago Blackhawks",
+			"teamCommonName": "Blackhawks",
+			"teamPlaceName": "Chicago"
+		},
+		{
+			"id": 12,
+			"fullName": "Detroit Red Wings",
+			"teamCommonName": "Red Wings",
+			"teamPlaceName": "Detroit"
+		},
+		{
+			"id": 13,
+			"fullName": "Cleveland Barons",
+			"teamCommonName": "Barons",
+			"teamPlaceName": "Cleveland"
+		},
+		{
+			"id": 14,
+			"fullName": "Los Angeles Kings",
+			"teamCommonName": "Kings",
+			"teamPlaceName": "Los Angeles"
+		},
+		{
+			"id": 15,
+			"fullName": "Dallas Stars",
+			"teamCommonName": "Stars",
+			"teamPlaceName": "Dallas"
+		},
+		{
+			"id": 16,
+			"fullName": "Philadelphia Flyers",
+			"teamCommonName": "Flyers",
+			"teamPlaceName": "Philadelphia"
+		},
+		{
+			"id": 17,
+			"fullName": "Pittsburgh Penguins",
+			"teamCommonName": "Penguins",
+			"teamPlaceName": "Pittsburgh"
+		},
+		{
+			"id": 18,
+			"fullName": "St. Louis Blues",
+			"teamCommonName": "Blues",
+			"teamPlaceName": "St. Louis"
+		},
+		{
+			"id": 19,
+			"fullName": "Buffalo Sabres",
+			"teamCommonName": "Sabres",
+			"teamPlaceName": "Buffalo"
+		},
+		{
+			"id": 20,
+			"fullName": "Vancouver Canucks",
+			"teamCommonName": "Canucks",
+			"teamPlaceName": "Vancouver"
+		},
+		{
+			"id": 21,
+			"fullName": "Calgary Flames",
+			"teamCommonName": "Flames",
+			"teamPlaceName": "Calgary"
+		},
+		{
+			"id": 22,
+			"fullName": "New York Islanders",
+			"teamCommonName": "Islanders",
+			"teamPlaceName": "New York"
+		},
+		{
+			"id": 23,
+			"fullName": "New Jersey Devils",
+			"teamCommonName": "Devils",
+			"teamPlaceName": "New Jersey"
+		},
+		{
+			"id": 24,
+			"fullName": "Washington Capitals",
+			"teamCommonName": "Capitals",
+			"teamPlaceName": "Washington"
+		},
+		{
+			"id": 25,
+			"fullName": "Edmonton Oilers",
+			"teamCommonName": "Oilers",
+			"teamPlaceName": "Edmonton"
+		},
+		{
+			"id": 26,
+			"fullName": "Carolina Hurricanes",
+			"teamCommonName": "Hurricanes",
+			"teamPlaceName": "Carolina"
+		},
+		{
+			"id": 27,
+			"fullName": "Colorado Avalanche",
+			"teamCommonName": "Avalanche",
+			"teamPlaceName": "Colorado"
+		},
+		{
+			"id": 28,
+			"fullName": "Arizona Coyotes",
+			"teamCommonName": "Coyotes",
+			"teamPlaceName": "Arizona"
+		},
+		{
+			"id": 29,
+			"fullName": "San Jose Sharks",
+			"teamCommonName": "Sharks",
+			"teamPlaceName": "San Jose"
+		},
+		{
+			"id": 30,
+			"fullName": "Ottawa Senators",
+			"teamCommonName": "Senators",
+			"teamPlaceName": "Ottawa"
+		},
+		{
+			"id": 31,
+			"fullName": "Tampa Bay Lightning",
+			"teamCommonName": "Lightning",
+			"teamPlaceName": "Tampa Bay"
+		},
+		{
+			"id": 32,
+			"fullName": "Anaheim Ducks",
+			"teamCommonName": "Ducks",
+			"teamPlaceName": "Anaheim"
+		},
+		{
+			"id": 33,
+			"fullName": "Florida Panthers",
+			"teamCommonName": "Panthers",
+			"teamPlaceName": "Florida"
+		},
+		{
+			"id": 34,
+			"fullName": "Nashville Predators",
+			"teamCommonName": "Predators",
+			"teamPlaceName": "Nashville"
+		},
+		{
+			"id": 35,
+			"fullName": "Winnipeg Jets",
+			"teamCommonName": "Jets",
+			"teamPlaceName": "Winnipeg"
+		},
+		{
+			"id": 36,
+			"fullName": "Columbus Blue Jackets",
+			"teamCommonName": "Blue Jackets",
+			"teamPlaceName": "Columbus"
+		},
+		{
+			"id": 37,
+			"fullName": "Minnesota Wild",
+			"teamCommonName": "Wild",
+			"teamPlaceName": "Minnesota"
+		},
+		{
+			"id": 38,
+			"fullName": "Vegas Golden Knights",
+			"teamCommonName": "Golden Knights",
+			"teamPlaceName": "Vegas"
+		},
+		{
+			"id": 39,
+			"fullName": "Seattle Kraken",
+			"teamCommonName": "Kraken",
+			"teamPlaceName": "Seattle"
+		}
+	],
+	"total": 39
+}
