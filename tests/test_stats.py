@@ -67,3 +67,39 @@ def team_test_summary_year_range_playoffs(h_m, nhl_client):
         "perty%22%3A%20%22teamId%22%2C%20%22direction%22%3A%20%22ASC%22%7D%5D",
         "cayenneExp": "gameTypeId=3 and seasonId<=20222023 and seasonId>=20182019",
     }
+
+
+@mock.patch("httpx.get")
+def test_skater_stats_summary(h_m, nhl_client):
+    nhl_client.stats.skater_stats_summary(start_season="20232024", end_season="20232024")
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api.nhle.com/stats/rest/en/skater/summary"
+    assert h_m.call_args[1]["params"] == {
+        "isAggregate": False,
+        "isGame": False,
+        "limit": 70,
+        "start": 0,
+        "factCayenneExp": "gamesPlayed>=1",
+        "sort": "%5B%7B%22property%22%3A%20%22points%22%2C%20%22direction%22%3A%20%22DESC%22%7D%2C%20%7B%22"
+        "property%22%3A%20%22gamesPlayed%22%2C%20%22direction%22%3A%20%22ASC%22%7D%2C%20%7B%22property%22"
+        "%3A%20%22playerId%22%2C%20%22direction%22%3A%20%22ASC%22%7D%5D",
+        "cayenneExp": "gameTypeId=2 and seasonId<=20232024 and seasonId>=20232024",
+    }
+
+
+@mock.patch("httpx.get")
+def test_skater_stats_summary_franchise(h_m, nhl_client):
+    nhl_client.stats.skater_stats_summary(start_season="20232024", end_season="20232024", franchise_id=19)
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api.nhle.com/stats/rest/en/skater/summary"
+    assert h_m.call_args[1]["params"] == {
+        "isAggregate": False,
+        "isGame": False,
+        "limit": 70,
+        "start": 0,
+        "factCayenneExp": "gamesPlayed>=1",
+        "sort": "%5B%7B%22property%22%3A%20%22points%22%2C%20%22direction%22%3A%20%22DESC%22%7D%2C%20%7B%22"
+        "property%22%3A%20%22gamesPlayed%22%2C%20%22direction%22%3A%20%22ASC%22%7D%2C%20%7B%22property%22"
+        "%3A%20%22playerId%22%2C%20%22direction%22%3A%20%22ASC%22%7D%5D",
+        "cayenneExp": "franchiseId=19 and gameTypeId=2 and seasonId<=20232024 and seasonId>=20232024",
+    }
