@@ -29,13 +29,13 @@ class Schedule:
         resource = f"club-schedule/{team_abbr}/month/{month if month else 'now'}"
         return self.client.get(resource=resource).json()["games"]
 
-    def get_schedule_by_team_by_week(self, team_abbr: str) -> List[dict]:
+    def get_schedule_by_team_by_week(self, team_abbr: str, date: Optional[str] = None) -> List[dict]:
         """
-        This returns the schedule for the team (team_abbr) for the current week.
+        This returns the schedule for the team (team_abbr) for the week set, or the current week if no week is specificed.
         :param team_abbr: The 3 letter abbreviation of the team.  BUF, TOR, etc
         :return:
         """
-        resource = f"club-schedule/{team_abbr}/week/now"
+        resource = f"club-schedule/{team_abbr}/week/{date if date else 'now'}"
         return self.client.get(resource=resource).json()["games"]
 
     def get_season_schedule(self, team_abbr: str, season: str) -> dict:
