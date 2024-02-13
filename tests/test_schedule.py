@@ -37,6 +37,13 @@ def test_get_schedule_by_team_by_week(h_m, nhl_client):
 
 
 @mock.patch("httpx.get")
+def test_get_schedule_by_team_by_week_with_date(h_m, nhl_client):
+    nhl_client.schedule.get_schedule_by_team_by_week(team_abbr="BUF", date="2024-02-10")
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/club-schedule/BUF/week/2024-02-10"
+
+
+@mock.patch("httpx.get")
 def test_get_season_schedule(h_m, nhl_client):
     nhl_client.schedule.get_season_schedule(team_abbr="BUF", season="20202021")
     h_m.assert_called_once()

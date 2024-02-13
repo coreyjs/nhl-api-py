@@ -18,7 +18,7 @@ class Stats:
         """
         return self.client.get(resource=f"club-stats-season/{team_abbr}").json()
 
-    def player_career_stats(self, player_id: int) -> dict:
+    def player_career_stats(self, player_id: str) -> dict:
         """
         This returns the career stats for a player as well as player information.
 
@@ -28,6 +28,16 @@ class Stats:
         :return: dict
         """
         return self.client.get(resource=f"player/{player_id}/landing").json()
+
+    def player_game_log(self, player_id: str, season_id: str, game_type: int) -> List[dict]:
+        """
+        Returns the game log, for the given player, for the given season and game type.
+        :param game_type: 1 is for preseason, 2 is for regular season, 3 is for playoffs.
+        :param season_id: Season format of "20222023", "20232024", etc.
+        :param player_id:
+        :return:
+        """
+        return self.client.get(resource=f"player/{player_id}/game-log/{season_id}/{game_type}").json()["gameLog"]
 
     def team_summary(
         self,
