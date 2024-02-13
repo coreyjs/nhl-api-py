@@ -30,6 +30,41 @@ client = NHLClient(verbose=True) # a tad more logging such as the URL being call
 ```
 
 
+### Stats Endpoints (In development)
+
+```python
+
+client.club_stats_season(team_abbr="BUF") # kinda weird endpoint.
+
+client.player_career_stats(player_id=8478402)
+
+# Team Summary Stats.
+# These have lots of available parameters.  You can also tap into the apache cayenne expressions to build custom
+# queries, if you have that knowledge.
+client.stats.team_summary(start_season="20202021", end_season="20212022", game_type_id=2)
+client.stats.team_summary(start_season="20202021", end_season="20212022")
+
+###
+# Skater Summary Stats.
+# Queries for skaters for year ranges, filterable down by franchise.
+client.stats.skater_stats_summary(start_season="20232024", end_season="20232024")
+client.stats.skater_stats_summary(franchise_id=10, start_season="20232024", end_season="20232024")
+
+ # skater_stats_summary_by_expression is more advanced method.  It allows for more direct manipulation of the query and
+ # the cayenne expression clauses.
+ sort_expr = [
+                {"property": "points", "direction": "DESC"},
+                {"property": "gamesPlayed", "direction": "ASC"},
+                {"property": "playerId", "direction": "ASC"},
+            ]
+expr = "gameTypeId=2 and seasonId<=20232024 and seasonId>=20222023"
+client.stats.skater_stats_summary_by_expression(default_cayenne_exp=expr, sort_expr=sort_expr)
+
+###
+
+```
+
+
 ### Schedule Endpoints
 
 ```python
@@ -40,6 +75,7 @@ client.schedule.get_schedule_by_team_by_month(team_abbr="BUF")
 client.schedule.get_schedule_by_team_by_month(team_abbr="BUF", month="2021-01")
 
 client.schedule.get_schedule_by_team_by_week(team_abbr="BUF")
+client.schedule.get_schedule_by_team_by_week(team_abbr="BUF", date="2024-01-01")
 
 client.schedule.get_season_schedule(team_abbr="BUF", season="20212022")
 
@@ -79,6 +115,19 @@ client.game_center.landing(game_id="2023020280")
 client.game_center.score_now()
 ```
 
+
+### Misc Endpoints
+```python
+client.misc.glossary()
+
+client.misc.config()
+
+client.misc.countries()
+
+client.misc.season_specific_rules_and_info()
+
+client.misc.draft_year_and_rounds()
+```
 
 ---
 ### Insomnia Rest Client Export
