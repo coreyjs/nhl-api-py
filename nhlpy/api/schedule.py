@@ -31,8 +31,8 @@ class Schedule:
 
     def get_schedule_by_team_by_week(self, team_abbr: str, date: Optional[str] = None) -> List[dict]:
         """
-        This returns the schedule for the team (team_abbr) for the week set, or the current week if no week is specified. 
-        
+        This returns the schedule for the team (team_abbr) for the week set or the current week if no week is specified.
+
         :param date: Optional date, in which to search the week of.  In format YYYY-MM-DD.  Example "2024-02-10".
 
         :param team_abbr: The 3 letter abbreviation of the team.  BUF, TOR, etc
