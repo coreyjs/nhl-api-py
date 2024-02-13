@@ -105,7 +105,7 @@ class Stats:
         self,
         start_season: str,
         end_season: str,
-        franchise_id: int = None,
+        franchise_id: str = None,
         game_type_id: int = 2,
         aggregate: bool = False,
         sort_expr: List[dict] = None,
@@ -119,7 +119,7 @@ class Stats:
                  c.stats.skater_stats_summary(franchise_id=10, start_season="20232024", end_season="20232024")
         :param start_season: Season id, in format 20202021, 20212022, etc, that will be the start of the range.
         :param end_season: Season id for the end range.
-        :param franchise_id: The ID of the franchise.  Not to be confused with team_id found on other endpoints.
+        :param franchise_id: String, The ID of the franchise.  Not to be confused with team_id found on other endpoints.
             This seems to be specific to the /stats apis.
         :param game_type_id: 2 is for regular season, 3 is for playoffs.  I think 1 is for preseason.
         :param aggregate: If doing multiple years, you can choose to aggreate the date per player, or have separate
