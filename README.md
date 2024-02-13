@@ -34,9 +34,9 @@ client = NHLClient(verbose=True) # a tad more logging such as the URL being call
 
 ```python
 
-client.club_stats_season(team_abbr="BUF") # kinda weird endpoint.
+client.stats.club_stats_season(team_abbr="BUF") # kinda weird endpoint.
 
-client.player_career_stats(player_id=8478402)
+client.stats.player_career_stats(player_id="8478402")
 
 # Team Summary Stats.
 # These have lots of available parameters.  You can also tap into the apache cayenne expressions to build custom
