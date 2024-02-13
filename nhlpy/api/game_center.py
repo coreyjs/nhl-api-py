@@ -1,3 +1,4 @@
+from typing import Optional
 from nhlpy.http_client import HttpClient
 
 
@@ -34,9 +35,11 @@ class GameCenter:
         """
         return self.client.get(resource=f"gamecenter/{game_id}/landing").json()
 
-    def score_now(self) -> dict:
+    def score_now(self, date: Optional[str] = None) -> dict:
         """
         Get the current score of all games in progress.  I think, not totally sure.
+        Now param does not switch to new day until noon of that day.
+        :param date: Optional date, select date to see score. In format YYYY-MM-DD.
         :return: dict
         """
-        return self.client.get(resource="score/now").json()
+        return self.client.get(resource=f"score/{date if date else 'now'}").json()
