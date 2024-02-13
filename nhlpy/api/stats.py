@@ -18,7 +18,7 @@ class Stats:
         """
         return self.client.get(resource=f"club-stats-season/{team_abbr}").json()
 
-    def player_career_stats(self, player_id: int) -> dict:
+    def player_career_stats(self, player_id: str) -> dict:
         """
         This returns the career stats for a player as well as player information.
 
@@ -28,6 +28,16 @@ class Stats:
         :return: dict
         """
         return self.client.get(resource=f"player/{player_id}/landing").json()
+
+    def player_game_log(self, player_id: str, season_id: str, game_type: int) -> List[dict]:
+        """
+        Returns the game log, for the given player, for the given season and game type.
+        :param game_type: 1 is for preseason, 2 is for regular season, 3 is for playoffs.
+        :param season_id: Season format of "20222023", "20232024", etc.
+        :param player_id:
+        :return:
+        """
+        return self.client.get(resource=f"player/{player_id}/game-log/{season_id}/{game_type}").json()["gameLog"]
 
     def team_summary(
         self,
@@ -95,7 +105,7 @@ class Stats:
         self,
         start_season: str,
         end_season: str,
-        franchise_id: int = None,
+        franchise_id: str = None,
         game_type_id: int = 2,
         aggregate: bool = False,
         sort_expr: List[dict] = None,
@@ -109,7 +119,7 @@ class Stats:
                  c.stats.skater_stats_summary(franchise_id=10, start_season="20232024", end_season="20232024")
         :param start_season: Season id, in format 20202021, 20212022, etc, that will be the start of the range.
         :param end_season: Season id for the end range.
-        :param franchise_id: The ID of the franchise.  Not to be confused with team_id found on other endpoints.
+        :param franchise_id: String, The ID of the franchise.  Not to be confused with team_id found on other endpoints.
             This seems to be specific to the /stats apis.
         :param game_type_id: 2 is for regular season, 3 is for playoffs.  I think 1 is for preseason.
         :param aggregate: If doing multiple years, you can choose to aggreate the date per player, or have separate

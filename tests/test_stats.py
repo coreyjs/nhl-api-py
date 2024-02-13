@@ -103,3 +103,17 @@ def test_skater_stats_summary_franchise(h_m, nhl_client):
         "%3A%20%22playerId%22%2C%20%22direction%22%3A%20%22ASC%22%7D%5D",
         "cayenneExp": "franchiseId=19 and gameTypeId=2 and seasonId<=20232024 and seasonId>=20232024",
     }
+
+
+@mock.patch("httpx.get")
+def test_player_game_log(h_m, nhl_client):
+    nhl_client.stats.player_game_log(player_id="8481528", season_id="20232024", game_type=2)
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/player/8481528/game-log/20232024/2"
+
+
+@mock.patch("httpx.get")
+def test_player_game_log_playoffs(h_m, nhl_client):
+    nhl_client.stats.player_game_log(player_id="8481528", season_id="20232024", game_type=3)
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/player/8481528/game-log/20232024/3"
