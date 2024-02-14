@@ -2,7 +2,7 @@ import urllib.parse
 import json
 from typing import List
 
-
+from nhlpy.api.query.builder import QueryContext
 from nhlpy.http_client import HttpClient
 
 
@@ -163,9 +163,10 @@ class Stats:
             "data"
         ]
 
-    def skater_stats_summary_by_expression(
+    def skater_stats_with_query_context(
         self,
-        cayenne_exp: str,
+        query_context: QueryContext,
+        report_type: str,
         sort_expr: List[dict],
         aggregate: bool = False,
         start: int = 0,
@@ -173,8 +174,6 @@ class Stats:
         fact_cayenne_exp: str = "gamesPlayed>=1",
     ) -> dict:
         """
-        A more bare bones / raw version of skater_stats_summary.  This allows for more flexibility in the query params.
-        You must supply your own cayenne expressions and sort expressions.
 
         example:
             sort_expr = [
@@ -185,6 +184,10 @@ class Stats:
             cayenne_exp = "gameTypeId=2 and seasonId<=20232024 and seasonId>=20232024"
             client.stats.skater_stats_summary_by_expression(cayenne_exp=expr, sort_expr=sort_expr)
 
+        :param report_type: summary, bios,  faceoffpercentages, faceoffwins, goalsForAgainst, realtime, penalties,
+            penaltykill, penaltyShots, powerplay, puckPossessions, summaryshooting, percentages, scoringRates,
+            scoringpergame, shootout, shottype, timeonice
+        :param query_context:
         :param aggregate: bool - If doing multiple years, you can choose to aggreate the date per player,
             or have separate entries for each one.
         :param sort_expr: A list of key/value pairs for sort criteria.  As used in skater_stats_summary(), this is
@@ -197,7 +200,6 @@ class Stats:
         :param start:
         :param limit:
         :param fact_cayenne_exp:
-        :param default_cayenne_exp:
         :return:
         """
         q_params = {
@@ -208,5 +210,7 @@ class Stats:
             "factCayenneExp": fact_cayenne_exp,
         }
         q_params["sort"] = urllib.parse.quote(json.dumps(sort_expr))
-        q_params["cayenneExp"] = cayenne_exp
-        return self.client.get_by_url("https://api.nhle.com/stats/rest/en/skater/summary", query_params=q_params).json()
+        q_params["cayenneExp"] = query_context.query_str
+        return self.client.get_by_url(
+            f"https://api.nhle.com/stats/rest/en/skater/{report_type}", query_params=q_params
+        ).json()

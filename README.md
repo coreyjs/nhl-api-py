@@ -49,21 +49,76 @@ client.stats.team_summary(start_season="20202021", end_season="20212022")
 # Queries for skaters for year ranges, filterable down by franchise.
 client.stats.skater_stats_summary(start_season="20232024", end_season="20232024")
 client.stats.skater_stats_summary(franchise_id=10, start_season="20232024", end_season="20232024")
+```
 
- # skater_stats_summary_by_expression is more advanced method.  It allows for more direct manipulation of the query and
- # the cayenne expression clauses.
- sort_expr = [
+### Stats with QueryBuilder
+
+The skater stats endpoint can be accessed using the new query builder.  It should make
+creating and understanding the queries a bit easier.  Filters are being added as I go.
+
+The following report types are available.  These are used to build the request url.  So `/summary`, `/bios`, etc.
+
+```bash
+summary
+bios
+faceoffpercentages
+faceoffwins
+goalsForAgainst
+realtime
+penaltie
+penaltykill
+penaltyShots
+powerplay
+puckPossessions
+summaryshooting
+percentages
+scoringRates
+scoringpergame
+shootout
+shottype
+timeonice
+```
+
+### Available Filters
+
+- Draft Year and Round
+- Season Ranges
+- Game Type (1=pre, 2=regular, 3=playoffs)
+- Shoots/Catches (L, R)
+- Franchise
+- Position
+
+```python
+from nhlpy.api.query.builder import QueryBuilder, QueryContext
+from nhlpy.nhl_client import NHLClient
+from nhlpy.api.query.filters.draft import DraftQuery
+from nhlpy.api.query.filters.season import SeasonQuery
+from nhlpy.api.query.filters.game_type import GameTypeQuery
+from nhlpy.api.query.filters.position import PositionQuery, PositionTypes
+
+client = NHLClient(verbose=True)
+
+sort_expr = [
                 {"property": "points", "direction": "DESC"},
                 {"property": "gamesPlayed", "direction": "ASC"},
                 {"property": "playerId", "direction": "ASC"},
             ]
-expr = "gameTypeId=2 and seasonId<=20232024 and seasonId>=20222023"
-client.stats.skater_stats_summary_by_expression(default_cayenne_exp=expr, sort_expr=sort_expr)
+filters = [
+    GameTypeQuery(game_type="2"),
+    DraftQuery(year="2020", draft_round="2"),
+    SeasonQuery(season_start="20202021", season_end="20232024"),
+    PositionQuery(position=PositionTypes.ALL_FORWARDS)
+]
 
-###
+query_builder = QueryBuilder()
+query_context: QueryContext = query_builder.build(filters=filters)
 
+client.stats.skater_stats_with_query_context(
+    query_context=query_context,
+    sort_expr=sort_expr,
+    aggregate=True
+)
 ```
-
 
 ### Schedule Endpoints
 
