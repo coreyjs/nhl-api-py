@@ -68,6 +68,6 @@ def test_all_forwards_playoffs_season_query():
     assert (
         context.query_str
         == "gameTypeId=3 and seasonId >= 20222023 and seasonId <= 20222023 and (positionCode='L' or positionCode='R' "
-           "or positionCode='C')"
+        "or positionCode='C')"
     )
     assert len(context.filters) == 3
