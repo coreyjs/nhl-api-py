@@ -42,6 +42,16 @@ The skater stats endpoint can be accessed using the new query builder.  It shoul
 creating and understanding the queries a bit easier.  Filters are being added as I go, and will match up
 to what the NHL API will allow.
 
+The idea is to easily, and programatically, build up more complex queries using the query filters.  A quick example below:
+```python
+filters = [
+    GameTypeQuery(game_type="2"),
+    DraftQuery(year="2020", draft_round="2"),
+    SeasonQuery(season_start="20202021", season_end="20232024"),
+    PositionQuery(position=PositionTypes.ALL_FORWARDS)
+]
+```
+
 
 
 ### Sorting
