@@ -1,4 +1,5 @@
 from nhlpy.api.query.builder import QueryBuilder, QueryContext
+from nhlpy.api.query.filters.decision import DecisionQuery
 from nhlpy.api.query.filters.draft import DraftQuery
 from nhlpy.api.query.filters.game_type import GameTypeQuery
 from nhlpy.api.query.filters.position import PositionQuery, PositionTypes
@@ -71,3 +72,22 @@ def test_all_forwards_playoffs_season_query():
         "or positionCode='C')"
     )
     assert len(context.filters) == 3
+
+
+def test_query_with_invalid_filter_mixed_in():
+    qb = QueryBuilder(verbose=True)
+    filters = [
+        GameTypeQuery(game_type="3"),
+        SeasonQuery(season_start="20222023", season_end="20222023"),
+        PositionQuery(position=PositionTypes.ALL_FORWARDS),
+        DecisionQuery(decision="Win"),
+    ]
+    context: QueryContext = qb.build(filters=filters)
+
+    assert context.is_valid() is False
+
+    assert (
+        context.query_str
+        == "gameTypeId=3 and seasonId >= 20222023 and seasonId <= 20222023 and (positionCode='L' or positionCode='R' "
+        "or positionCode='C')"
+    )

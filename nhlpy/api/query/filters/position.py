@@ -1,3 +1,4 @@
+from typing import Union
 from enum import Enum
 
 from nhlpy.api.query.builder import QueryBase
@@ -26,3 +27,6 @@ class PositionQuery(QueryBase):
             )
 
         return f"{self._position_q}='{self.position.value}'"
+
+    def validate(self) -> Union[bool, None]:
+        return True

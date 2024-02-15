@@ -1,3 +1,5 @@
+from typing import Union
+
 from nhlpy.api.query.builder import QueryBase
 
 
@@ -12,3 +14,6 @@ class ShootCatchesQuery(QueryBase):
 
     def to_query(self) -> str:
         return f"{self.shoot_catch_q}={self.shoot_catch}"
+
+    def validate(self) -> Union[bool, None]:
+        return True

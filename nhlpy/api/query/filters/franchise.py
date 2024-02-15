@@ -1,3 +1,5 @@
+from typing import Union
+
 from nhlpy.api.query.builder import QueryBase
 
 
@@ -8,3 +10,6 @@ class FranchiseQuery(QueryBase):
 
     def to_query(self) -> str:
         return f"{self._franchise_q}={self.franchise_id}"
+
+    def validate(self) -> Union[bool, None]:
+        return True

@@ -1,3 +1,5 @@
+from typing import Union
+
 from nhlpy.api.query.filters import QueryBase
 
 
@@ -15,3 +17,6 @@ class SeasonQuery(QueryBase):
         query += " and "
         query += f"{self._season_end_q} {self._season_end_q_exp} {self.season_end}"
         return query
+
+    def validate(self) -> Union[bool, None]:
+        return True

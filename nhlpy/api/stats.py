@@ -3,6 +3,7 @@ import json
 from typing import List
 
 from nhlpy.api.query.builder import QueryContext
+from nhlpy.api.query.sorting.sorting_options import SortingOptions
 from nhlpy.http_client import HttpClient
 
 
@@ -101,7 +102,7 @@ class Stats:
             "data"
         ]
 
-    def skater_stats_summary(
+    def skater_stats_summary_simple(
         self,
         start_season: str,
         end_season: str,
@@ -130,7 +131,7 @@ class Stats:
                 {"property": "gamesPlayed", "direction": "ASC"},
                 {"property": "playerId", "direction": "ASC"}
             ]
-        :param start: Possibly start of the retrived data, based on limit.
+        :param start: Possibly start of the retrieved data, based on limit.
         :param limit: How many to return.
         :param fact_cayenne_exp: An anchor expression almost, default criteria.  Only players with more than 1 game
             played.  I default this to gamesPlayed>=1, which is what the nhl.com site uses.  But you can play with it.
@@ -167,11 +168,10 @@ class Stats:
         self,
         query_context: QueryContext,
         report_type: str,
-        sort_expr: List[dict],
+        sort_expr: List[dict] = None,
         aggregate: bool = False,
         start: int = 0,
         limit: int = 70,
-        fact_cayenne_exp: str = "gamesPlayed>=1",
     ) -> dict:
         """
 
@@ -199,7 +199,6 @@ class Stats:
             ]
         :param start:
         :param limit:
-        :param fact_cayenne_exp:
         :return:
         """
         q_params = {
@@ -207,8 +206,12 @@ class Stats:
             "isGame": False,
             "start": start,
             "limit": limit,
-            "factCayenneExp": fact_cayenne_exp,
+            "factCayenneExp": query_context.fact_query,
         }
+
+        if not sort_expr:
+            sort_expr = SortingOptions.get_default_sorting_for_report(report_type)
+
         q_params["sort"] = urllib.parse.quote(json.dumps(sort_expr))
         q_params["cayenneExp"] = query_context.query_str
         return self.client.get_by_url(

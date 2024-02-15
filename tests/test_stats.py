@@ -71,7 +71,7 @@ def team_test_summary_year_range_playoffs(h_m, nhl_client):
 
 @mock.patch("httpx.get")
 def test_skater_stats_summary(h_m, nhl_client):
-    nhl_client.stats.skater_stats_summary(start_season="20232024", end_season="20232024")
+    nhl_client.stats.skater_stats_summary_simple(start_season="20232024", end_season="20232024")
     h_m.assert_called_once()
     assert h_m.call_args[1]["url"] == "https://api.nhle.com/stats/rest/en/skater/summary"
     assert h_m.call_args[1]["params"] == {
@@ -89,7 +89,7 @@ def test_skater_stats_summary(h_m, nhl_client):
 
 @mock.patch("httpx.get")
 def test_skater_stats_summary_franchise(h_m, nhl_client):
-    nhl_client.stats.skater_stats_summary(start_season="20232024", end_season="20232024", franchise_id=19)
+    nhl_client.stats.skater_stats_summary_simple(start_season="20232024", end_season="20232024", franchise_id=19)
     h_m.assert_called_once()
     assert h_m.call_args[1]["url"] == "https://api.nhle.com/stats/rest/en/skater/summary"
     assert h_m.call_args[1]["params"] == {

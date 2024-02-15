@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from nhlpy.api.query.filters import QueryBase
 
@@ -22,3 +22,6 @@ class DraftQuery(QueryBase):
             query += " and "
             query += f"{self._round_q}={self.round}"
         return query
+
+    def validate(self) -> Union[bool, None]:
+        return True
