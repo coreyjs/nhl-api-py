@@ -1,5 +1,6 @@
 from nhlpy.api import teams, standings, schedule, game_center, stats, misc
 from nhlpy.http_client import HttpClient
+from nhlpy.async_http_client import AsyncHttpClient
 from nhlpy.config import ClientConfig
 
 
@@ -26,3 +27,11 @@ class NHLClient:
         self.game_center = game_center.GameCenter(http_client=self._http_client)
         self.stats = stats.Stats(http_client=self._http_client)
         self.misc = misc.Misc(http_client=self._http_client)
+
+
+class AsyncNHLClient:
+    def __init__(self, verbose: bool = False) -> None:
+        self._config = ClientConfig(verbose=verbose)
+        self._http_client = AsyncHttpClient(self._config)
+
+        self.stats = stats.Stats(http_client=self._http_client)
