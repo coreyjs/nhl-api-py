@@ -1,21 +1,21 @@
 from unittest import mock
 
 
-@mock.patch("httpx.get")
+@mock.patch("httpx.Client.get")
 def test_stats_season(h_m, nhl_client):
     nhl_client.stats.club_stats_season(team_abbr="BUF")
     h_m.assert_called_once()
     assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/club-stats-season/BUF"
 
 
-@mock.patch("httpx.get")
+@mock.patch("httpx.Client.get")
 def test_player_career_stats(h_m, nhl_client):
     nhl_client.stats.player_career_stats(player_id=8481528)
     h_m.assert_called_once()
     assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/player/8481528/landing"
 
 
-@mock.patch("httpx.get")
+@mock.patch("httpx.Client.get")
 def test_team_summary_single_year(h_m, nhl_client):
     nhl_client.stats.team_summary(start_season="20232024", end_season="20232024")
     h_m.assert_called_once()
@@ -33,7 +33,7 @@ def test_team_summary_single_year(h_m, nhl_client):
     }
 
 
-@mock.patch("httpx.get")
+@mock.patch("httpx.Client.get")
 def team_test_summary_year_range(h_m, nhl_client):
     nhl_client.stats.team_summary(start_season="20202021", end_season="20232024")
     h_m.assert_called_once()
@@ -51,7 +51,7 @@ def team_test_summary_year_range(h_m, nhl_client):
     }
 
 
-@mock.patch("httpx.get")
+@mock.patch("httpx.Client.get")
 def team_test_summary_year_range_playoffs(h_m, nhl_client):
     nhl_client.stats.team_summary(start_season="20182019", end_season="20222023", game_type_id=3)
     h_m.assert_called_once()
@@ -69,7 +69,7 @@ def team_test_summary_year_range_playoffs(h_m, nhl_client):
     }
 
 
-@mock.patch("httpx.get")
+@mock.patch("httpx.Client.get")
 def test_skater_stats_summary(h_m, nhl_client):
     nhl_client.stats.skater_stats_summary_simple(start_season="20232024", end_season="20232024")
     h_m.assert_called_once()
@@ -87,7 +87,7 @@ def test_skater_stats_summary(h_m, nhl_client):
     }
 
 
-@mock.patch("httpx.get")
+@mock.patch("httpx.Client.get")
 def test_skater_stats_summary_franchise(h_m, nhl_client):
     nhl_client.stats.skater_stats_summary_simple(start_season="20232024", end_season="20232024", franchise_id=19)
     h_m.assert_called_once()
@@ -105,14 +105,14 @@ def test_skater_stats_summary_franchise(h_m, nhl_client):
     }
 
 
-@mock.patch("httpx.get")
+@mock.patch("httpx.Client.get")
 def test_player_game_log(h_m, nhl_client):
     nhl_client.stats.player_game_log(player_id="8481528", season_id="20232024", game_type=2)
     h_m.assert_called_once()
     assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/player/8481528/game-log/20232024/2"
 
 
-@mock.patch("httpx.get")
+@mock.patch("httpx.Client.get")
 def test_player_game_log_playoffs(h_m, nhl_client):
     nhl_client.stats.player_game_log(player_id="8481528", season_id="20232024", game_type=3)
     h_m.assert_called_once()
