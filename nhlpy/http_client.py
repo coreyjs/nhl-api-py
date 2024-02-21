@@ -14,9 +14,10 @@ class HttpClient:
         :param resource:
         :return:
         """
-        r: httpx.request = httpx.get(
-            url=f"{self._config.api_web_base_url}{self._config.api_web_api_ver}{resource}", follow_redirects=True
-        )
+        with httpx.Client(
+            verify=self._config.ssl_verify, timeout=self._config.timeout, follow_redirects=self._config.follow_redirects
+        ) as client:
+            r: httpx.request = client.get(url=f"{self._config.api_web_base_url}{self._config.api_web_api_ver}{resource}")
 
         if self._config.verbose:
             logging.info(f"API URL: {r.url}")
@@ -30,7 +31,10 @@ class HttpClient:
         :param full_resource:  The full resource to get.
         :return:
         """
-        r: httpx.request = httpx.get(url=full_resource, params=query_params, follow_redirects=True)
+        with httpx.Client(
+            verify=self._config.ssl_verify, timeout=self._config.timeout, follow_redirects=self._config.follow_redirects
+        ) as client:
+            r: httpx.request = client.get(url=full_resource, params=query_params)
 
         if self._config.verbose:
             logging.info(f"API URL: {r.url}")

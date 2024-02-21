@@ -32,8 +32,10 @@ Im available on [Bluesky](https://bsky.app/profile/coreyjs.dev) for any question
 from nhlpy import NHLClient
 
 client = NHLClient()
-# OR
-client = NHLClient(verbose=True) # a tad more logging such as the URL being called
+# Fore more verbose logging
+client = NHLClient(verbose=True)
+# OR Other available configurations:
+client = NHLClient(verbose={bool}, timeout={int}, ssl_verify={bool}, follow_redirects={bool})
 ```
 ---
 ## Stats with QueryBuilder
