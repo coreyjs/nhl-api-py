@@ -10,7 +10,7 @@ class HttpClient:
 
     def get(self, resource: str) -> httpx.request:
         """
-        Private method to make a get request to the NHL API.  This wraps the lib httpx functionality.
+        Method to make a get request to the NHL API.  This wraps the lib httpx functionality.
         :param resource:
         :return:
         """
