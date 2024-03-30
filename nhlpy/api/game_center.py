@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from nhlpy.http_client import HttpClient
 
 
@@ -43,3 +43,18 @@ class GameCenter:
         :return: dict
         """
         return self.client.get(resource=f"score/{date if date else 'now'}").json()
+
+    def shift_chart_data(self, game_id: str, excludes: List[str] = None) -> dict:
+        """
+        Get shift chart data for the game_id.  GameIds can be retrieved from the schedule endpoint.
+        :param excludes:
+        :param game_id: The game_id for the game you want the shift chart data for.
+        :return: dict gameId=2023021148 and ((duration != '00:00' and typeCode = 517) or typeCode != 517 )
+        """
+        if not excludes:
+            excludes = ["eventDetails"]
+
+        exclude_p = ",".join(excludes)
+        base_url: str = "https://api.nhle.com/stats/rest/en/shiftcharts"
+        expr_p: str = f"gameId={game_id} and ((duration != '00:00' and typeCode = 517) or typeCode != 517 )"
+        return self.client.get_by_url(full_resource=f"{base_url}?cayenneExp={expr_p}&exclude={exclude_p}").json()
