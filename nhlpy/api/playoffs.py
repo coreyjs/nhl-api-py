@@ -1,14 +1,13 @@
 from nhlpy.http_client import HttpClient
 
 
-class Playoff:
+class Playoffs:
     def __init__(self, http_client: HttpClient):
         self.client = http_client
 
     def carousel(self, season: str) -> dict:
         """
-        Get the list of all series games. Currently only
-        shows Round 1 games
+        Get the list of all series games up to the current round.
 
         :param season: the current season ex. "20232024"
 
@@ -23,7 +22,7 @@ class Playoff:
         """
         Returns the schedule for a specified series.
 
-        :param season: the the season you wish to see the schedule of
+        :param season: the season you wish to see the schedule of
         :param series: the series (a-h) for Round 1
 
         example:
