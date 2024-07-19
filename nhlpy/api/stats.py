@@ -217,3 +217,39 @@ class Stats:
         return self.client.get_by_url(
             f"https://api.nhle.com/stats/rest/en/skater/{report_type}", query_params=q_params
         ).json()
+
+    def goalie_stats_summary_simple(
+        self,
+        start_season: str,
+        end_season: str,
+        game_type_id: int = 2,
+        aggregate: bool = False,
+        sort_expr: List[dict] = None,
+        start: int = 0,
+        limit: int = 70,
+        fact_cayenne_exp: str = "gamesPlayed>=1",
+        default_cayenne_exp: str = None,
+    ) -> List[dict]:
+        q_params = {
+            "isAggregate": aggregate,
+            "isGame": False,
+            "start": start,
+            "limit": limit,
+            "factCayenneExp": fact_cayenne_exp,
+        }
+
+        if not sort_expr:
+            sort_expr = [
+                {"property": "wins", "direction": "DESC"},
+                {"property": "gamesPlayed", "direction": "ASC"},
+                {"property": "playerId", "direction": "ASC"},
+            ]
+        q_params["sort"] = urllib.parse.quote(json.dumps(sort_expr))
+
+        if not default_cayenne_exp:
+            default_cayenne_exp = f"gameTypeId={game_type_id} and seasonId<={end_season} and seasonId>={start_season}"
+        q_params["cayenneExp"] = default_cayenne_exp
+
+        return self.client.get_by_url("https://api.nhle.com/stats/rest/en/goalie/summary", query_params=q_params).json()[
+            "data"
+        ]
