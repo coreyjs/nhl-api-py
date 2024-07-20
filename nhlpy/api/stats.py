@@ -221,15 +221,30 @@ class Stats:
     def goalie_stats_summary_simple(
         self,
         start_season: str,
-        end_season: str,
+        end_season: str = None,
+        stats_type: str = "summary",
         game_type_id: int = 2,
         aggregate: bool = False,
         sort_expr: List[dict] = None,
         start: int = 0,
         limit: int = 70,
-        fact_cayenne_exp: str = "gamesPlayed>=1",
+        fact_cayenne_exp: str = None,
         default_cayenne_exp: str = None,
     ) -> List[dict]:
+        """
+        Simple endpoint to retrieve goalie stats.  Types of status are derived via the stats_type parameter.
+        :param start_season:
+        :param end_season:
+        :param stats_type: summary, advanced, bios, daysrest, penaltyShots, savesByStrength, shootout, startedVsRelieved
+        :param game_type_id:
+        :param aggregate:
+        :param sort_expr:
+        :param start:
+        :param limit:
+        :param fact_cayenne_exp:
+        :param default_cayenne_exp:
+        :return:
+        """
         q_params = {
             "isAggregate": aggregate,
             "isGame": False,
@@ -237,6 +252,9 @@ class Stats:
             "limit": limit,
             "factCayenneExp": fact_cayenne_exp,
         }
+
+        if end_season is None:
+            end_season = start_season
 
         if not sort_expr:
             sort_expr = [
@@ -250,6 +268,6 @@ class Stats:
             default_cayenne_exp = f"gameTypeId={game_type_id} and seasonId<={end_season} and seasonId>={start_season}"
         q_params["cayenneExp"] = default_cayenne_exp
 
-        return self.client.get_by_url("https://api.nhle.com/stats/rest/en/goalie/summary", query_params=q_params).json()[
-            "data"
-        ]
+        return self.client.get_by_url(
+            f"https://api.nhle.com/stats/rest/en/goalie/{stats_type}", query_params=q_params
+        ).json()["data"]
