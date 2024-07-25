@@ -11,6 +11,63 @@ class Stats:
     def __init__(self, http_client: HttpClient):
         self.client = http_client
 
+    def _goalie_stats_sorts(self, report: str) -> List[dict]:
+        """
+        This is default criteria for sorting on goalie stats.  I hate this method.  Ill fix it soon.
+        :param report:
+        :return:
+        """
+        if report == "summary":
+            return [
+                {"property": "wins", "direction": "DESC"},
+                {"property": "gamesPlayed", "direction": "ASC"},
+                {"property": "playerId", "direction": "ASC"},
+            ]
+        elif report == "advanced":
+            return [
+                {"property": "qualityStart", "direction": "DESC"},
+                {"property": "goalsAgainstAverage", "direction": "ASC"},
+                {"property": "playerId", "direction": "ASC"},
+            ]
+        elif report == "bios":
+            return [
+                {"property": "lastName", "direction": "ASC_CI"},
+                {"property": "goalieFullName", "direction": "ASC_CI"},
+                {"property": "playerId", "direction": "ASC"},
+            ]
+        elif report == "daysrest":
+            return [
+                {"property": "wins", "direction": "DESC"},
+                {"property": "savePct", "direction": "DESC"},
+                {"property": "playerId", "direction": "ASC"},
+            ]
+        elif report == "penaltyShots":
+            return [
+                {"property": "penaltyShotsSaves", "direction": "DESC"},
+                {"property": "penaltyShotSavePct", "direction": "DESC"},
+                {"property": "playerId", "direction": "ASC"},
+            ]
+        elif report == "savesByStrength":
+            return [
+                {"property": "wins", "direction": "DESC"},
+                {"property": "savePct", "direction": "DESC"},
+                {"property": "playerId", "direction": "ASC"},
+            ]
+        elif report == "shootout":
+            return [
+                {"property": "shootoutWins", "direction": "DESC"},
+                {"property": "shootoutSavePct", "direction": "DESC"},
+                {"property": "playerId", "direction": "ASC"},
+            ]
+        elif report == "startedVsRelieved":
+            return [
+                {"property": "gamesStarted", "direction": "DESC"},
+                {"property": "gamesStartedSavePct", "direction": "DESC"},
+                {"property": "playerId", "direction": "ASC"},
+            ]
+        else:
+            return [{}]
+
     def club_stats_season(self, team_abbr: str) -> dict:
         """
         This seems to return gameTypes for every season the team was in existence.  Maybe its useful?
@@ -217,3 +274,60 @@ class Stats:
         return self.client.get_by_url(
             f"https://api.nhle.com/stats/rest/en/skater/{report_type}", query_params=q_params
         ).json()
+
+    def goalie_stats_summary_simple(
+        self,
+        start_season: str,
+        end_season: str = None,
+        stats_type: str = "summary",
+        game_type_id: int = 2,
+        franchise_id: str = None,
+        aggregate: bool = False,
+        sort_expr: List[dict] = None,
+        start: int = 0,
+        limit: int = 70,
+        fact_cayenne_exp: str = None,
+        default_cayenne_exp: str = None,
+    ) -> List[dict]:
+        """
+        Simple endpoint to retrieve goalie stats.  Types of status are derived via the stats_type parameter.
+        :param start_season: Season id, in string format 20202021, 20212022, etc, that will be the start of the range.
+        :param end_season: Optional, Season id for the end range.  If not provided, it will default to start_season.
+        :param stats_type: summary, advanced, bios, daysrest, penaltyShots, savesByStrength, shootout, startedVsRelieved
+        :param game_type_id: 2 is for regular season, 3 is for playoffs.  I think 1 is for preseason.
+        :param franchise_id: Optional, the franchise id to filter by.
+        :param aggregate: bool - If doing multiple years, you can choose to aggreate the date per player,
+        :param sort_expr: A list of key/value pairs for sort criteria.  This is defaulting to what is used on the EDGE
+            stats site, but I think it works with any properties returned in the payload.
+        :param start:
+        :param limit:
+        :param fact_cayenne_exp:
+        :param default_cayenne_exp:
+        :return:
+        """
+        q_params = {
+            "isAggregate": aggregate,
+            "isGame": False,
+            "start": start,
+            "limit": limit,
+            "factCayenneExp": fact_cayenne_exp,
+        }
+
+        if end_season is None:
+            end_season = start_season
+
+        if not sort_expr:
+            sort_expr = self._goalie_stats_sorts(stats_type)
+        q_params["sort"] = urllib.parse.quote(json.dumps(sort_expr))
+
+        if not default_cayenne_exp:
+            default_cayenne_exp = f"gameTypeId={game_type_id} and seasonId<={end_season} and seasonId>={start_season}"
+
+        if franchise_id:
+            default_cayenne_exp = f"franchiseId={franchise_id} and {default_cayenne_exp}"
+
+        q_params["cayenneExp"] = default_cayenne_exp
+
+        return self.client.get_by_url(
+            f"https://api.nhle.com/stats/rest/en/goalie/{stats_type}", query_params=q_params
+        ).json()["data"]
