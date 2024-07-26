@@ -12,14 +12,22 @@ packages = [{include = "nhlpy"}]
 license = "GPL-3.0-or-later"
 homepage = "https://github.com/coreyjs/nhl-api-py"
 repository = "https://github.com/coreyjs/nhl-api-py"
-keywords = ["nhl", "api", "wrapper", "hockey", "sports"]
+keywords = ["nhl", "api", "wrapper", "hockey", "sports", "edge", "edge stats", "edge analytics", "edge sports",
+    "edge hockey", "edge nhl", "edge nhl stats", "edge nhl analytics", "edge nhl sports", "edge nhl hockey",
+    "edge nhl data", "edge nhl data analytics", "edge nhl data stats", "edge nhl data sports", "edge nhl data hockey",
+    "edge nhl data stats analytics", "edge nhl data stats sports", "edge nhl data stats hockey", "hockey ai", "hockey machine learning", "nhl ML", "nhl AI",
+    "nhl machine learning", "nhl stats", "nhl analytics", "nhl sports", "nhl hockey", "nhl nhl", "nhl nhl stats", "nhl nhl analytics", "nhl nhl sports",
+    "edge nhl data hockey stats"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: Libraries",
