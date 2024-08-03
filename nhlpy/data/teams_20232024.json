@@ -31,6 +31,7 @@
     { "id": "23", "abbreviation": "VAN", "name": "Vancouver Canucks" },
     { "id": "54", "abbreviation": "VGK", "name": "Vegas Golden Knights" },
     { "id": "15", "abbreviation": "WSH", "name": "Washington Capitals" },
-    { "id": "52", "abbreviation": "WPG", "name": "Winnipeg Jets" }
+    { "id": "52", "abbreviation": "WPG", "name": "Winnipeg Jets" },
+    { "id": "40", "abbreviation": "UTA", "name": "Utah Hockey Club"}
   ]
 }

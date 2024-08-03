@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "nhl-api-py"
-version = "2.7.1"
+version = "2.8.0"
 description = "NHL API (Updated for 2024/2025) and EDGE Stats.  For standings, team stats, outcomes, player information.  Contains each individual API endpoint as well as convience methods as well as pythonic query builder for more indepth EDGE stats."
 authors = ["Corey Schaf <cschaf@gmail.com>"]
 readme = "README.md"
