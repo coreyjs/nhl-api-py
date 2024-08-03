@@ -233,7 +233,13 @@
 			"fullName": "Seattle Kraken",
 			"teamCommonName": "Kraken",
 			"teamPlaceName": "Seattle"
+		},
+		{
+			"id": 40,
+			"fullName": "Utah Hockey Club",
+			"teamCommonName": "Hockey Club",
+			"teamPlaceName": "Utah"
 		}
 	],
-	"total": 39
+	"total": 40
 }
