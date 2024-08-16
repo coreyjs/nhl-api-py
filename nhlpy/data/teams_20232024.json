@@ -24,7 +24,7 @@
     { "id": "4", "abbreviation": "PHI", "name": "Philadelphia Flyers" },
     { "id": "5", "abbreviation": "PIT", "name": "Pittsburgh Penguins" },
     { "id": "28", "abbreviation": "SJS", "name": "San Jose Sharks" },
-    { "id": "55", "abbreviation": "SEA", "name":  "Seattle Kraken"},
+    { "id": "55", "abbreviation": "SEA", "name": "Seattle Kraken"},
     { "id": "19", "abbreviation": "STL", "name": "St. Louis Blues" },
     { "id": "14", "abbreviation": "TBL", "name": "Tampa Bay Lightning" },
     { "id": "10", "abbreviation": "TOR", "name": "Toronto Maple Leafs" },
