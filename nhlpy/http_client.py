@@ -7,6 +7,8 @@ class HttpClient:
         self._config = config
         if self._config.verbose:
             logging.basicConfig(level=logging.INFO)
+        else:
+            logging.basicConfig(level=logging.WARNING)
 
     def get(self, resource: str) -> httpx.request:
         """
