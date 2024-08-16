@@ -18,6 +18,18 @@ class Teams:
         """
         data_resource = importlib.resources.files("nhlpy") / "data"
         teams_info = json.loads((data_resource / "teams_20232024.json").read_text())["teams"]
+
+        # We also need to get "franchise_id", which is different than team_id.  This is used in the stats.
+        franchises = self.all_franchises()
+        for f in franchises:
+            for team in teams_info:
+                if "Canadiens" in f["fullName"] and "Canadiens" in team["name"]:
+                    team["franchise_id"] = f["id"]
+                    continue
+
+                if f["fullName"] == team["name"]:
+                    team["franchise_id"] = f["id"]
+
         return teams_info
 
     def roster(self, team_abbr: str, season: str) -> dict:
