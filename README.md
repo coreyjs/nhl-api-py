@@ -28,6 +28,11 @@ Im available on [Bluesky](https://bsky.app/profile/coreyjs.dev) for any question
 
 
 # Usage
+
+```bash
+pip install nhl-api-py
+```
+
 ```python
 from nhlpy import NHLClient
 
