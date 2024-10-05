@@ -1,7 +1,7 @@
 [![PyPI version](https://badge.fury.io/py/nhl-api-py.svg)](https://badge.fury.io/py/nhl-api-py)
 ![nhl-api-py workflow](https://github.com/coreyjs/nhl-api-py/actions/workflows/python-app.yml/badge.svg?branch=main)
 
-# NHL-API-PY
+# NHL API & NHL Edge Stats
 
 
 ## About
@@ -15,8 +15,9 @@ projects around the NHL and the NHL data sets.  Special thanks to https://github
 
 ### Developer Note: This is being updated with the new, also undocumented, NHL API.  
 
-More endpoints will be flushed out and completed as they
-are discovered. If you find any, open a ticket or post in the discussions tab.   I would love to hear more.
+As of 10/5/24 I seem to have a majority of the endpoints added from what I can tell, but every once and awhile I come across one that needs to be added/changed.  These will most likely be a minor ver bump.
+
+If you find any, open a ticket or post in the discussions tab.   I would love to hear more.
 
 
 ---
