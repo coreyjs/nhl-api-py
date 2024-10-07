@@ -1,3 +1,3 @@
 # Should this be driven by the main pyproject.toml file? yes, is it super convoluted? yes, can it wait? sure
 
-__version__ = "2.10.1"
+__version__ = "2.10.2"
