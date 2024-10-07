@@ -234,6 +234,8 @@ client.stats.club_stats_season(team_abbr="BUF") # kinda weird endpoint.
 
 client.stats.player_career_stats(player_id="8478402")
 
+client.stats.player_game_log(player_id="", season_id="20242025", game_type="2")
+
 # Team Summary Stats.
 #   These have lots of available parameters.  You can also tap into the apache cayenne expressions to build custom
 #   queries, if you have that knowledge.
@@ -243,8 +245,15 @@ client.stats.team_summary(start_season="20202021", end_season="20212022")
 
 # Skater Summary Stats.
 #   Queries for skaters for year ranges, filterable down by franchise.
-client.stats.skater_stats_summary(start_season="20232024", end_season="20232024")
-client.stats.skater_stats_summary(franchise_id=10, start_season="20232024", end_season="20232024")
+client.stats.skater_stats_summary_simple(start_season="20232024", end_season="20232024")
+client.stats.skater_stats_summary_simple(franchise_id=10, start_season="20232024", end_season="20232024")
+
+# For the following query context endpoints, see the above section
+client.stats.skater_stats_with_query_context(...)
+
+# Goalies
+client.stats.goalie_stats_summary_simple(start_season="20242025", stats_type="summary")
+
 ```
 ---
 
