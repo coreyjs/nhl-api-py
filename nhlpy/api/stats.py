@@ -173,8 +173,8 @@ class Stats:
         default_cayenne_exp: str = None,
     ) -> List[dict]:
         """
-        Example: c.stats.skater_stats_summary(start_season="20232024", end_season="20232024")
-                 c.stats.skater_stats_summary(franchise_id=10, start_season="20232024", end_season="20232024")
+        Example: c.stats.skater_stats_summary_simple(start_season="20232024", end_season="20232024")
+                 c.stats.skater_stats_summary_simple(franchise_id=10, start_season="20232024", end_season="20232024")
         :param start_season: Season id, in format 20202021, 20212022, etc, that will be the start of the range.
         :param end_season: Season id for the end range.
         :param franchise_id: String, The ID of the franchise.  Not to be confused with team_id found on other endpoints.
