@@ -1,5 +1,7 @@
 from unittest import mock
 
+import pytest
+
 
 @mock.patch("httpx.Client.get")
 def test_get_schedule_with_date(h_m, nhl_client):
@@ -9,8 +11,28 @@ def test_get_schedule_with_date(h_m, nhl_client):
 
 
 @mock.patch("httpx.Client.get")
-def test_get_schedule_with_no_date(h_m, nhl_client):
-    nhl_client.schedule.get_schedule()
+def test_get_schedule_with_fixable_date(h_m, nhl_client):
+    nhl_client.schedule.get_schedule("2024-10-9")
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/schedule/2024-10-09"
+
+
+@mock.patch("httpx.Client.get")
+def test_get_schedule_will_error_with_bad_date(h_m, nhl_client):
+    with pytest.raises(ValueError):
+        nhl_client.schedule.get_schedule("2024-10-09-")
+
+
+@mock.patch("httpx.Client.get")
+def test_get_weekly_schedule_with_date(h_m, nhl_client):
+    nhl_client.schedule.get_weekly_schedule(date="2021-01-01")
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/schedule/2021-01-01"
+
+
+@mock.patch("httpx.Client.get")
+def test_get_weekly_schedule_with_no_date(h_m, nhl_client):
+    nhl_client.schedule.get_weekly_schedule()
     h_m.assert_called_once()
     assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/schedule/now"
 
