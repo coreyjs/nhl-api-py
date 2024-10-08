@@ -261,8 +261,12 @@ client.stats.goalie_stats_summary_simple(start_season="20242025", stats_type="su
 ## Schedule Endpoints
 
 ```python
+
+# Returns the games for the given date.
 client.schedule.get_schedule(date="2021-01-13")
-client.schedule.get_schedule()
+
+# Return games for the week of (date)
+client.schedule.get_weekly_schedule(date="2021-01-13")
 
 client.schedule.get_schedule_by_team_by_month(team_abbr="BUF")
 client.schedule.get_schedule_by_team_by_month(team_abbr="BUF", month="2021-01")
