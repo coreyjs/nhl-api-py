@@ -245,7 +245,7 @@ class Stats:
             penaltykill, penaltyShots, powerplay, puckPossessions, summaryshooting, percentages, scoringRates,
             scoringpergame, shootout, shottype, timeonice
         :param query_context:
-        :param aggregate: bool - If doing multiple years, you can choose to aggreate the date per player,
+        :param aggregate: bool - If doing multiple years, you can choose to aggregate the date per player,
             or have separate entries for each one.
         :param sort_expr: A list of key/value pairs for sort criteria.  As used in skater_stats_summary(), this is
             in the format:
@@ -269,7 +269,7 @@ class Stats:
         if not sort_expr:
             sort_expr = SortingOptions.get_default_sorting_for_report(report_type)
 
-        q_params["sort"] = urllib.parse.quote(json.dumps(sort_expr))
+        q_params["sort"] = json.dumps(sort_expr)
         q_params["cayenneExp"] = query_context.query_str
         return self.client.get_by_url(
             f"https://api.nhle.com/stats/rest/en/skater/{report_type}", query_params=q_params

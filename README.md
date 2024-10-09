@@ -373,3 +373,27 @@ $ ruff .
 $ black .
 
 ```
+
+
+#### Poetry version management
+```
+# View current version
+poetry version
+
+# Bump version
+poetry version patch  # 0.1.0 -> 0.1.1
+poetry version minor  # 0.1.0 -> 0.2.0
+poetry version major  # 0.1.0 -> 1.0.0
+
+# Set specific version
+poetry version 2.0.0
+
+# Set pre-release versions
+poetry version prepatch  # 0.1.0 -> 0.1.1-alpha.0
+poetry version preminor  # 0.1.0 -> 0.2.0-alpha.0
+poetry version premajor  # 0.1.0 -> 1.0.0-alpha.0
+
+# Specify pre-release identifier
+poetry version prerelease  # 0.1.0 -> 0.1.0-alpha.0
+poetry version prerelease beta  # 0.1.0-alpha.0 -> 0.1.0-beta.0
+```
