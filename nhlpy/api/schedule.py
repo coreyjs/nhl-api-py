@@ -25,6 +25,7 @@ class Schedule:
             "nextStartDate": schedule_data["nextStartDate"],
             "previousStartDate": schedule_data["previousStartDate"],
             "date": date,
+            "oddsPartners": schedule_data["oddsPartners"]
         }
 
         matching_day = next((day for day in schedule_data["gameWeek"] if day["date"] == date), None)
