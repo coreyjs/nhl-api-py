@@ -22,10 +22,10 @@ class Schedule:
 
         schedule_data: dict = self.client.get(resource=f"schedule/{date}").json()
         response_payload = {
-            "nextStartDate": schedule_data["nextStartDate"],
-            "previousStartDate": schedule_data["previousStartDate"],
+            "nextStartDate": schedule_data.get("nextStartDate", None),
+            "previousStartDate": schedule_data.get("previousStartDate", None),
             "date": date,
-            "oddsPartners": schedule_data["oddsPartners"],
+            "oddsPartners": schedule_data.get("oddsPartners", None),
         }
 
         matching_day = next((day for day in schedule_data["gameWeek"] if day["date"] == date), None)
