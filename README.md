@@ -128,7 +128,7 @@ filters = [
     ShootCatchesQuery(shoot_catch="L"),
     HomeRoadQuery(home_road="H"),
     FranchiseQuery(franchise_id="1"),
-    StatusQuery(is_active=True) #for active players OR for HOF players StatusQuery(is_hall_of_fame=True),
+    StatusQuery(is_active=True),#for active players OR for HOF players StatusQuery(is_hall_of_fame=True),
     OpponentQuery(opponent_franchise_id="2"),
     ExperienceQuery(is_rookie=True), # for rookies || ExperienceQuery(is_rookie=False) #for veteran
     DecisionQuery(decision="W") # OR DecisionQuery(decision="L") OR DecisionQuery(decision="O")

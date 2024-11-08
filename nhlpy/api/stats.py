@@ -3,6 +3,7 @@ import json
 from typing import List
 
 from nhlpy.api.query.builder import QueryContext
+from nhlpy.api.query.filters import _goalie_stats_sorts
 from nhlpy.api.query.sorting.sorting_options import SortingOptions
 from nhlpy.http_client import HttpClient
 
@@ -10,63 +11,6 @@ from nhlpy.http_client import HttpClient
 class Stats:
     def __init__(self, http_client: HttpClient):
         self.client = http_client
-
-    def _goalie_stats_sorts(self, report: str) -> List[dict]:
-        """
-        This is default criteria for sorting on goalie stats.  I hate this method.  Ill fix it soon.
-        :param report:
-        :return:
-        """
-        if report == "summary":
-            return [
-                {"property": "wins", "direction": "DESC"},
-                {"property": "gamesPlayed", "direction": "ASC"},
-                {"property": "playerId", "direction": "ASC"},
-            ]
-        elif report == "advanced":
-            return [
-                {"property": "qualityStart", "direction": "DESC"},
-                {"property": "goalsAgainstAverage", "direction": "ASC"},
-                {"property": "playerId", "direction": "ASC"},
-            ]
-        elif report == "bios":
-            return [
-                {"property": "lastName", "direction": "ASC_CI"},
-                {"property": "goalieFullName", "direction": "ASC_CI"},
-                {"property": "playerId", "direction": "ASC"},
-            ]
-        elif report == "daysrest":
-            return [
-                {"property": "wins", "direction": "DESC"},
-                {"property": "savePct", "direction": "DESC"},
-                {"property": "playerId", "direction": "ASC"},
-            ]
-        elif report == "penaltyShots":
-            return [
-                {"property": "penaltyShotsSaves", "direction": "DESC"},
-                {"property": "penaltyShotSavePct", "direction": "DESC"},
-                {"property": "playerId", "direction": "ASC"},
-            ]
-        elif report == "savesByStrength":
-            return [
-                {"property": "wins", "direction": "DESC"},
-                {"property": "savePct", "direction": "DESC"},
-                {"property": "playerId", "direction": "ASC"},
-            ]
-        elif report == "shootout":
-            return [
-                {"property": "shootoutWins", "direction": "DESC"},
-                {"property": "shootoutSavePct", "direction": "DESC"},
-                {"property": "playerId", "direction": "ASC"},
-            ]
-        elif report == "startedVsRelieved":
-            return [
-                {"property": "gamesStarted", "direction": "DESC"},
-                {"property": "gamesStartedSavePct", "direction": "DESC"},
-                {"property": "playerId", "direction": "ASC"},
-            ]
-        else:
-            return [{}]
 
     def club_stats_season(self, team_abbr: str) -> dict:
         """
@@ -317,7 +261,8 @@ class Stats:
             end_season = start_season
 
         if not sort_expr:
-            sort_expr = self._goalie_stats_sorts(stats_type)
+            sort_expr = _goalie_stats_sorts(report=stats_type)
+
         q_params["sort"] = urllib.parse.quote(json.dumps(sort_expr))
 
         if not default_cayenne_exp:

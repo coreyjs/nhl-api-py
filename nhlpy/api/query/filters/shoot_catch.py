@@ -13,7 +13,7 @@ class ShootCatchesQuery(QueryBase):
         self.shoot_catch_q = "shootsCatches"
 
     def to_query(self) -> str:
-        return f"{self.shoot_catch_q}={self.shoot_catch}"
+        return f"{self.shoot_catch_q}='{self.shoot_catch}'"
 
     def validate(self) -> Union[bool, None]:
         return True
