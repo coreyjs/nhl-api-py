@@ -80,9 +80,9 @@ def test_skater_stats_summary(h_m, nhl_client):
         "limit": 70,
         "start": 0,
         "factCayenneExp": "gamesPlayed>=1",
-        "sort": "%5B%7B%22property%22%3A%20%22points%22%2C%20%22direction%22%3A%20%22DESC%22%7D%2C%20%7B%22"
-        "property%22%3A%20%22gamesPlayed%22%2C%20%22direction%22%3A%20%22ASC%22%7D%2C%20%7B%22property%22"
-        "%3A%20%22playerId%22%2C%20%22direction%22%3A%20%22ASC%22%7D%5D",
+        "sort": '[{"property": "points", "direction": "DESC"}, {"property": '
+        '"gamesPlayed", "direction": "ASC"}, {"property": "playerId", '
+        '"direction": "ASC"}]',
         "cayenneExp": "gameTypeId=2 and seasonId<=20232024 and seasonId>=20232024",
     }
 
@@ -98,9 +98,9 @@ def test_skater_stats_summary_franchise(h_m, nhl_client):
         "limit": 70,
         "start": 0,
         "factCayenneExp": "gamesPlayed>=1",
-        "sort": "%5B%7B%22property%22%3A%20%22points%22%2C%20%22direction%22%3A%20%22DESC%22%7D%2C%20%7B%22"
-        "property%22%3A%20%22gamesPlayed%22%2C%20%22direction%22%3A%20%22ASC%22%7D%2C%20%7B%22property%22"
-        "%3A%20%22playerId%22%2C%20%22direction%22%3A%20%22ASC%22%7D%5D",
+        "sort": '[{"property": "points", "direction": "DESC"}, {"property": '
+        '"gamesPlayed", "direction": "ASC"}, {"property": "playerId", '
+        '"direction": "ASC"}]',
         "cayenneExp": "franchiseId=19 and gameTypeId=2 and seasonId<=20232024 and seasonId>=20232024",
     }
 

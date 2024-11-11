@@ -153,7 +153,7 @@ class Stats:
                 {"property": "gamesPlayed", "direction": "ASC"},
                 {"property": "playerId", "direction": "ASC"},
             ]
-        q_params["sort"] = urllib.parse.quote(json.dumps(sort_expr))
+        q_params["sort"] = json.dumps(sort_expr)
 
         if not default_cayenne_exp:
             default_cayenne_exp = f"gameTypeId={game_type_id} and seasonId<={end_season} and seasonId>={start_season}"
@@ -263,7 +263,7 @@ class Stats:
         if not sort_expr:
             sort_expr = _goalie_stats_sorts(report=stats_type)
 
-        q_params["sort"] = urllib.parse.quote(json.dumps(sort_expr))
+        q_params["sort"] = json.dumps(sort_expr)
 
         if not default_cayenne_exp:
             default_cayenne_exp = f"gameTypeId={game_type_id} and seasonId<={end_season} and seasonId>={start_season}"
