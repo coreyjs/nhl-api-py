@@ -40,7 +40,7 @@ class Stats:
         :return:
         """
         data = self.client.get(resource=f"player/{player_id}/game-log/{season_id}/{game_type}").json()
-        return data.get('gameLog', [])
+        return data.get("gameLog", [])
 
     def team_summary(
         self,
