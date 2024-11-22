@@ -69,6 +69,7 @@ class Schedule:
         :return:
         """
         resource = f"club-schedule/{team_abbr}/week/{date if date else 'now'}"
+
         return self.client.get(resource=resource).json()["games"]
 
     def get_season_schedule(self, team_abbr: str, season: str) -> dict:
@@ -79,7 +80,9 @@ class Schedule:
         :param season: Season in format YYYYYYYY.  20202021, 20212022, etc
         :return:
         """
-        return self.client.get(resource=f"club-schedule-season/{team_abbr}/{season}").json()
+        request = self.client.get(resource=f"club-schedule-season/{team_abbr}/{season}")
+
+        return request.json()
 
     def schedule_calendar(self, date: str) -> dict:
         """
