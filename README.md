@@ -234,7 +234,7 @@ client.stats.club_stats_season(team_abbr="BUF") # kinda weird endpoint.
 
 client.stats.player_career_stats(player_id="8478402")
 
-client.stats.player_game_log(player_id="", season_id="20242025", game_type="2")
+client.stats.player_game_log(player_id="8478402", season_id="20242025", game_type="2")
 
 # Team Summary Stats.
 #   These have lots of available parameters.  You can also tap into the apache cayenne expressions to build custom
