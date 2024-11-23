@@ -1,4 +1,3 @@
-import urllib.parse
 import json
 from typing import List
 
@@ -94,7 +93,7 @@ class Stats:
                 {"property": "wins", "direction": "DESC"},
                 {"property": "teamId", "direction": "ASC"},
             ]
-        q_params["sort"] = urllib.parse.quote(json.dumps(sort_expr))
+        q_params["sort"] = json.dumps(sort_expr)
 
         if not default_cayenne_exp:
             default_cayenne_exp = f"gameTypeId={game_type_id} and seasonId<={end_season} and seasonId>={start_season}"

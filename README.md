@@ -286,7 +286,7 @@ client.schedule.schedule_calendar(date="2023-11-23")
 ```python
 client.standings.get_standings()
 client.standings.get_standings(date="2021-01-13")
-client.standings.get_standings(season="202222023")
+client.standings.get_standings(season="20222023")
 
 # standings manifest.  This returns a ton of information for every season ever it seems like
 # This calls the API for this info, I also cache this in /data/seasonal_information_manifest.json
@@ -299,8 +299,6 @@ client.standings.season_standing_manifest()
 
 ```python
 client.teams.teams_info() # returns id + abbrevation + name of all teams
-
-client.teams.team_stats_summary(lang="en") # I honestly dont know. This is missing teams and has teams long abandoned.
 ```
 
 ---
@@ -372,6 +370,13 @@ $ pytest
 $ ruff .
 $ black .
 
+```
+
+
+### pypi test net
+```
+poetry build
+poetry publish -r test-pypi
 ```
 
 
