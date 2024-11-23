@@ -26,7 +26,8 @@ def test_team_summary_single_year(h_m, nhl_client):
         "limit": 50,
         "start": 0,
         "factCayenneExp": "gamesPlayed>1",
-        "sort": '[{"property": "points", "direction": "DESC"}, {"property": "wins", "direction": "DESC"}, {"property": "teamId", "direction": "ASC"}]',
+        "sort": '[{"property": "points", "direction": "DESC"}, {"property": "wins", "direction": "DESC"}, '
+        '{"property": "teamId", "direction": "ASC"}]',
         "cayenneExp": "gameTypeId=2 and seasonId<=20232024 and seasonId>=20232024",
     }
 
