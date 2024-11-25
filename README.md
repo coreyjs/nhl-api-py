@@ -312,6 +312,9 @@ client.game_center.play_by_play(game_id="2023020280")
 client.game_center.landing(game_id="2023020280")
 
 client.game_center.score_now()
+
+# this is used via the website to provide additional related game information
+client.game_center.right_rail(game_id="2023020280")
 ```
 
 ---
