@@ -58,3 +58,13 @@ class GameCenter:
         exclude_p: str = ",".join(excludes)
         expr_p: str = f"gameId={game_id} and ((duration != '00:00' and typeCode = 517) or typeCode != 517 )"
         return self.client.get_by_url(full_resource=f"{base_url}?cayenneExp={expr_p}&exclude={exclude_p}").json()
+
+    def right_rail(self, game_id: str) -> dict:
+        """
+        Get the game stats and season series information for the game_id.
+        GameIds can be retrieved from the schedule endpoint.
+
+        :param game_id: The game_id for the game you want the stats for.
+        :return: dict
+        """
+        return self.client.get(resource=f"gamecenter/{game_id}/right-rail").json()
