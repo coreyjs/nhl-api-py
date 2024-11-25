@@ -68,3 +68,11 @@ class GameCenter:
         :return: dict
         """
         return self.client.get(resource=f"gamecenter/{game_id}/right-rail").json()
+
+    def game_story(self, game_id: str) -> dict:
+        """
+        Get game story information for the game id. GameIds can be retrieved from the schedule endpoint.
+        :param game_id: The game_id for the game you want the game story for.
+        :return: dict
+        """
+        return self.client.get(resource=f"wsc/game-story/{game_id}").json()
