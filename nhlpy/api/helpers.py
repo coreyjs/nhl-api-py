@@ -19,8 +19,9 @@ class Helpers:
         teams = Teams(self.client).teams_info()
 
         gameids = []
+        schedule_api = Schedule(self.client)
         for team in teams:
-            schedule = Schedule(self.client).get_season_schedule(team["abbr"], season)
+            schedule = schedule_api.get_season_schedule(team["abbr"], season)
             for game in schedule["games"]:
                 if not game_types or game["gameType"] in game_types:
                     gameids.append(game["id"])
