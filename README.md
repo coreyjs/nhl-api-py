@@ -11,7 +11,7 @@ NHL API, allowing you to easily access and retrieve NHL data in your Python
 applications.
 
 Note: This is ~~very early~~ maturing, I created this to help me with some machine learning
-projects around the NHL and the NHL data sets.  Special thanks to https://github.com/erunion/sport-api-specifications/tree/master/nhl and https://gitlab.com/dword4/nhlapi/-/blob/master/stats-api.md.
+projects around the NHL and the NHL data sets.  Special thanks to https://github.com/erunion/sport-api-specifications/tree/master/nhl, https://gitlab.com/dword4/nhlapi/-/blob/master/stats-api.md and https://github.com/Zmalski/NHL-API-Reference?tab=readme-ov-file#season.
 
 ### Developer Note: This is being updated with the new, also undocumented, NHL API.  
 
@@ -21,12 +21,17 @@ If you find any, open a ticket or post in the discussions tab.   I would love to
 
 
 ---
-## Contact
+# Contact
+
 Im available on [Bluesky](https://bsky.app/profile/coreyjs.dev) for any questions or just general chats about enhancements.
 
 ---
 
+# Wiki
 
+More in depth examples can be found in the wiki, feel free to add more: [Examples](https://github.com/coreyjs/nhl-api-py/wiki/Example-Use-Cases)
+
+---
 
 # Usage
 
@@ -316,6 +321,19 @@ client.game_center.score_now()
 # this is used via the website to provide additional related game information
 client.game_center.right_rail(game_id="2023020280")
 ```
+
+
+---
+
+## Helpers
+
+These are expieremental and often times make many requests, can return DFs or do calculations. Stuff I find myself doing over and over I tend to move into helpers for convience.
+
+```python
+# Game types 1=preseason, 2=regular season, 3 playoffs
+client.helpers.get_gameids_by_season("20242025", game_types=[2])
+```
+
 
 ---
 
