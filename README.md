@@ -10,8 +10,11 @@ NHL-api-py is a Python package that provides a simple wrapper around the
 NHL API, allowing you to easily access and retrieve NHL data in your Python 
 applications.
 
-Note: I created this to help me with some machine learning
-projects around the NHL and the NHL data sets.  Special thanks to https://github.com/erunion/sport-api-specifications/tree/master/nhl, https://gitlab.com/dword4/nhlapi/-/blob/master/stats-api.md and https://github.com/Zmalski/NHL-API-Reference?tab=readme-ov-file#season.
+
+Note:  I created this to help me with some machine learning
+projects around the NHL and the NHL data sets.  Special thanks to https://github.com/erunion/sport-api-specifications/tree/master/nhl,
+https://gitlab.com/dword4/nhlapi/-/blob/master/stats-api.md and https://github.com/Zmalski/NHL-API-Reference.
+
 
 ### Developer Note: This is being updated with the new, also undocumented, NHL API.  
 
