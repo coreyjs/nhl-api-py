@@ -6,43 +6,46 @@ class Playoffs:
         self.client = http_client
 
     def carousel(self, season: str) -> dict:
-        """
-        Get the list of all series games up to the current round.
+        """Gets list of all series games up to current playoff round.
 
-        :param season: the current season ex. "20232024"
+        Args:
+           season (str): Season in YYYYYYYY format (e.g., "20232024")
 
-        example:
-                https://api-web.nhle.com/v1/playoff-series/carousel/20232024/
+        Returns:
+           dict: Playoff series data for the specified season.
 
-        :return: dict
+        Example:
+           API endpoint: https://api-web.nhle.com/v1/playoff-series/carousel/20232024/
         """
         return self.client.get(resource=f"playoff-series/carousel/{season}").json()
 
     def schedule(self, season: str, series: str) -> dict:
-        """
-        Returns the schedule for a specified series.
+        """Returns the schedule for a specified playoff series.
 
-        :param season: the season you wish to see the schedule of
-        :param series: the series (a-h) for Round 1
+        Args:
+           season (str): Season in YYYYYYYY format (e.g., "20232024")
+           series (str): Series identifier (a-h) for Round 1
 
-        example:
-                https://api-web.nhle.com/v1/schedule/playoff-series/20232024/a/
+        Returns:
+           dict: Schedule data for the specified playoff series.
 
-        :return: dict
+        Example:
+           API endpoint: https://api-web.nhle.com/v1/schedule/playoff-series/20232024/a/
         """
 
         return self.client.get(resource=f"schedule/playoff-series/{season}/{series}").json()
 
     def bracket(self, year: str) -> dict:
-        """
-        Returns the playoff bracket
+        """Returns the playoff bracket.
 
-        :param year: the year the playoffs are taking place ex. "2024"
+        Args:
+           year (str): Year playoffs take place (e.g., "2024")
 
-        example:
-                https://api-web.nhle.com/v1/playoff-bracket/2024
+        Returns:
+           dict: Playoff bracket data.
 
-        :return: dict
+        Example:
+           API endpoint: https://api-web.nhle.com/v1/playoff-bracket/2024
         """
 
         return self.client.get(resource=f"playoff-bracket/{year}").json()

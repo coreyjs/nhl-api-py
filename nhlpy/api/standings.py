@@ -39,24 +39,28 @@ class Standings:
         return self.client.get(resource=f"standings/{res}").json()
 
     def season_standing_manifest(self) -> List[dict]:
-        """
+        """Gets metadata for all NHL seasons.
         Returns information about what seems like every season.  Start date, end date, etc.
 
-        :example
-            [{
-                        "id": 20232024,
-                        "conferencesInUse": true,
-                        "divisionsInUse": true,
-                        "pointForOTlossInUse": true,
-                        "regulationWinsInUse": true,
-                        "rowInUse": true,
-                        "standingsEnd": "2023-11-10",
-                        "standingsStart": "2023-10-10",
-                        "tiesInUse": false,
-                        "wildcardInUse": true
-                }]
+        Args:
+           None
 
-        :return: dict
+        Returns:
+           dict: Season metadata including dates, conference/division usage, and scoring rules.
+
+        Example:
+           Response format:
+           [{
+               "id": 20232024,
+               "conferencesInUse": true,
+               "divisionsInUse": true,
+               "pointForOTlossInUse": true,
+               "regulationWinsInUse": true,
+               "rowInUse": true,
+               "standingsEnd": "2023-11-10",
+               "standingsStart": "2023-10-10",
+               "tiesInUse": false,
+               "wildcardInUse": true
+           }]
         """
-
         return self.client.get(resource="standings-season").json()["seasons"]

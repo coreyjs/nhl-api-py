@@ -7,49 +7,62 @@ class GameCenter:
         self.client = http_client
 
     def boxscore(self, game_id: str) -> dict:
-        """
-        Get the boxscore for the game_id.  GameIds can be retrieved from the schedule endpoint.
-        :param game_id: The game_id for the game you want the boxscore for.
+        """Get boxscore data for a specific NHL game. GameIds can be retrieved from the schedule endpoint.
 
-        :example
-            https://api-web.nhle.com/v1/gamecenter/2023020280/boxscore
-        :return: dict
+        Args:
+           game_id (str): The game_id for the game you want the boxscore for
+
+        Example:
+           API endpoint format: https://api-web.nhle.com/v1/gamecenter/2023020280/boxscore
+
+        Returns:
+           dict: Game boxscore data
         """
         return self.client.get(resource=f"gamecenter/{game_id}/boxscore").json()
 
     def play_by_play(self, game_id: str) -> dict:
-        """
-        Get the play by play for the game_id.  GameIds can be retrieved from the schedule endpoint.
-        :param game_id: The game_id for the game you want the play by play for.
-        :return: dict
+        """Get play-by-play data for a specific NHL game. GameIds can be retrieved from the schedule endpoint.
+
+        Args:
+           game_id (str): The game_id for the game you want the play by play for
+
+        Returns:
+           dict: Play-by-play game data
         """
         return self.client.get(resource=f"gamecenter/{game_id}/play-by-play").json()
 
     def landing(self, game_id: str) -> dict:
-        """
-        Get verbose information about the matchup for the given game.
+        """Get detailed match up information for a specific NHL game. GameIds can be retrieved from the schedule endpoint.
 
-        GameIds can be retrieved from the schedule endpoint.
-        :param game_id: The game_id for the game you want the landing page for.
-        :return: dict
+        Args:
+           game_id (str): The game_id for the game you want the landing page for
+
+        Returns:
+           dict: Detailed game matchup data
         """
         return self.client.get(resource=f"gamecenter/{game_id}/landing").json()
 
     def score_now(self, date: Optional[str] = None) -> dict:
-        """
-        Get the current score of all games in progress.  I think, not totally sure.
-        Now param does not switch to new day until noon of that day.
-        :param date: Optional date, select date to see score. In format YYYY-MM-DD.
-        :return: dict
+        """Get current scores for NHL games. GameDay updates at noon est I think.
+
+        Args:
+           date (str, optional): Date to check scores in YYYY-MM-DD format
+
+        Returns:
+           dict: Game scores and status information
         """
         return self.client.get(resource=f"score/{date if date else 'now'}").json()
 
     def shift_chart_data(self, game_id: str, excludes: List[str] = None) -> dict:
-        """
-        Get shift chart data for the game_id.  GameIds can be retrieved from the schedule endpoint.
-        :param excludes: List of strings of items to exclude from the response.
-        :param game_id: The game_id for the game you want the shift chart data for.
-        :return: dict
+        """Gets shift chart data for a specific game.
+
+        Args:
+           game_id (str): ID of the game to retrieve shift data for. Game IDs can be retrieved
+               from the schedule endpoint.
+           excludes (List[str]): List of items to exclude from the response.
+
+        Returns:
+           Dict containing the shift chart data.
         """
         if not excludes:
             excludes = ["eventDetails"]
@@ -60,19 +73,25 @@ class GameCenter:
         return self.client.get_by_url(full_resource=f"{base_url}?cayenneExp={expr_p}&exclude={exclude_p}").json()
 
     def right_rail(self, game_id: str) -> dict:
-        """
-        Get the game stats and season series information for the game_id.
-        GameIds can be retrieved from the schedule endpoint.
+        """Gets game stats and season series information for a specific game.
 
-        :param game_id: The game_id for the game you want the stats for.
-        :return: dict
+        Args:
+           game_id (str): ID of the game to retrieve stats for. Game IDs can be retrieved
+               from the schedule endpoint.
+
+        Returns:
+           Dict containing game stats and season series data.
         """
         return self.client.get(resource=f"gamecenter/{game_id}/right-rail").json()
 
     def game_story(self, game_id: str) -> dict:
-        """
-        Get game story information for the game id. GameIds can be retrieved from the schedule endpoint.
-        :param game_id: The game_id for the game you want the game story for.
-        :return: dict
+        """Gets game story information for a specific game.
+
+        Args:
+           game_id (str): ID of the game to retrieve story for. Game IDs can be retrieved
+               from the schedule endpoint.
+
+        Returns:
+           Dict containing game story data.
         """
         return self.client.get(resource=f"wsc/game-story/{game_id}").json()
