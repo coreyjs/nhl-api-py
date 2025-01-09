@@ -9,10 +9,13 @@ class Schedule:
         self.client = http_client
 
     def get_schedule(self, date: str = None) -> dict:
-        """
-        Get the schedule for the NHL for the given date.  Contains only games for the given date.
-        :param date:  In format YYYY-MM-DD.
-        :return: dict
+        """Gets NHL schedule for a specific date.
+
+        Args:
+           date (str): Date in YYYY-MM-DD format.
+
+        Returns:
+           dict: Game schedule data for the specified date.
         """
         try:
             # Parse and reformat the date to ensure YYYY-MM-DD
@@ -37,59 +40,71 @@ class Schedule:
         return response_payload
 
     def get_weekly_schedule(self, date: Optional[str] = None) -> dict:
-        """
-        Get the schedule for the NHL for the week of `date`.  If no date is supplied it will
-        default to today. What the "NHL" deems as "today" seems to switch over around 12 est.  Its preferred you
-        supply a date
+        """Gets NHL schedule for a week starting from the specified date.
 
-        :param date:  In format YYYY-MM-DD.  If no date is supplied, it will default to "Today".  Which in case
-            of the NHL could be today or yesterday depending on how early you call it.
-        :return: dict
+        Args:
+           date (str, optional): Date in YYYY-MM-DD format. Defaults to today's date.
+               Note: NHL's "today" typically shifts around 12:00 EST.
+
+        Returns:
+           dict: Weekly game schedule data.
         """
         res = date if date else "now"
 
         return self.client.get(resource=f"schedule/{res}").json()
 
     def get_schedule_by_team_by_month(self, team_abbr: str, month: Optional[str] = None) -> List[dict]:
-        """
-        Get the schedule for the team (team_abbr) for the given month.  If no month is supplied it will
-        :param team_abbr: The 3 letter abbreviation of the team.  BUF, TOR, etc
-        :param month: In format YYYY-MM.  2021-10, 2021-11, etc.  Defaults to "now" otherwise.
-        :return:
+        """Gets monthly schedule for specified team or the given month.  If no month is supplied it will default to now.
+
+        Args:
+            team_abbr (str): Three-letter team abbreviation (e.g., BUF, TOR)
+            month (str, optional): Month in YYYY-MM format (e.g., 2021-10). Defaults to current month.
+
+        Returns:
+            List[dict]: List of games in the monthly schedule.
         """
         resource = f"club-schedule/{team_abbr}/month/{month if month else 'now'}"
         return self.client.get(resource=resource).json()["games"]
 
     def get_schedule_by_team_by_week(self, team_abbr: str, date: Optional[str] = None) -> List[dict]:
-        """
-        This returns the schedule for the team (team_abbr) for the week set or the current week if no week is specified.
+        """Gets weekly schedule for specified team.  If no date is supplied it will default to current week.
 
-        :param date: Optional date, in which to search the week of.  In format YYYY-MM-DD.  Example "2024-02-10".
-        :param team_abbr: The 3 letter abbreviation of the team.  BUF, TOR, etc
-        :return:
+        Args:
+            team_abbr (str): Three-letter team abbreviation (e.g., BUF, TOR)
+            date (str, optional): Date in YYYY-MM-DD format. Gets schedule for week containing this date.
+                Defaults to current week.
+
+        Returns:
+            List[dict]: List of games in the weekly schedule.
         """
         resource = f"club-schedule/{team_abbr}/week/{date if date else 'now'}"
-
         return self.client.get(resource=resource).json()["games"]
 
     def get_season_schedule(self, team_abbr: str, season: str) -> dict:
-        """
-        This returns the schedule for the team (team_abbr) for the current season.  This also
-        contains all the metadata from the base api request.
-        :param team_abbr: Team abbreviation.  BUF, TOR, etc
-        :param season: Season in format YYYYYYYY.  20202021, 20212022, etc
-        :return:
+        """Gets full season schedule for specified team.
+
+        Args:
+            team_abbr (str): Three-letter team abbreviation (e.g., BUF, TOR)
+            season (str): Season in YYYYYYYY format (e.g., 20232024)
+
+        Returns:
+            dict: Complete season schedule data including metadata.
         """
         request = self.client.get(resource=f"club-schedule-season/{team_abbr}/{season}")
 
         return request.json()
 
     def schedule_calendar(self, date: str) -> dict:
-        """
-        This returns the schedule for the given date in a calendar format.  Im not really sure
+        """Gets schedule in calendar format for specified date. Im not really sure
         how this is diff from the other endppoints.
-        https://api-web.nhle.com/v1/schedule-calendar/2023-11-08
-        :param date: In format 2023-11-23
-        :return:
+
+           Args:
+               date (str): Date in YYYY-MM-DD format (e.g., 2023-11-23)
+
+           Returns:
+               dict: Calendar-formatted schedule data.
+
+           Example:
+               API endpoint: https://api-web.nhle.com/v1/schedule-calendar/2023-11-08
         """
         return self.client.get(resource=f"schedule-calendar/{date}").json()

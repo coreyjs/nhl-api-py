@@ -11,32 +11,107 @@ class Stats:
     def __init__(self, http_client: HttpClient):
         self.client = http_client
 
-    def club_stats_season(self, team_abbr: str) -> dict:
-        """
-        This seems to return gameTypes for every season the team was in existence.  Maybe its useful?
-        :param team_abbr: The 3 letter abbreviation of the team.  BUF, TOR, etc
-        :return: dict
+    def gametypes_per_season_directory_by_team(self, team_abbr: str) -> dict:
+        """Gets all game types played by a team throughout their history.
+
+        A dictionary containing game types for each season the team has existed in the league.
+
+        Args:
+            team_abbr (str): The 3 letter abbreviation of the team (e.g., BUF, TOR)
+
+        Returns:
+            dict: A mapping of seasons to game types played by the team
+
+        Example:
+            https://api-web.nhle.com/v1/club-stats-season/TOR
+
+            [
+                {'season': 20242025, 'gameTypes': [2]},
+                {'season': 20232024, 'gameTypes': [2, 3]},
+                {'season': 20222023, 'gameTypes': [2, 3]},
+                {'season': 20212022, 'gameTypes': [2, 3]},
+             ...
+             ]
+
         """
         return self.client.get(resource=f"club-stats-season/{team_abbr}").json()
 
     def player_career_stats(self, player_id: str) -> dict:
-        """
-        This returns the career stats for a player as well as player information.
+        """Gets a player's career statistics and biographical information.
 
-        example: https://api-web.nhle.com/v1/player/8481528/landing
+        Retrieves comprehensive player data including career stats and personal details from the NHL API.
+        API endpoint example: https://api-web.nhle.com/v1/player/8481528/landing
 
-        :param player_id: The player_id for the player you want the stats for.
-        :return: dict
+        Args:
+            player_id (str): The unique identifier for the NHL player
+
+        Returns:
+            dict: A dictionary containing the player's career statistics and personal information
+
+        Example:
+            Full Example: https://github.com/coreyjs/nhl-api-py/wiki/Player-Career-Stats-%E2%80%90-Example-Payload
+
+            {'playerId': 8478402,
+             'isActive': True,
+             'currentTeamId': 22,
+             'currentTeamAbbrev': 'EDM',
+             'fullTeamName': {'default': 'Edmonton Oilers', 'fr': "Oilers d'Edmonton"},
+             'teamCommonName': {'default': 'Oilers'},
+             'teamPlaceNameWithPreposition': {'default': 'Edmonton', 'fr': "d'Edmonton"},
+             'firstName': {'default': 'Connor'},
+             'lastName': {'default': 'McDavid'},
+             'badges': [{'logoUrl': {'default': 'https://assets.nhle.com/badges/4n_face-off.svg',
+                'fr': 'https://assets.nhle.com/badges/4n_face-off_fr.svg'},
+               'title': {'default': '4 Nations Face-Off',
+                'fr': 'Confrontation Des 4 Nations'}}],
+             'teamLogo': 'https://assets.nhle.com/logos/nhl/svg/EDM_light.svg',
+             'sweaterNumber': 97,
+             'position': 'C',
         """
         return self.client.get(resource=f"player/{player_id}/landing").json()
 
     def player_game_log(self, player_id: str, season_id: str, game_type: int) -> List[dict]:
-        """
-        Returns the game log, for the given player, for the given season and game type.
-        :param game_type: 1 is for preseason, 2 is for regular season, 3 is for playoffs.
-        :param season_id: Season format of "20222023", "20232024", etc.
-        :param player_id:
-        :return:
+        """Gets a player's game log for a specific season and game type.
+
+        Retrieves detailed game-by-game statistics for a player during a specified season and game type.
+
+        Args:
+            game_type (int): The type of games to retrieve:
+                1: Preseason
+                2: Regular season
+                3: Playoffs
+            season_id (str): The season identifier in YYYYYYYY format (e.g., "20222023", "20232024")
+            player_id (str): The unique identifier for the NHL player
+
+        Returns:
+            dict: A dictionary containing the player's game-by-game statistics for the specified parameters
+
+        Example:
+            Full example here https://github.com/coreyjs/nhl-api-py/wiki/Stats.Player-Game-Log-%E2%80%90-Example-Response
+            [
+            {'gameId': 2024020641,
+              'teamAbbrev': 'EDM',
+              'homeRoadFlag': 'R',
+              'gameDate': '2025-01-07',
+              'goals': 1,
+              'assists': 0,
+              'commonName': {'default': 'Oilers'},
+              'opponentCommonName': {'default': 'Bruins'},
+              'points': 1,
+              'plusMinus': 0,
+              'powerPlayGoals': 1,
+              'powerPlayPoints': 1,
+              'gameWinningGoals': 0,
+              'otGoals': 0,
+              'shots': 5,
+              'shifts': 18,
+              'shorthandedGoals': 0,
+              'shorthandedPoints': 0,
+              'opponentAbbrev': 'BOS',
+              'pim': 0,
+              'toi': '18:04'},
+              ...
+              ]
         """
         data = self.client.get(resource=f"player/{player_id}/game-log/{season_id}/{game_type}").json()
         return data.get("gameLog", [])
@@ -54,30 +129,67 @@ class Stats:
         fact_cayenne_exp: str = "gamesPlayed>1",
         default_cayenne_exp: str = None,
     ) -> List[dict]:
-        """
-        Example: c.stats.team_summary(start_season="20202021", end_season="20212022", game_type_id=2)
-                 c.stats.team_summary(start_season="20202021", end_season="20212022")
-        :param start_season: Season id, in format 20202021, 20212022, etc, that will be the start of the range.  This
-            allows for searching over multiple season.  If you just want one season, set start_season and end_season.
-        :param end_season: Season id for the end range.
-        :param game_type_id: 2 is for regular season, 3 is for playoffs.  I think 1 is for preseason.
-        :param is_game: (dev notes: not sure what this is, its part of the api call)
-        :param is_aggregate:
-        :param sort_expr: A list of key/value pairs of properties and their sort direction.  For Example this defaults
-            to [
-            {"property":"points","direction":"DESC"},
-            {"property":"wins","direction":"DESC"},
-            {"property":"teamId","direction":"ASC"}
-            ]
-        :param start:
-        :param limit:
-        :param fact_cayenne_exp:  An expression used by apache cayenne.  This defaults to 'gamesPlayed>=1'.
-            You can experiment at will, this was taken from the nhl.com website.
-        :param default_cayenne_exp: Similar to above, I believe this provides a filter for the data returned.
-            This will look something like: "gameTypeId=2 and seasonId<=20232024 and seasonId>=20232024".
+        """Retrieves team summary statistics across one or more seasons.
 
-            If this value is supplied, it will override a generated one, giving the user ability to experiment.
-        :return:
+        Gets aggregated team statistics for a specified range of seasons with optional filtering and sorting.
+
+        Args:
+            start_season (str): Beginning of season range in YYYYYYYY format (e.g., "20202021").
+                For single season queries, set equal to end_season.
+            end_season (str): End of season range in YYYYYYYY format (e.g., "20212022")
+            game_type_id (int, optional): Type of games to include:
+                2: Regular season (default)
+                3: Playoffs
+                1: Preseason
+            is_game (bool, optional): Defaults False. (dev notes: not sure what this is, its part of the api call)
+            is_aggregate (bool, optional): Defaults False. Whether to aggregate the statistics
+            sort_expr (List[dict], optional): List of sorting criteria. Defaults to:
+                [
+                    {"property": "points", "direction": "DESC"},
+                    {"property": "wins", "direction": "DESC"},
+                    {"property": "teamId", "direction": "ASC"}
+                ]
+            start (int, optional): Starting index for pagination. Defaults to 0
+            limit (int, optional): Maximum number of results to return. Defaults to 50
+            fact_cayenne_exp (str, optional): Apache Cayenne filter expression.
+                Defaults to 'gamesPlayed>=1'
+            default_cayenne_exp (str, optional): Additional Apache Cayenne filter.
+                Example: "gameTypeId=2 and seasonId<=20232024 and seasonId>=20232024"
+                If provided, overrides the automatically generated expression.
+
+        Returns:
+            List[dict]: List of dictionaries containing team summary statistics
+
+        Examples:
+            Full Response Example: https://github.com/coreyjs/nhl-api-py/wiki/Stats.Team-Summary-%E2%80%90-Example-Response
+            c.stats.team_summary(start_season="20202021", end_season="20212022", game_type_id=2)
+            c.stats.team_summary(start_season="20202021", end_season="20212022")
+
+            [{'faceoffWinPct': 0.48235,
+              'gamesPlayed': 82,
+              'goalsAgainst': 242,
+              'goalsAgainstPerGame': 2.95121,
+              'goalsFor': 337,
+              'goalsForPerGame': 4.10975,
+              'losses': 18,
+              'otLosses': 6,
+              'penaltyKillNetPct': 0.841698,
+              'penaltyKillPct': 0.795367,
+              'pointPct': 0.7439,
+              'points': 122,
+              'powerPlayNetPct': 0.21374,
+              'powerPlayPct': 0.244274,
+              'regulationAndOtWins': 55,
+              'seasonId': 20212022,
+              'shotsAgainstPerGame': 30.67073,
+              'shotsForPerGame': 37.34146,
+              'teamFullName': 'Florida Panthers',
+              'teamId': 13,
+              'ties': None,
+              'wins': 58,
+              'winsInRegulation': 42,
+              'winsInShootout': 3},
+              ... ]
         """
         q_params = {
             "isAggregate": is_aggregate,
@@ -112,32 +224,73 @@ class Stats:
         aggregate: bool = False,
         sort_expr: List[dict] = None,
         start: int = 0,
-        limit: int = 70,
+        limit: int = 25,
         fact_cayenne_exp: str = "gamesPlayed>=1",
         default_cayenne_exp: str = None,
     ) -> List[dict]:
-        """
-        Example: c.stats.skater_stats_summary_simple(start_season="20232024", end_season="20232024")
-                 c.stats.skater_stats_summary_simple(franchise_id=10, start_season="20232024", end_season="20232024")
-        :param start_season: Season id, in format 20202021, 20212022, etc, that will be the start of the range.
-        :param end_season: Season id for the end range.
-        :param franchise_id: String, The ID of the franchise.  Not to be confused with team_id found on other endpoints.
-            This seems to be specific to the /stats apis.
-        :param game_type_id: 2 is for regular season, 3 is for playoffs.  I think 1 is for preseason.
-        :param aggregate: If doing multiple years, you can choose to aggreate the date per player, or have separate
-            entries for each one.
-        :param sort_expr: Default sorting expresions.  Provided as an array of key/value pairs.  For example:
-            [
-                {"property": "points", "direction": "DESC"},
-                {"property": "gamesPlayed", "direction": "ASC"},
-                {"property": "playerId", "direction": "ASC"}
-            ]
-        :param start: Possibly start of the retrieved data, based on limit.
-        :param limit: How many to return.
-        :param fact_cayenne_exp: An anchor expression almost, default criteria.  Only players with more than 1 game
-            played.  I default this to gamesPlayed>=1, which is what the nhl.com site uses.  But you can play with it.
-        :param default_cayenne_exp:
-        :return:
+        """Gets simplified skater statistics summary for specified seasons and franchises.
+
+        Retrieves aggregated or season-by-season skating statistics with optional filtering and sorting.
+
+
+        Args:
+            start_season (str): Beginning of season range in YYYYYYYY format (e.g., "20202021")
+            end_season (str): End of season range in YYYYYYYY format
+            franchise_id (str, optional): Franchise identifier specific to /stats APIs.
+                Note: Different from team_id used in other endpoints
+            game_type_id (int, optional): Type of games to include:
+                2: Regular season (Default)
+                3: Playoffs
+                1: Preseason
+            aggregate (bool, optional): When True, combines multiple seasons' data per player.
+                When False, returns separate entries per season. Defaults to False.
+            sort_expr (List[dict], optional): List of sorting criteria. Defaults to:
+                [
+                    {"property": "points", "direction": "DESC"},
+                    {"property": "gamesPlayed", "direction": "ASC"},
+                    {"property": "playerId", "direction": "ASC"}
+                ]
+            start (int, optional): Starting index for pagination
+            limit (int, optional): Maximum number of results to return. Defaults to 25.
+            fact_cayenne_exp (str, optional): Base filter criteria. Defaults to 'gamesPlayed>=1'
+                Can be modified for custom filtering
+            default_cayenne_exp (str, optional): Additional filter expression
+
+        Returns:
+            List[dict]: List of dictionaries containing skater statistics
+
+        Examples:
+            Full Response Example: https://github.com/coreyjs/nhl-api-py/wiki/Stats.Skater-Stats-Summary-Simple
+            c.stats.skater_stats_summary_simple(start_season="20232024", end_season="20232024")
+            c.stats.skater_stats_summary_simple(franchise_id=10, start_season="20232024", end_season="20232024")
+
+            [{'assists': 71,
+              'evGoals': 38,
+              'evPoints': 75,
+              'faceoffWinPct': 0.1,
+              'gameWinningGoals': 5,
+              'gamesPlayed': 82,
+              'goals': 49,
+              'lastName': 'Panarin',
+              'otGoals': 1,
+              'penaltyMinutes': 24,
+              'playerId': 8478550,
+              'plusMinus': 18,
+              'points': 120,
+              'pointsPerGame': 1.46341,
+              'positionCode': 'L',
+              'ppGoals': 11,
+              'ppPoints': 44,
+              'seasonId': 20232024,
+              'shGoals': 0,
+              'shPoints': 1,
+              'shootingPct': 0.16171,
+              'shootsCatches': 'R',
+              'shots': 303,
+              'skaterFullName': 'Artemi Panarin',
+              'teamAbbrevs': 'NYR',
+              'timeOnIcePerGame': 1207.1341},
+              ... ]
         """
         q_params = {
             "isAggregate": aggregate,
@@ -172,35 +325,80 @@ class Stats:
         sort_expr: List[dict] = None,
         aggregate: bool = False,
         start: int = 0,
-        limit: int = 70,
+        limit: int = 25,
     ) -> dict:
-        """
+        """Retrieves skater statistics using a query context and specified report type.
 
-        example:
-            sort_expr = [
-                {"property": "points", "direction": "DESC"},
-                {"property": "gamesPlayed", "direction": "ASC"},
-                {"property": "playerId", "direction": "ASC"}
+        Gets detailed skater statistics with customizable filtering, sorting, and aggregation options.
+
+        Args:
+            query_context (QueryContext): Context object containing query parameters
+            report_type (str): Type of statistical report to retrieve:
+                'summary', 'bios', 'faceoffpercentages', 'faceoffwins',
+                'goalsForAgainst', 'realtime', 'penalties', 'penaltykill',
+                'penaltyShots', 'powerplay', 'puckPossessions',
+                'summaryshooting', 'percentages', 'scoringRates',
+                'scoringpergame', 'shootout', 'shottype', 'timeonice'
+            sort_expr (List[dict], optional): List of sorting criteria. Defaults to None.
+                Example format:
+                [
+                    {"property": "points", "direction": "DESC"},
+                    {"property": "gamesPlayed", "direction": "ASC"},
+                    {"property": "playerId", "direction": "ASC"}
                 ]
-            cayenne_exp = "gameTypeId=2 and seasonId<=20232024 and seasonId>=20232024"
-            client.stats.skater_stats_summary_by_expression(cayenne_exp=expr, sort_expr=sort_expr)
+            aggregate (bool, optional): When True, combines multiple seasons' data per player.
+                When False, returns separate entries per season. Defaults to False.
+            start (int, optional): Starting index for pagination. Defaults to 0.
+            limit (int, optional): Maximum number of results to return. Defaults to 25.
 
-        :param report_type: summary, bios,  faceoffpercentages, faceoffwins, goalsForAgainst, realtime, penalties,
-            penaltykill, penaltyShots, powerplay, puckPossessions, summaryshooting, percentages, scoringRates,
-            scoringpergame, shootout, shottype, timeonice
-        :param query_context:
-        :param aggregate: bool - If doing multiple years, you can choose to aggregate the date per player,
-            or have separate entries for each one.
-        :param sort_expr: A list of key/value pairs for sort criteria.  As used in skater_stats_summary(), this is
-            in the format:
-            [
-                {"property": "points", "direction": "DESC"},
-                {"property": "gamesPlayed", "direction": "ASC"},
-                {"property": "playerId", "direction": "ASC"}
+        Returns:
+            dict: Dictionary containing skater statistics based on the specified report type
+
+        Example:
+            Full example here: https://github.com/coreyjs/nhl-api-py/wiki/Stats.Skater-Stats-with-Query-Context
+
+            filters = [
+                GameTypeQuery(game_type="2"),
+                DraftQuery(year="2020", draft_round="2"),
+                SeasonQuery(season_start="20202021", season_end="20232024"),
+                PositionQuery(position=PositionTypes.ALL_FORWARDS)
             ]
-        :param start:
-        :param limit:
-        :return:
+
+            query_builder = QueryBuilder()
+            query_context: QueryContext = query_builder.build(filters=filters)
+
+            data = client.stats.skater_stats_with_query_context(
+                report_type='summary',
+                query_context=query_context,
+                aggregate=True
+            )
+
+            Response:
+            {'data': [{'assists': 42,
+           'evGoals': 35,
+           'evPoints': 70,
+           'faceoffWinPct': 0.33333,
+           'gameWinningGoals': 6,
+           'gamesPlayed': 161,
+           'goals': 40,
+           'lastName': 'Peterka',
+           'otGoals': 0,
+           'penaltyMinutes': 54,
+           'playerId': 8482175,
+           'plusMinus': -5,
+           'points': 82,
+           'pointsPerGame': 0.50931,
+           'positionCode': 'R',
+           'ppGoals': 5,
+           'ppPoints': 12,
+           'shGoals': 0,
+           'shPoints': 0,
+           'shootingPct': 0.11299,
+           'shootsCatches': 'L',
+           'shots': 354,
+           'skaterFullName': 'JJ Peterka',
+           'timeOnIcePerGame': 904.5714},
+           ...]
         """
         q_params = {
             "isAggregate": aggregate,
@@ -229,25 +427,64 @@ class Stats:
         aggregate: bool = False,
         sort_expr: List[dict] = None,
         start: int = 0,
-        limit: int = 70,
+        limit: int = 25,
         fact_cayenne_exp: str = None,
         default_cayenne_exp: str = None,
     ) -> List[dict]:
-        """
-        Simple endpoint to retrieve goalie stats.  Types of status are derived via the stats_type parameter.
-        :param start_season: Season id, in string format 20202021, 20212022, etc, that will be the start of the range.
-        :param end_season: Optional, Season id for the end range.  If not provided, it will default to start_season.
-        :param stats_type: summary, advanced, bios, daysrest, penaltyShots, savesByStrength, shootout, startedVsRelieved
-        :param game_type_id: 2 is for regular season, 3 is for playoffs.  I think 1 is for preseason.
-        :param franchise_id: Optional, the franchise id to filter by.
-        :param aggregate: bool - If doing multiple years, you can choose to aggreate the date per player,
-        :param sort_expr: A list of key/value pairs for sort criteria.  This is defaulting to what is used on the EDGE
-            stats site, but I think it works with any properties returned in the payload.
-        :param start:
-        :param limit:
-        :param fact_cayenne_exp:
-        :param default_cayenne_exp:
-        :return:
+        """Retrieves goalie statistics with various filtering and aggregation options.
+
+        A simple endpoint that returns different types of goalie statistics based on the specified stats_type parameter.
+
+        Args:
+            start_season (str): Beginning of season range in YYYYYYYY format (e.g., "20202021")
+            end_season (str, optional): End of season range in YYYYYYYY format.
+                Defaults to start_season if not provided.
+            stats_type (str): Type of statistics to retrieve:
+                'summary', 'advanced', 'bios', 'daysrest', 'penaltyShots',
+                'savesByStrength', 'shootout', 'startedVsRelieved'
+            game_type_id (int, optional): Type of games to include:
+                2: Regular season
+                3: Playoffs
+                1: Preseason (tentative)
+            franchise_id (str, optional): Franchise identifier to filter results
+            aggregate (bool, optional): When True, combines multiple seasons' data per goalie.
+                When False, returns separate entries per season. Defaults to False.
+            sort_expr (List[dict], optional): List of sorting criteria. Uses EDGE stats site defaults.
+                Can be customized using any properties from the response payload.
+            start (int, optional): Starting index for pagination
+            limit (int, optional): Defaults to 25. Maximum number of results to return
+            fact_cayenne_exp (str, optional): Base filter criteria
+            default_cayenne_exp (str, optional): Additional filter expression
+
+        Returns:
+            dict: Dictionary containing goalie statistics based on the specified parameters
+
+        Example:
+            client.stats.goalie_stats_summary_simple(start_season="20242025", stats_type="summary")
+
+            [{'assists': 0,
+              'gamesPlayed': 33,
+              'gamesStarted': 33,
+              'goalieFullName': 'Connor Hellebuyck',
+              'goals': 0,
+              'goalsAgainst': 69,
+              'goalsAgainstAverage': 2.08485,
+              'lastName': 'Hellebuyck',
+              'losses': 6,
+              'otLosses': 2,
+              'penaltyMinutes': 0,
+              'playerId': 8476945,
+              'points': 0,
+              'savePct': 0.92612,
+              'saves': 865,
+              'seasonId': 20242025,
+              'shootsCatches': 'L',
+              'shotsAgainst': 934,
+              'shutouts': 5,
+              'teamAbbrevs': 'WPG',
+              'ties': None,
+              'timeOnIce': 119145,
+              'wins': 25},
         """
         q_params = {
             "isAggregate": aggregate,
