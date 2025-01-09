@@ -8,13 +8,21 @@ class Standings:
         self.client = http_client
 
     def get_standings(self, date: Optional[str] = None, season: Optional[str] = None, cache=True) -> dict:
-        """
-        Gets the standings for the season supplied via season: param.
-        :param date: str, Date in format YYYY-MM-DD.  If no date is supplied, it will default to "Today".
-        :param season: The season to return the final standings from.  This takes precedence over date.
-        :param cache: bool, Load from hard file of data instead of making api call.  Possible the cache gets out
-            of date if I dont update this yearly.
-        :return: dict
+        """Gets league standings for a specified season or date.
+
+        Retrieves NHL standings either for a specific date or for the end of a season.
+        If both parameters are provided, season takes precedence.
+
+        Args:
+            date (str, optional): Date in YYYY-MM-DD format. Defaults to current date.
+            season (str, optional): Season identifier to get final standings.
+                Takes precedence over date parameter if both are provided.
+            cache (bool, optional, deprecated): When True, loads data from local cache instead of API.
+                Note: Cache data may become outdated if not regularly updated.
+                Defaults to False.
+
+        Returns:
+            dict: Dictionary containing league standings data
         """
 
         # We need to look up the last date of the season and use that as the date, since it doesnt seem to take

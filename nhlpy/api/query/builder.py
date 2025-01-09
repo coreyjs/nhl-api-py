@@ -6,6 +6,18 @@ from nhlpy.api.query.filters import QueryBase
 
 
 class QueryContext:
+    """A container for query information and validation state.
+
+    This class holds the constructed query string, original filters, any validation
+    errors, and a base fact query. It provides methods to check query validity.
+
+    Attributes:
+        query_str (str): The constructed query string from all valid filters
+        filters (List[QueryBase]): List of original query filter objects
+        errors (List[str]): List of validation error messages
+        fact_query (str): Base fact query, defaults to "gamesPlayed>=1"
+    """
+
     def __init__(self, query: str, filters: List[QueryBase], fact_query: str = None, errors: List[str] = None):
         self.query_str = query
         self.filters = filters
@@ -13,16 +25,49 @@ class QueryContext:
         self.fact_query = fact_query if fact_query else "gamesPlayed>=1"
 
     def is_valid(self) -> bool:
+        """Check if the query context is valid.
+
+        Returns:
+            bool: True if there are no validation errors, False otherwise
+        """
         return len(self.errors) == 0
 
 
 class QueryBuilder:
+    """Builds and validates query strings from a list of query filters.
+
+    This class processes a list of QueryBase filters, validates them, and combines
+    them into a single query string. It handles validation errors and provides
+    optional verbose logging.
+
+    Attributes:
+        _verbose (bool): When True, enables detailed logging of the build process
+    """
+
     def __init__(self, verbose: bool = False):
         self._verbose = verbose
         if self._verbose:
             logging.basicConfig(level=logging.INFO)
 
     def build(self, filters: List[QueryBase]) -> QueryContext:
+        """Build a query string from a list of filters.
+
+        Processes each filter in the list, validates it, and combines valid filters
+        into a single query string using 'and' as the connector.
+
+        Args:
+            filters (List[QueryBase]): List of query filter objects to process
+
+        Returns:
+            QueryContext: A context object containing the query string, original filters,
+                and any validation errors
+
+        Notes:
+            - Skips filters that aren't instances of QueryBase
+            - Collects validation errors but continues processing remaining filters
+            - Combines valid filters with 'and' operator
+            - Returns empty query string if no valid filters are found
+        """
         result_query: str = ""
         output_filters: List[str] = []
         errors: List[str] = []

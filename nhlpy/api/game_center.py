@@ -32,7 +32,8 @@ class GameCenter:
         return self.client.get(resource=f"gamecenter/{game_id}/play-by-play").json()
 
     def landing(self, game_id: str) -> dict:
-        """Get detailed match up information for a specific NHL game. GameIds can be retrieved from the schedule endpoint.
+        """Get detailed match up information for a specific NHL game. GameIds can be retrieved
+        from the schedule endpoint.
 
         Args:
            game_id (str): The game_id for the game you want the landing page for

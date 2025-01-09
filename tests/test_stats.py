@@ -3,7 +3,7 @@ from unittest import mock
 
 @mock.patch("httpx.Client.get")
 def test_stats_season(h_m, nhl_client):
-    nhl_client.stats.club_stats_season(team_abbr="BUF")
+    nhl_client.stats.gametypes_per_season_directory_by_team(team_abbr="BUF")
     h_m.assert_called_once()
     assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/club-stats-season/BUF"
 
@@ -76,7 +76,7 @@ def test_skater_stats_summary(h_m, nhl_client):
     assert h_m.call_args[1]["params"] == {
         "isAggregate": False,
         "isGame": False,
-        "limit": 70,
+        "limit": 25,
         "start": 0,
         "factCayenneExp": "gamesPlayed>=1",
         "sort": '[{"property": "points", "direction": "DESC"}, {"property": '
@@ -94,7 +94,7 @@ def test_skater_stats_summary_franchise(h_m, nhl_client):
     assert h_m.call_args[1]["params"] == {
         "isAggregate": False,
         "isGame": False,
-        "limit": 70,
+        "limit": 25,
         "start": 0,
         "factCayenneExp": "gamesPlayed>=1",
         "sort": '[{"property": "points", "direction": "DESC"}, {"property": '
