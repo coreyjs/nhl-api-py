@@ -1,0 +1,112 @@
+[
+  {
+    "domain": ".nhl.com",
+    "expiry": 1754618232,
+    "httpOnly": false,
+    "name": "__eoi",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "ID=3630fcb61050a6cc:T=1739066232:RT=1739066232:S=AA-Afjb1Zg1h-VaqKdIqV5kkk8-z"
+  },
+  {
+    "domain": ".nhl.com",
+    "expiry": 1772762232,
+    "httpOnly": false,
+    "name": "__gpi",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "UID=0000103801c90d44:T=1739066232:RT=1739066232:S=ALNI_MZaWa9q_fBCm5OOsQw6wkEZqx7mkQ"
+  },
+  {
+    "domain": ".nhl.com",
+    "expiry": 1746842232,
+    "httpOnly": false,
+    "name": "OTGPPConsent",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "DBABBg~BUoAAAKA.QA"
+  },
+  {
+    "domain": ".nhl.com",
+    "expiry": 1746842234,
+    "httpOnly": false,
+    "name": "OptanonConsent",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "isGpcEnabled=0&datestamp=Sat+Feb+08+2025+20%3A57%3A14+GMT-0500+(Eastern+Standard+Time)&version=202409.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=1e956534-7433-4fe5-922c-428b63297054&interactionCount=0&isAnonUser=1&landingPath=https%3A%2F%2Fedge.nhl.com%2Fen%2Fhome&GPPCookiesCount=1&groups=C0001%3A1%2CC0003%3A1%2CC0002%3A1%2CC0004%3A1"
+  },
+  {
+    "domain": ".nhl.com",
+    "expiry": 1772762232,
+    "httpOnly": false,
+    "name": "__gads",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "ID=0e5aed5ad6178006:T=1739066232:RT=1739066232:S=ALNI_MaOSe04gMI-8j1i8vy4yAHPLC7djA"
+  },
+  {
+    "domain": ".nhl.com",
+    "expiry": 1773626232,
+    "httpOnly": false,
+    "name": "_ga_XZHCNEQSGP",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "GS1.1.1739066232.1.0.1739066232.0.0.0"
+  },
+  {
+    "domain": ".nhl.com",
+    "expiry": 1739068031,
+    "httpOnly": true,
+    "name": "__cf_bm",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "hvQ6DB2DCbCy6URqTHRpE6N5aDQrqR5_a6qGUWPl3WA-1739066231-1.0.1.1-.xH0QfHUjx2xSLus7y1WkscPlqHOh7Ff5G0pxp4HpTs_splKFQAVzOZJljBspwL1TM3Uy4WWNHnilaY0njTTXg"
+  },
+  {
+    "domain": "edge.nhl.com",
+    "expiry": 1739671032,
+    "httpOnly": false,
+    "name": "AWSALB",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "AC3+n7fOjP4JRGoZImkyisLTI4FGRNjVpjS4lwojWkh81vkVyfQvSNQRioQTdhFwNqCie4orGHn9YqOSnriyXkq48Z8envKrPBU/aP3hQ8Bkof6eePioeN289b34"
+  },
+  {
+    "domain": ".nhl.com",
+    "expiry": 1773626232,
+    "httpOnly": false,
+    "name": "_ga",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "GA1.1.1572516305.1739066232"
+  },
+  {
+    "domain": "edge.nhl.com",
+    "expiry": 1739671032,
+    "httpOnly": false,
+    "name": "AWSALBCORS",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "AC3+n7fOjP4JRGoZImkyisLTI4FGRNjVpjS4lwojWkh81vkVyfQvSNQRioQTdhFwNqCie4orGHn9YqOSnriyXkq48Z8envKrPBU/aP3hQ8Bkof6eePioeN289b34"
+  },
+  {
+    "domain": ".nhl.com",
+    "expiry": 1773626231,
+    "httpOnly": false,
+    "name": "_ga_8X98ESVH5Y",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "GS1.1.1739066231.1.0.1739066231.0.0.0"
+  }
+]
