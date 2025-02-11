@@ -8,15 +8,15 @@ the parsing functions while enforcing a timeout on the websocket connection.
 
 import asyncio
 import json
-from nhlpy.api.advanced_team_stats import AdvancedTeamStats, AdvancedTeamStatsConfig
+from nhlpy.api.advanced_stats import TeamStats, TeamStatsConfig
 from nhlpy.utils.cookies import get_nhl_edge_cookies
-from nhlpy.parsers.advanced_team_stats_parsers import parse_message_team, parse_messages_team
+from nhlpy.parsers.advanced_parsers import parse_message_team
 
 async def main():
     print("Retrieving cookies from NHL Edge...")
     cookies = get_nhl_edge_cookies(headless=True)
     
-    config = AdvancedTeamStatsConfig(
+    config = TeamStatsConfig(
         team="PHI",  # Replace with the desired team identifier.
         season="20242025",
         stage="regular",
@@ -26,7 +26,7 @@ async def main():
         shootingmetrics="shooting%"  # Use team-relevant parameters (if applicable)
     )
     
-    adv_stats = AdvancedTeamStats(config)
+    adv_stats = TeamStats(config)
     
     try:
         # Wait at most 3 seconds for messages. Adjust the timeout as needed.
