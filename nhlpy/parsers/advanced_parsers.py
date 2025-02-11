@@ -10,7 +10,7 @@ via websockets) and extract advanced statistics. It supports three modes:
   - "team":    for advanced team stats
 
 Usage:
-    python combined_advanced_parsers.py <mode: goalie|player|team> <raw_messages.json>
+    python advanced_parsers.py <mode: goalie|player|team> <raw_messages.json>
 """
 
 import json
