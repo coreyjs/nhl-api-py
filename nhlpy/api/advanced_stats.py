@@ -3,7 +3,7 @@
 Combined advanced stats module for NHL skaters, goalies, and teams.
 
 Usage (from the command line):
-    python combined_advanced_stats.py <type> <id>
+    python advanced_stats.py <type> <id>
 
 Where:
   - <type> is one of "skater", "goalie", or "team"
