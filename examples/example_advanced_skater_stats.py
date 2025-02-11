@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-example_advanced_stats.py
+example_advanced_skater_stats.py
 
 This script demonstrates how to use the AdvancedStats API together with
 the parsing functions while enforcing a timeout on the websocket connection.
@@ -8,15 +8,15 @@ the parsing functions while enforcing a timeout on the websocket connection.
 
 import asyncio
 import json
-from nhlpy.api.advanced_stats import AdvancedStats, AdvancedStatsConfig
+from nhlpy.api.advanced_stats import SkaterStats, SkaterStatsConfig
 from nhlpy.utils.cookies import get_nhl_edge_cookies
-from nhlpy.parsers.advanced_stats_parsers import parse_message
+from nhlpy.parsers.advanced_parsers import parse_message_player
 
 async def main():
     print("Retrieving cookies from NHL Edge...")
     cookies = get_nhl_edge_cookies(headless=True)
     
-    config = AdvancedStatsConfig(
+    config = SkaterStatsConfig(
         player_id="8478439",  # Replace with the desired player ID.
         season="20242025",
         stage="regular",
@@ -26,7 +26,7 @@ async def main():
         shootingmetrics="shots"
     )
     
-    adv_stats = AdvancedStats(config)
+    adv_stats = SkaterStats(config)
     
     try:
         # Wait at most 3 second for messages. Adjust the timeout as needed.
@@ -37,7 +37,7 @@ async def main():
     # Parse in-memory messages directly
     parsed_data = {}
     for msg in raw_messages:
-        parsed_data.update(parse_message(msg))
+        parsed_data.update(parse_message_player(msg))
     
     print(json.dumps(parsed_data, indent=2))
 
