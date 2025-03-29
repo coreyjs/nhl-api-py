@@ -39,12 +39,18 @@ class Teams:
         teams = []
         for i in teams_info:
             team = {
-                "conference": {"abbr": i["conferenceAbbrev"], "name": i["conferenceName"]},
-                "division": {"abbr": i["divisionAbbrev"], "name": i["divisionName"]},
-                "name": i["teamName"]["default"],
-                "common_name": i["teamCommonName"]["default"],
-                "abbr": i["teamAbbrev"]["default"],
-                "logo": i["teamLogo"],
+                "conference": {
+                    "abbr": i.get("conferenceAbbrev"),
+                    "name": i.get("conferenceName")
+                },
+                "division": {
+                    "abbr": i.get("divisionAbbrev"),
+                    "name": i.get("divisionName")
+                },
+                "name": i.get("teamName", {}).get("default"),
+                "common_name": i.get("teamCommonName", {}).get("default"),
+                "abbr": i.get("teamAbbrev", {}).get("default"),
+                "logo": i.get("teamLogo"),
             }
             teams.append(team)
 
