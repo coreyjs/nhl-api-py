@@ -510,6 +510,7 @@ class Stats:
 
         q_params["cayenneExp"] = default_cayenne_exp
 
-        return self.client.get_by_url(
+        response = self.client.get_by_url(
             f"https://api.nhle.com/stats/rest/en/goalie/{stats_type}", query_params=q_params
-        ).json()["data"]
+        ).json()
+        return response.get("data", [])
