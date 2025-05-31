@@ -38,26 +38,35 @@ class Teams:
         ]
         teams = []
         for i in teams_info:
+            team_name = i.get("teamName", {}).get("default", "")
+            team_common_name = i.get("teamCommonName", {}).get("default", "")
+            team_abbrev = i.get("teamAbbrev", {}).get("default", "")
+
             team = {
-                "conference": {"abbr": i["conferenceAbbrev"], "name": i["conferenceName"]},
-                "division": {"abbr": i["divisionAbbrev"], "name": i["divisionName"]},
-                "name": i["teamName"]["default"],
-                "common_name": i["teamCommonName"]["default"],
-                "abbr": i["teamAbbrev"]["default"],
-                "logo": i["teamLogo"],
+                "conference": {"abbr": i.get("conferenceAbbrev", ""), "name": i.get("conferenceName", "")},
+                "division": {"abbr": i.get("divisionAbbrev", ""), "name": i.get("divisionName", "")},
+                "name": team_name,
+                "common_name": team_common_name,
+                "abbr": team_abbrev,
+                "logo": i.get("teamLogo", ""),
             }
             teams.append(team)
 
         # We also need to get "franchise_id", which is different than team_id.  This is used in the stats.
         franchises = self.all_franchises()
         for f in franchises:
+            franchise_full_name = f.get("fullName", "")
+            franchise_id = f.get("id")
+
             for team in teams:
-                if "Canadiens" in f["fullName"] and "Canadiens" in team["name"]:
-                    team["franchise_id"] = f["id"]
+                team_name = team.get("name", "")
+
+                if "Canadiens" in franchise_full_name and "Canadiens" in team_name:
+                    team["franchise_id"] = franchise_id
                     continue
 
-                if f["fullName"] == team["name"]:
-                    team["franchise_id"] = f["id"]
+                if franchise_full_name == team_name:
+                    team["franchise_id"] = franchise_id
 
         return teams
 
@@ -79,4 +88,5 @@ class Teams:
         Returns:
            List of all NHL franchises, including historical/defunct teams.
         """
-        return self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/franchise").json()["data"]
+        response = self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/franchise").json()
+        return response.get("data", [])

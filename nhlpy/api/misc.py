@@ -13,9 +13,10 @@ class Misc:
         Returns:
            dict: NHL API glossary data
         """
-        return self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/glossary?sort=fullName").json()[
-            "data"
-        ]
+        response = self.client.get_by_url(
+            full_resource="https://api.nhle.com/stats/rest/en/glossary?sort=fullName"
+        ).json()
+        return response.get("data", [])
 
     def config(self) -> dict:
         """Get available filter options.
@@ -31,7 +32,8 @@ class Misc:
         Returns:
            dict: Dictionary of country data
         """
-        return self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/country").json()["data"]
+        response = self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/country").json()
+        return response.get("data", [])
 
     def season_specific_rules_and_info(self) -> List[dict]:
         """Get NHL season rules and information.
@@ -39,7 +41,8 @@ class Misc:
         Returns:
            dict: Dictionary containing season-specific rules and information
         """
-        return self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/season").json()["data"]
+        response = self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/season").json()
+        return response.get("data", [])
 
     def draft_year_and_rounds(self) -> List[dict]:
         """Get NHL draft year and round information.
@@ -47,4 +50,5 @@ class Misc:
         Returns:
            dict: Draft data containing 'id', 'draftYear', and 'rounds count'
         """
-        return self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/draft").json()["data"]
+        response = self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/draft").json()
+        return response.get("data", [])

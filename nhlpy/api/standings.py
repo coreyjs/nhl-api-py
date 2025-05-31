@@ -33,14 +33,15 @@ class Standings:
                 import json
 
                 data_resource = importlib.resources.files("nhlpy") / "data"
-                seasons = json.loads((data_resource / "seasonal_information_manifest.json").read_text())["seasons"]
+                manifest_data = json.loads((data_resource / "seasonal_information_manifest.json").read_text())
+                seasons = manifest_data.get("seasons", [])
             else:
                 seasons = self.season_standing_manifest()
 
-            season_data = next((s for s in seasons if s["id"] == int(season)), None)
+            season_data = next((s for s in seasons if s.get("id") == int(season)), None)
             if not season_data:
                 raise ValueError(f"Invalid Season Id {season}")
-            date = season_data["standingsEnd"]
+            date = season_data.get("standingsEnd")
 
         res = date if date else "now"
 
@@ -71,4 +72,5 @@ class Standings:
                "wildcardInUse": true
            }]
         """
-        return self.client.get(resource="standings-season").json()["seasons"]
+        response = self.client.get(resource="standings-season").json()
+        return response.get("seasons", [])
