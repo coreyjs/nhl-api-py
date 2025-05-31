@@ -81,5 +81,5 @@ jobs:
         run: poetry run black . --check
 
       # run a lint check with ruff
-      - name: poetry run ruff .
-        run: poetry run ruff .
+      - name: poetry run ruff check
+        run: poetry run ruff check .
