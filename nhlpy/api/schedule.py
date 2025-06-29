@@ -8,7 +8,7 @@ class Schedule:
     def __init__(self, http_client: HttpClient) -> None:
         self.client = http_client
 
-    def get_schedule(self, date: str = None) -> dict:
+    def daily_schedule(self, date: str = None) -> dict:
         """Gets NHL schedule for a specific date.
 
         Args:
@@ -41,7 +41,7 @@ class Schedule:
 
         return response_payload
 
-    def get_weekly_schedule(self, date: Optional[str] = None) -> dict:
+    def weekly_schedule(self, date: Optional[str] = None) -> dict:
         """Gets NHL schedule for a week starting from the specified date.
 
         Args:
@@ -55,7 +55,7 @@ class Schedule:
 
         return self.client.get(resource=f"schedule/{res}").json()
 
-    def get_schedule_by_team_by_month(self, team_abbr: str, month: Optional[str] = None) -> List[dict]:
+    def team_monthly_schedule(self, team_abbr: str, month: Optional[str] = None) -> List[dict]:
         """Gets monthly schedule for specified team or the given month.  If no month is supplied it will default to now.
 
         Args:
@@ -69,7 +69,7 @@ class Schedule:
         response = self.client.get(resource=resource).json()
         return response.get("games", [])
 
-    def get_schedule_by_team_by_week(self, team_abbr: str, date: Optional[str] = None) -> List[dict]:
+    def team_weekly_schedule(self, team_abbr: str, date: Optional[str] = None) -> List[dict]:
         """Gets weekly schedule for specified team.  If no date is supplied it will default to current week.
 
         Args:
@@ -84,7 +84,7 @@ class Schedule:
         response = self.client.get(resource=resource).json()
         return response.get("games", [])
 
-    def get_season_schedule(self, team_abbr: str, season: str) -> dict:
+    def team_season_schedule(self, team_abbr: str, season: str) -> dict:
         """Gets full season schedule for specified team.
 
         Args:
@@ -98,7 +98,7 @@ class Schedule:
 
         return request.json()
 
-    def schedule_calendar(self, date: str) -> dict:
+    def calendar_schedule(self, date: str) -> dict:
         """Gets schedule in calendar format for specified date. Im not really sure
         how this is diff from the other endppoints.
 
@@ -112,3 +112,49 @@ class Schedule:
                API endpoint: https://api-web.nhle.com/v1/schedule-calendar/2023-11-08
         """
         return self.client.get(resource=f"schedule-calendar/{date}").json()
+    
+
+    def playoff_carousel(self, season: str) -> dict:
+        """Gets list of all series games up to current playoff round.
+
+        Args:
+           season (str): Season in YYYYYYYY format (e.g., "20232024")
+
+        Returns:
+           dict: Playoff series data for the specified season.
+
+        Example:
+           API endpoint: https://api-web.nhle.com/v1/playoff-series/carousel/20232024/
+        """
+        return self.client.get(resource=f"playoff-series/carousel/{season}").json()
+    
+    def playoff_series_schedule(self, season: str, series: str) -> dict:
+        """Returns the schedule for a specified playoff series.
+
+        Args:
+           season (str): Season in YYYYYYYY format (e.g., "20232024")
+           series (str): Series identifier (a-h) for Round 1
+
+        Returns:
+           dict: Schedule data for the specified playoff series.
+
+        Example:
+           API endpoint: https://api-web.nhle.com/v1/schedule/playoff-series/20232024/a/
+        """
+
+        return self.client.get(resource=f"schedule/playoff-series/{season}/{series}").json()
+
+    def playoff_bracket(self, year: str) -> dict:
+        """Returns the playoff bracket.
+
+        Args:
+           year (str): Year playoffs take place (e.g., "2024")
+
+        Returns:
+           dict: Playoff bracket data.
+
+        Example:
+           API endpoint: https://api-web.nhle.com/v1/playoff-bracket/2024
+        """
+
+        return self.client.get(resource=f"playoff-bracket/{year}").json()

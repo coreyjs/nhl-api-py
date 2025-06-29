@@ -24,7 +24,7 @@ def test_landing_page(h_m, nhl_client):
 
 @mock.patch("httpx.Client.get")
 def test_score_now(h_m, nhl_client):
-    nhl_client.game_center.score_now()
+    nhl_client.game_center.scores()
     h_m.assert_called_once()
     assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/score/now"
 

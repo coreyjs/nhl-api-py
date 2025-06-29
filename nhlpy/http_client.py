@@ -5,6 +5,12 @@ import httpx
 import logging
 
 
+class Endpoint(Enum):
+    API_WEB_V1 = "https://api-web.nhle.com/v1/"
+    API_CORE = "https://api.nhle.com"
+    API_STATS = "https://api.nhle.com/stats/rest/"
+
+
 class NHLApiErrorCode(Enum):
     """Enum for NHL API specific error codes if any"""
 
@@ -99,7 +105,7 @@ class HttpClient:
         else:
             raise NHLApiException(f"Unexpected error: {error_message}", response.status_code)
 
-    def get(self, resource: str) -> httpx.Response:
+    def get(self, endpoint: Endpoint, resource: str) -> httpx.Response:
         """
         Private method to make a get request to the NHL API.  This wraps the lib httpx functionality.
         :param resource:
@@ -111,12 +117,15 @@ class HttpClient:
             BadRequestException: When request is malformed
             UnauthorizedException: When authentication fails
             NHLApiException: For other unexpected errors
+
+            url=f"{self._config.api_web_base_url}{self._config.api_web_api_ver}{resource}"
+            )
         """
         with httpx.Client(
             verify=self._config.ssl_verify, timeout=self._config.timeout, follow_redirects=self._config.follow_redirects
         ) as client:
             r: httpx.Response = client.get(
-                url=f"{self._config.api_web_base_url}{self._config.api_web_api_ver}{resource}"
+                url=f"{endpoint.value}{resource}"
             )
 
         self._handle_response(r, resource)
