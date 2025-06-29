@@ -43,11 +43,12 @@ class GameCenter:
         """
         return self.client.get(resource=f"gamecenter/{game_id}/landing").json()
 
-    def score_now(self, date: Optional[str] = None) -> dict:
-        """Get current scores for NHL games. GameDay updates at noon est I think.
+    def daily_scores(self, date: Optional[str] = None) -> dict:
+        """Get scores for NHL games on a specific date or current day.
 
         Args:
-           date (str, optional): Date to check scores in YYYY-MM-DD format
+           date (str, optional): Date to check scores in YYYY-MM-DD format. 
+                                If not provided, returns current day's scores.
 
         Returns:
            dict: Game scores and status information
