@@ -10,7 +10,7 @@ class NHLClient:
     You can instantiate this class and then access the various endpoints of the API,
     such as:
         client = NHLClient()
-        client = NHLClient(verbose=True) # for a lil extra logging
+        client = NHLClient(debug=True) # for a lil extra logging
     """
 
     def __init__(
@@ -19,7 +19,7 @@ class NHLClient:
         """
         :param follow_redirects: bool.  Some of these endpoints use redirects (ew).  This is the case when using
         endpoints that use "/now" in them, which will redirect to todays data.
-        :param verbose: bool, Defaults to False.  Set to True for extra logging.
+        :param debug: bool, Defaults to False.  Set to True for extra logging.
         :param timeout: int, Defaults to 10 seconds.
         :param ssl_verify: bool, Defaults to True.  Set to false if you want to ignore SSL verification.
         """

@@ -34,7 +34,7 @@ class MockResponse:
 def mock_config():
     """Fixture for config object"""
     config = Mock()
-    config.verbose = False
+    config.debug = False
     config.ssl_verify = True
     config.timeout = 30
     config.follow_redirects = True

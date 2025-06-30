@@ -46,10 +46,10 @@ pip install nhl-api-py
 from nhlpy import NHLClient
 
 client = NHLClient()
-# Fore more verbose logging
-client = NHLClient(verbose=True)
+# Fore more verbose debug logging
+client = NHLClient(debug=True)
 # OR Other available configurations:
-client = NHLClient(verbose={bool}, timeout={int}, ssl_verify={bool}, follow_redirects={bool})
+client = NHLClient(debug={bool}, timeout={int}, ssl_verify={bool}, follow_redirects={bool})
 ```
 
 ## Endpoint Modules

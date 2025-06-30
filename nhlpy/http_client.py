@@ -69,8 +69,8 @@ class UnauthorizedException(NHLApiException):
 class HttpClient:
     def __init__(self, config) -> None:
         self._config = config
-        if self._config.verbose:
-            logging.basicConfig(level=logging.INFO)
+        if self._config.debug:
+            logging.basicConfig(level=logging.DEBUG)
         else:
             logging.basicConfig(level=logging.WARNING)
 
