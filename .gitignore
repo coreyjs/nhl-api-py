@@ -25,3 +25,6 @@ archive.zip
 .*.sw?
 
 */.DS_Store
+
+CLAUDE.md
+v3.md

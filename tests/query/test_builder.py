@@ -75,7 +75,7 @@ def test_all_forwards_playoffs_season_query():
 
 
 def test_query_with_invalid_filter_mixed_in():
-    qb = QueryBuilder(verbose=True)
+    qb = QueryBuilder(debug=True)
     filters = [
         GameTypeQuery(game_type="3"),
         SeasonQuery(season_start="20222023", season_end="20222023"),

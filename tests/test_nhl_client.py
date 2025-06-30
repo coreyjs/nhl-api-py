@@ -10,6 +10,7 @@ from nhlpy.http_client import (
     BadRequestException,
     UnauthorizedException,
     HttpClient,
+    Endpoint,
 )
 
 
@@ -19,7 +20,7 @@ class MockResponse:
     def __init__(self, status_code, json_data=None):
         self.status_code = status_code
         self._json_data = json_data or {}
-        self.url = "https://api.nhl.com/v1/test"
+        self.url = "https://api.nhle.com/test"
 
     def json(self):
         return self._json_data
@@ -33,7 +34,7 @@ class MockResponse:
 def mock_config():
     """Fixture for config object"""
     config = Mock()
-    config.verbose = False
+    config.debug = False
     config.ssl_verify = True
     config.timeout = 30
     config.follow_redirects = True
@@ -86,7 +87,7 @@ def test_http_client_error_handling(http_client, status_code, expected_exception
         mock_client.return_value.__enter__.return_value.get.return_value = mock_response
 
         with pytest.raises(expected_exception) as exc_info:
-            http_client.get("/test")
+            http_client.get(endpoint=Endpoint.API_CORE, resource="/test")
 
         assert exc_info.value.status_code == status_code
         assert "Test error message" in str(exc_info.value)
@@ -98,7 +99,7 @@ def test_http_client_success_response(http_client):
 
     with patch("httpx.Client") as mock_client:
         mock_client.return_value.__enter__.return_value.get.return_value = mock_response
-        response = http_client.get("/test")
+        response = http_client.get(endpoint=Endpoint.API_CORE, resource="/test")
         assert response.status_code == 200
 
 
@@ -111,7 +112,7 @@ def test_http_client_non_json_error_response(http_client):
         mock_client.return_value.__enter__.return_value.get.return_value = mock_response
 
         with pytest.raises(ServerErrorException) as exc_info:
-            http_client.get("/test")
+            http_client.get(endpoint=Endpoint.API_CORE, resource="test")
 
         assert exc_info.value.status_code == 500
         assert "Request to" in str(exc_info.value)
@@ -126,9 +127,9 @@ def test_http_client_get_by_url_with_params(http_client):
         mock_instance = mock_client.return_value.__enter__.return_value
         mock_instance.get.return_value = mock_response
 
-        response = http_client.get_by_url("https://api.nhl.com/v1/test", query_params)
+        response = http_client.get(endpoint=Endpoint.API_CORE, resource="test", query_params=query_params)
 
-        mock_instance.get.assert_called_once_with(url="https://api.nhl.com/v1/test", params=query_params)
+        mock_instance.get.assert_called_once_with(url="https://api.nhle.com/test", params=query_params)
         assert response.status_code == 200
 
 
@@ -141,6 +142,6 @@ def test_http_client_custom_error_message(http_client):
         mock_client.return_value.__enter__.return_value.get.return_value = mock_response
 
         with pytest.raises(BadRequestException) as exc_info:
-            http_client.get("/test")
+            http_client.get(endpoint=Endpoint.API_CORE, resource="/test")
 
         assert custom_message in str(exc_info.value)

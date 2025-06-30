@@ -4,7 +4,7 @@ from typing import List
 from nhlpy.api.query.builder import QueryContext
 from nhlpy.api.query.filters import _goalie_stats_sorts
 from nhlpy.api.query.sorting.sorting_options import SortingOptions
-from nhlpy.http_client import HttpClient
+from nhlpy.http_client import HttpClient, Endpoint
 
 
 class Stats:
@@ -34,7 +34,7 @@ class Stats:
              ]
 
         """
-        return self.client.get(resource=f"club-stats-season/{team_abbr}").json()
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"club-stats-season/{team_abbr}").json()
 
     def player_career_stats(self, player_id: str) -> dict:
         """Gets a player's career statistics and biographical information.
@@ -68,7 +68,7 @@ class Stats:
              'sweaterNumber': 97,
              'position': 'C',
         """
-        return self.client.get(resource=f"player/{player_id}/landing").json()
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"player/{player_id}/landing").json()
 
     def player_game_log(self, player_id: str, season_id: str, game_type: int) -> List[dict]:
         """Gets a player's game log for a specific season and game type.
@@ -113,7 +113,9 @@ class Stats:
               ...
               ]
         """
-        data = self.client.get(resource=f"player/{player_id}/game-log/{season_id}/{game_type}").json()
+        data = self.client.get(
+            endpoint=Endpoint.API_WEB_V1, resource=f"player/{player_id}/game-log/{season_id}/{game_type}"
+        ).json()
         return data.get("gameLog", [])
 
     def team_summary(
@@ -211,7 +213,7 @@ class Stats:
             default_cayenne_exp = f"gameTypeId={game_type_id} and seasonId<={end_season} and seasonId>={start_season}"
         q_params["cayenneExp"] = default_cayenne_exp
 
-        return self.client.get_by_url("https://api.nhle.com/stats/rest/en/team/summary", query_params=q_params).json()[
+        return self.client.get(endpoint=Endpoint.API_STATS, resource="en/team/summary", query_params=q_params).json()[
             "data"
         ]
 
@@ -314,7 +316,7 @@ class Stats:
                 default_cayenne_exp = f"franchiseId={franchise_id} and {default_cayenne_exp}"
         q_params["cayenneExp"] = default_cayenne_exp
 
-        return self.client.get_by_url("https://api.nhle.com/stats/rest/en/skater/summary", query_params=q_params).json()[
+        return self.client.get(endpoint=Endpoint.API_STATS, resource="en/skater/summary", query_params=q_params).json()[
             "data"
         ]
 
@@ -413,8 +415,8 @@ class Stats:
 
         q_params["sort"] = json.dumps(sort_expr)
         q_params["cayenneExp"] = query_context.query_str
-        return self.client.get_by_url(
-            f"https://api.nhle.com/stats/rest/en/skater/{report_type}", query_params=q_params
+        return self.client.get(
+            endpoint=Endpoint.API_STATS, resource=f"en/skater/{report_type}", query_params=q_params
         ).json()
 
     def goalie_stats_summary_simple(
@@ -510,7 +512,7 @@ class Stats:
 
         q_params["cayenneExp"] = default_cayenne_exp
 
-        response = self.client.get_by_url(
-            f"https://api.nhle.com/stats/rest/en/goalie/{stats_type}", query_params=q_params
+        response = self.client.get(
+            endpoint=Endpoint.API_STATS, resource=f"en/goalie/{stats_type}", query_params=q_params
         ).json()
         return response.get("data", [])

@@ -41,12 +41,12 @@ class QueryBuilder:
     optional verbose logging.
 
     Attributes:
-        _verbose (bool): When True, enables detailed logging of the build process
+        debug (bool): When True, enables detailed logging of the build process
     """
 
-    def __init__(self, verbose: bool = False):
-        self._verbose = verbose
-        if self._verbose:
+    def __init__(self, debug: bool = False):
+        self.debug = debug
+        if self.debug:
             logging.basicConfig(level=logging.INFO)
 
     def build(self, filters: List[QueryBase]) -> QueryContext:
@@ -73,7 +73,7 @@ class QueryBuilder:
         errors: List[str] = []
         for f in filters:
             if not isinstance(f, QueryBase):
-                if self._verbose:
+                if self.debug:
                     logging.info(f"Input filter is not of type QueryBase: {f.__name__}")
                 continue
 
@@ -82,7 +82,7 @@ class QueryBuilder:
                 if not f.validate():
                     raise InvalidQueryValueException(f"Filter failed validation: {str(f)}")
             except InvalidQueryValueException as e:
-                if self._verbose:
+                if self.debug:
                     logging.error(e)
                 errors.append(str(e))
                 continue

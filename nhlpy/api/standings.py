@@ -1,13 +1,13 @@
-import importlib.resources
-
 from typing import List, Optional
+
+from nhlpy.http_client import Endpoint
 
 
 class Standings:
     def __init__(self, http_client):
         self.client = http_client
 
-    def get_standings(self, date: Optional[str] = None, season: Optional[str] = None, cache=True) -> dict:
+    def league_standings(self, date: Optional[str] = None, season: Optional[str] = None) -> dict:
         """Gets league standings for a specified season or date.
 
         Retrieves NHL standings either for a specific date or for the end of a season.
@@ -17,9 +17,6 @@ class Standings:
             date (str, optional): Date in YYYY-MM-DD format. Defaults to current date.
             season (str, optional): Season identifier to get final standings.
                 Takes precedence over date parameter if both are provided.
-            cache (bool, optional, deprecated): When True, loads data from local cache instead of API.
-                Note: Cache data may become outdated if not regularly updated.
-                Defaults to False.
 
         Returns:
             dict: Dictionary containing league standings data
@@ -28,15 +25,7 @@ class Standings:
         # We need to look up the last date of the season and use that as the date, since it doesnt seem to take
         # season as a param.
         if season:
-            if cache:
-                # load json from data/seasonal_information_manifest.json
-                import json
-
-                data_resource = importlib.resources.files("nhlpy") / "data"
-                manifest_data = json.loads((data_resource / "seasonal_information_manifest.json").read_text())
-                seasons = manifest_data.get("seasons", [])
-            else:
-                seasons = self.season_standing_manifest()
+            seasons = self.season_standing_manifest()
 
             season_data = next((s for s in seasons if s.get("id") == int(season)), None)
             if not season_data:
@@ -45,7 +34,7 @@ class Standings:
 
         res = date if date else "now"
 
-        return self.client.get(resource=f"standings/{res}").json()
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"standings/{res}").json()
 
     def season_standing_manifest(self) -> List[dict]:
         """Gets metadata for all NHL seasons.
@@ -72,5 +61,5 @@ class Standings:
                "wildcardInUse": true
            }]
         """
-        response = self.client.get(resource="standings-season").json()
+        response = self.client.get(endpoint=Endpoint.API_WEB_V1, resource="standings-season").json()
         return response.get("seasons", [])
