@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 
-from nhlpy.http_client import HttpClient
+from nhlpy.http_client import HttpClient, Endpoint
 
 
 class Schedule:
@@ -23,7 +23,7 @@ class Schedule:
         except ValueError:
             raise ValueError("Invalid date format. Please use YYYY-MM-DD.")
 
-        schedule_data: dict = self.client.get(resource=f"schedule/{date}").json()
+        schedule_data: dict = self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"schedule/{date}").json()
         response_payload = {
             "nextStartDate": schedule_data.get("nextStartDate", None),
             "previousStartDate": schedule_data.get("previousStartDate", None),
@@ -53,7 +53,7 @@ class Schedule:
         """
         res = date if date else "now"
 
-        return self.client.get(resource=f"schedule/{res}").json()
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"schedule/{res}").json()
 
     def team_monthly_schedule(self, team_abbr: str, month: Optional[str] = None) -> List[dict]:
         """Gets monthly schedule for specified team or the given month.  If no month is supplied it will default to now.
@@ -66,7 +66,7 @@ class Schedule:
             List[dict]: List of games in the monthly schedule.
         """
         resource = f"club-schedule/{team_abbr}/month/{month if month else 'now'}"
-        response = self.client.get(resource=resource).json()
+        response = self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
         return response.get("games", [])
 
     def team_weekly_schedule(self, team_abbr: str, date: Optional[str] = None) -> List[dict]:
@@ -81,7 +81,7 @@ class Schedule:
             List[dict]: List of games in the weekly schedule.
         """
         resource = f"club-schedule/{team_abbr}/week/{date if date else 'now'}"
-        response = self.client.get(resource=resource).json()
+        response = self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
         return response.get("games", [])
 
     def team_season_schedule(self, team_abbr: str, season: str) -> dict:
@@ -94,7 +94,7 @@ class Schedule:
         Returns:
             dict: Complete season schedule data including metadata.
         """
-        request = self.client.get(resource=f"club-schedule-season/{team_abbr}/{season}")
+        request = self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"club-schedule-season/{team_abbr}/{season}")
 
         return request.json()
 
@@ -111,8 +111,7 @@ class Schedule:
            Example:
                API endpoint: https://api-web.nhle.com/v1/schedule-calendar/2023-11-08
         """
-        return self.client.get(resource=f"schedule-calendar/{date}").json()
-    
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"schedule-calendar/{date}").json()
 
     def playoff_carousel(self, season: str) -> dict:
         """Gets list of all series games up to current playoff round.
@@ -126,8 +125,8 @@ class Schedule:
         Example:
            API endpoint: https://api-web.nhle.com/v1/playoff-series/carousel/20232024/
         """
-        return self.client.get(resource=f"playoff-series/carousel/{season}").json()
-    
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"playoff-series/carousel/{season}").json()
+
     def playoff_series_schedule(self, season: str, series: str) -> dict:
         """Returns the schedule for a specified playoff series.
 
@@ -142,7 +141,9 @@ class Schedule:
            API endpoint: https://api-web.nhle.com/v1/schedule/playoff-series/20232024/a/
         """
 
-        return self.client.get(resource=f"schedule/playoff-series/{season}/{series}").json()
+        return self.client.get(
+            endpoint=Endpoint.API_WEB_V1, resource=f"schedule/playoff-series/{season}/{series}"
+        ).json()
 
     def playoff_bracket(self, year: str) -> dict:
         """Returns the playoff bracket.
@@ -157,4 +158,4 @@ class Schedule:
            API endpoint: https://api-web.nhle.com/v1/playoff-bracket/2024
         """
 
-        return self.client.get(resource=f"playoff-bracket/{year}").json()
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"playoff-bracket/{year}").json()

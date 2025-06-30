@@ -1,11 +1,13 @@
 from typing import List, Optional
 
+from nhlpy.http_client import Endpoint
+
 
 class Standings:
     def __init__(self, http_client):
         self.client = http_client
 
-    def get_standings(self, date: Optional[str] = None, season: Optional[str] = None) -> dict:
+    def league_standings(self, date: Optional[str] = None, season: Optional[str] = None) -> dict:
         """Gets league standings for a specified season or date.
 
         Retrieves NHL standings either for a specific date or for the end of a season.
@@ -32,7 +34,7 @@ class Standings:
 
         res = date if date else "now"
 
-        return self.client.get(resource=f"standings/{res}").json()
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"standings/{res}").json()
 
     def season_standing_manifest(self) -> List[dict]:
         """Gets metadata for all NHL seasons.
@@ -59,5 +61,5 @@ class Standings:
                "wildcardInUse": true
            }]
         """
-        response = self.client.get(resource="standings-season").json()
+        response = self.client.get(endpoint=Endpoint.API_WEB_V1, resource="standings-season").json()
         return response.get("seasons", [])

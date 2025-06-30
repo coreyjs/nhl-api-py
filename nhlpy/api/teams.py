@@ -7,6 +7,7 @@ from nhlpy.http_client import Endpoint, HttpClient
 @dataclass
 class TeamInfo:
     """Data class for team information."""
+
     name: str
     common_name: str
     abbr: str
@@ -18,16 +19,15 @@ class TeamInfo:
 
 class Teams:
     """NHL Teams API client."""
-    
+
     # Constants for API endpoints
     # NHL_WEB_API_BASE = "https://api-web.nhle.com"
     # NHL_STATS_API_BASE = "https://api.nhle.com/stats/rest"
-    
+
     def __init__(self, http_client: HttpClient) -> None:
         self.client = http_client
         self.base_url = "https://api.nhle.com"
         self.api_ver = "/stats/rest/"
-
 
     def _fetch_standings_data(self, date: str) -> List[Dict[str, Any]]:
         """Fetch standings data from NHL API."""
@@ -37,24 +37,18 @@ class Teams:
     def _parse_teams_from_standings(self, standings_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Parse team information from standings data."""
         teams = []
-        
+
         for team_data in standings_data:
             team = self._create_team_dict(team_data)
             teams.append(team)
-            
+
         return teams
 
     def _create_team_dict(self, team_data: Dict[str, Any]) -> Dict[str, Any]:
         """Create a standardized team dictionary from API data."""
         return {
-            "conference": {
-                "abbr": team_data.get("conferenceAbbrev", ""),
-                "name": team_data.get("conferenceName", "")
-            },
-            "division": {
-                "abbr": team_data.get("divisionAbbrev", ""),
-                "name": team_data.get("divisionName", "")
-            },
+            "conference": {"abbr": team_data.get("conferenceAbbrev", ""), "name": team_data.get("conferenceName", "")},
+            "division": {"abbr": team_data.get("divisionAbbrev", ""), "name": team_data.get("divisionName", "")},
             "name": self._extract_nested_default(team_data, "teamName"),
             "common_name": self._extract_nested_default(team_data, "teamCommonName"),
             "abbr": self._extract_nested_default(team_data, "teamAbbrev"),
@@ -69,7 +63,7 @@ class Teams:
         """Add franchise IDs to teams using franchise data."""
         franchises = self.franchises()
         franchise_lookup = self._create_franchise_lookup(franchises)
-        
+
         for team in teams:
             team_name = team.get("name", "")
             franchise_id = self._find_franchise_id(team_name, franchise_lookup)
@@ -91,15 +85,15 @@ class Teams:
         # Direct match first
         if team_name in franchise_lookup:
             return franchise_lookup[team_name]
-        
+
         # Special case for Canadiens (could be made configurable)
         if "Canadiens" in team_name:
             for franchise_name, franchise_id in franchise_lookup.items():
                 if "Canadiens" in franchise_name:
                     return franchise_id
-        
+
         return None
-    
+
     def teams(self, date: str = "now") -> List[TeamInfo]:
         """Get a list of all NHL teams with their conference, division, and franchise information.
 
@@ -146,6 +140,6 @@ class Teams:
         Returns:
             List of all NHL franchises, including historical/defunct teams.
         """
-        #franchise_url = f"{self.NHL_STATS_API_BASE}/en/franchise"
+        # franchise_url = f"{self.NHL_STATS_API_BASE}/en/franchise"
         response = self.client.get(endpoint=Endpoint.API_STATS, resource="en/franchise").json()
         return response.get("data", [])

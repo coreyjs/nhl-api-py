@@ -1,5 +1,4 @@
 from unittest import mock
-import json
 from unittest.mock import MagicMock
 
 
@@ -8,7 +7,6 @@ def test_roster(h_m, nhl_client):
     nhl_client.teams.roster_by_team(team_abbr="BUF", season="20202021")
     h_m.assert_called_once()
     assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/roster/BUF/20202021"
-
 
 
 @mock.patch("httpx.Client.get")
@@ -27,7 +25,7 @@ def test_all_teams(mock_get, nhl_client):
                 "teamName": {"default": "Boston Bruins"},
                 "teamCommonName": {"default": "Bruins"},
                 "teamAbbrev": {"default": "BOS"},
-                "teamLogo": "https://assets.nhle.com/logos/nhl/svg/BOS_light.svg"
+                "teamLogo": "https://assets.nhle.com/logos/nhl/svg/BOS_light.svg",
             },
             {
                 "conferenceAbbrev": "W",
@@ -37,7 +35,7 @@ def test_all_teams(mock_get, nhl_client):
                 "teamName": {"default": "Colorado Avalanche"},
                 "teamCommonName": {"default": "Avalanche"},
                 "teamAbbrev": {"default": "COL"},
-                "teamLogo": "https://assets.nhle.com/logos/nhl/svg/COL_light.svg"
+                "teamLogo": "https://assets.nhle.com/logos/nhl/svg/COL_light.svg",
             },
             {
                 "conferenceAbbrev": "E",
@@ -47,7 +45,7 @@ def test_all_teams(mock_get, nhl_client):
                 "teamName": {"default": "Montreal Canadiens"},
                 "teamCommonName": {"default": "Canadiens"},
                 "teamAbbrev": {"default": "MTL"},
-                "teamLogo": "https://assets.nhle.com/logos/nhl/svg/MTL_light.svg"
+                "teamLogo": "https://assets.nhle.com/logos/nhl/svg/MTL_light.svg",
             },
             {
                 "conferenceAbbrev": "E",
@@ -57,8 +55,8 @@ def test_all_teams(mock_get, nhl_client):
                 "teamName": {"default": "New Team"},
                 "teamCommonName": {"default": "New Team"},
                 "teamAbbrev": {"default": "NEW"},
-                "teamLogo": "https://assets.nhle.com/logos/nhl/svg/NEW_light.svg"
-            }
+                "teamLogo": "https://assets.nhle.com/logos/nhl/svg/NEW_light.svg",
+            },
         ]
     }
 
@@ -66,21 +64,13 @@ def test_all_teams(mock_get, nhl_client):
     franchise_mock_response = MagicMock()
     franchise_mock_response.json.return_value = {
         "data": [
-            {
-                "id": 6,
-                "fullName": "Boston Bruins",
-                "teamCommonName": "Bruins"
-            },
-            {
-                "id": 27,
-                "fullName": "Colorado Avalanche",
-                "teamCommonName": "Avalanche"
-            },
+            {"id": 6, "fullName": "Boston Bruins", "teamCommonName": "Bruins"},
+            {"id": 27, "fullName": "Colorado Avalanche", "teamCommonName": "Avalanche"},
             {
                 "id": 1,
                 "fullName": "Montréal Canadiens",  # Note the accent, different from "Montreal Canadiens"
-                "teamCommonName": "Canadiens"
-            }
+                "teamCommonName": "Canadiens",
+            },
             # No entry for "New Team" - testing case where franchise ID is not found
         ]
     }

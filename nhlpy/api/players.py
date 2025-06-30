@@ -1,4 +1,3 @@
-import json
 from typing import Dict, Any
 
 from nhlpy.http_client import Endpoint, HttpClient

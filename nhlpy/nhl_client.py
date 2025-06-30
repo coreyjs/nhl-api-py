@@ -14,7 +14,7 @@ class NHLClient:
     """
 
     def __init__(
-        self, verbose: bool = False, timeout: int = 10, ssl_verify: bool = True, follow_redirects: bool = True
+        self, debug: bool = False, timeout: int = 10, ssl_verify: bool = True, follow_redirects: bool = True
     ) -> None:
         """
         :param follow_redirects: bool.  Some of these endpoints use redirects (ew).  This is the case when using
@@ -25,7 +25,7 @@ class NHLClient:
         """
         # This config type setup isnt doing what I thought it would.  This will be reworked later on.
         self._config = ClientConfig(
-            verbose=verbose, timeout=timeout, ssl_verify=ssl_verify, follow_redirects=follow_redirects
+            debug=debug, timeout=timeout, ssl_verify=ssl_verify, follow_redirects=follow_redirects
         )
         self._http_client = HttpClient(self._config)
 

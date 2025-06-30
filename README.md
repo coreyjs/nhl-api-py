@@ -51,6 +51,26 @@ client = NHLClient(verbose=True)
 # OR Other available configurations:
 client = NHLClient(verbose={bool}, timeout={int}, ssl_verify={bool}, follow_redirects={bool})
 ```
+
+## Endpoint Modules
+
+This project is organized into several sub modules, each representing a different endpoint of the NHL API.  
+They are group by function to make the library easier to navigate and use.  The main modules are:
+
+- `stats`: Contains endpoints related to player and team statistics. This will have your basic stats, summary stats and
+  more advanced stats using the new query builder.  Which allows for more complex queries to be built up programmatically.
+- `schedule`: Contains endpoints related to the NHL schedule, including game dates, weekly schedules, and team schedules.
+- `standings`: Contains endpoints related to NHL standings, including current standings and historical standings.
+- `teams`: Contains endpoints related to NHL teams, including team information and rosters.  You can find team_id(s) here along with franchise_id(s) needed for some of the stats queries.
+- `game_center`: Contains endpoints related to game center data, including box scores, play-by-play data, and game summaries.
+- `misc`: Contains miscellaneous endpoints that don't fit into the other categories, such as glossary terms, configuration data, and country information.
+
+
+- `helpers`: Contains helper functions and utilities for working with the NHL API, such as getting game IDs by season or calculating player statistics.
+These are experimental and often times make many requests, can return DFs or do calculations. Stuff I find myself doing over and over I tend to move into helpers for convenience.  They are often
+cross domain, involve many sub requests, may integrate more machine learning techniques, or just make it easier to get the data you want.  These will have built in sleeping to avoid hitting the API too hard, but you can override this by setting the `sleep` parameter to `False` in the function call.
+
+
 ---
 ## Stats with QueryBuilder
 
