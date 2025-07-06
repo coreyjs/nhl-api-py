@@ -11,14 +11,17 @@ NHL API, allowing you to easily access and retrieve NHL data in your Python
 applications.
 
 
-Note:  I created this to help me with some machine learning
+Note: I created this to help me with some machine learning
 projects around the NHL and the NHL data sets.  Special thanks to https://github.com/erunion/sport-api-specifications/tree/master/nhl,
 https://gitlab.com/dword4/nhlapi/-/blob/master/stats-api.md and https://github.com/Zmalski/NHL-API-Reference.
 
 
 ### Developer Note: This is being updated with the new, also undocumented, NHL API.  
 
-As of 10/5/24 I seem to have a majority of the endpoints added from what I can tell, but every once and awhile I come across one that needs to be added/changed.  These will most likely be a minor ver bump.
+This started as a project arounnd the old NHL API, that got deprecated in 2023(?). This project has evolved 
+to adopt the new NHL API(s) which are undocumented but discoverable via the NHL platforms.  Some endpoints
+are still being added, and some are still being discovered.  The goal is to have a complete wrapper around the NHL API.
+
 
 If you find any, open a ticket or post in the discussions tab.   I would love to hear more.
 

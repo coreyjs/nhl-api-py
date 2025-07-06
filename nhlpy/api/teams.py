@@ -1,20 +1,18 @@
 from typing import List, Dict, Optional, Any
-from dataclasses import dataclass
-
 from nhlpy.http_client import Endpoint, HttpClient
 
 
-@dataclass
-class TeamInfo:
-    """Data class for team information."""
-
-    name: str
-    common_name: str
-    abbr: str
-    logo: str
-    conference: Dict[str, str]
-    division: Dict[str, str]
-    franchise_id: Optional[int] = None
+# @dataclass
+# class TeamInfo:
+#     """Data class for team information."""
+#
+#     name: str
+#     common_name: str
+#     abbr: str
+#     logo: str
+#     conference: Dict[str, str]
+#     division: Dict[str, str]
+#     franchise_id: Optional[int] = None
 
 
 class Teams:
@@ -26,7 +24,7 @@ class Teams:
 
     def __init__(self, http_client: HttpClient) -> None:
         self.client = http_client
-        self.base_url = "https://api.nhle.com"
+        # self.base_url = "https://api.nhle.com"
         self.api_ver = "/stats/rest/"
 
     def _fetch_standings_data(self, date: str) -> List[Dict[str, Any]]:
@@ -91,10 +89,14 @@ class Teams:
             for franchise_name, franchise_id in franchise_lookup.items():
                 if "Canadiens" in franchise_name:
                     return franchise_id
+        elif "Utah" in team_name:
+            for franchise_name, franchise_id in franchise_lookup.items():
+                if "Utah" in franchise_name:
+                    return franchise_id
 
         return None
 
-    def teams(self, date: str = "now") -> List[TeamInfo]:
+    def teams(self, date: str = "now") -> List[Dict[str, Any]]:
         """Get a list of all NHL teams with their conference, division, and franchise information.
 
         Args:
