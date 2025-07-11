@@ -81,6 +81,7 @@ client = NHLClient(
 ```
 
 ## Examples & Wiki
+*These need to updated with `v3` updates*
 
 More in depth examples can be found in the wiki, feel free to add more: [Examples](https://github.com/coreyjs/nhl-api-py/wiki/Example-Use-Cases)
 
@@ -103,6 +104,8 @@ They are grouped by function to make the library easier to navigate and use.  Th
 ### Helpers Module
 - **`helpers`**: Contains helper functions and utilities for working with the NHL API, such as getting game IDs by season or calculating player statistics. These are experimental and often times make many requests, can return DataFrames or do calculations. Stuff I find myself doing over and over I tend to move into helpers for convenience. They are often cross domain, involve many sub requests, may integrate more machine learning techniques, or just make it easier to get the data you want. These will have built in sleeping to avoid hitting the API too hard, but you can override this by setting the `sleep` parameter to `False` in the function call.
 
+
+Do you have a specific use case or cool code snippet you use over and over?  If its helpful to others please open a PR and add a helper.
 # Teams
 
 Get information about NHL teams, rosters, and franchises.
@@ -227,7 +230,7 @@ games = client.schedule.playoff_carousel(season="20242025")
 
 ## Playoff Schedule by Series
 ```python
-series = client.schedule.playoff_series_schedule(season="20242025", series_id="20242025-1")
+series = client.schedule.playoff_series_schedule(season="20242025",  series="a")
 ```
 
 ## Playoff Bracket
