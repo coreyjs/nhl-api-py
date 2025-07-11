@@ -553,12 +553,12 @@ client = NHLClient()
 glossary = client.misc.glossary()
 
 # Find specific stats definitions
-stat_terms = ["PIM", "PPG", "SHG", "GWG"]
+stat_terms = ["BENCH", "BKS", "A", "ENA", "EV GA"]
 for term in stat_terms:
     for entry in glossary:
-        if entry['fullName'].upper() == term:
+        if entry['abbreviation'].upper() == term:
             print(f"{term}: {entry['definition']}")
-            break
+            continue
 ```
 
 <details>
