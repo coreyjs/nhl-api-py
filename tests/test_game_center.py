@@ -16,8 +16,8 @@ def test_play_by_play(h_m, nhl_client):
 
 
 @mock.patch("httpx.Client.get")
-def test_landing_page(h_m, nhl_client):
-    nhl_client.game_center.landing(game_id="2020020001")
+def test_match_up(h_m, nhl_client):
+    nhl_client.game_center.match_up(game_id="2020020001")
     h_m.assert_called_once()
     assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/gamecenter/2020020001/landing"
 
@@ -67,8 +67,8 @@ def test_shift_chart_data_empty_excludes(h_m, nhl_client):
 
 
 @mock.patch("httpx.Client.get")
-def test_right_rail(h_m, nhl_client):
-    nhl_client.game_center.right_rail(game_id="2020020001")
+def test_season_series_matchup(h_m, nhl_client):
+    nhl_client.game_center.season_series_matchup(game_id="2020020001")
     h_m.assert_called_once()
     assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/gamecenter/2020020001/right-rail"
 

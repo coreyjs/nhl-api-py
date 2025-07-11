@@ -31,7 +31,7 @@ class GameCenter:
         """
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"gamecenter/{game_id}/play-by-play").json()
 
-    def landing(self, game_id: str) -> dict:
+    def match_up(self, game_id: str) -> dict:
         """Get detailed match up information for a specific NHL game. GameIds can be retrieved
         from the schedule endpoint.
 
@@ -75,7 +75,7 @@ class GameCenter:
             endpoint=Endpoint.API_STATS, resource=f"en/shiftcharts?cayenneExp={expr_p}&exclude={exclude_p}"
         ).json()
 
-    def right_rail(self, game_id: str) -> dict:
+    def season_series_matchup(self, game_id: str) -> dict:
         """Gets game stats and season series information for a specific game.
 
         Args:

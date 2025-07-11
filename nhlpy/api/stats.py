@@ -217,7 +217,7 @@ class Stats:
             "data"
         ]
 
-    def skater_stats_summary_simple(
+    def skater_stats_summary(
         self,
         start_season: str,
         end_season: str,
@@ -419,7 +419,7 @@ class Stats:
             endpoint=Endpoint.API_STATS, resource=f"en/skater/{report_type}", query_params=q_params
         ).json()
 
-    def goalie_stats_summary_simple(
+    def goalie_stats_summary(
         self,
         start_season: str,
         end_season: str = None,

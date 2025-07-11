@@ -148,7 +148,7 @@ for team in teams:
 # Get that team's roster
 roster = client.teams.team_roster(team_abbr="TOR", season="20242025")
 print(f"Forwards: {len(roster['forwards'])}")
-print(f"Defensemen: {len(roster['defensement'])}")
+print(f"Defensemen: {len(roster['defensemen'])}")
 print(f"Goalies: {len(roster['goalies'])}")
 ```
 
@@ -157,47 +157,17 @@ print(f"Goalies: {len(roster['goalies'])}")
 
 **teams() response:**
 ```json
-[
-   {
-      "conference": {"abbr": "W", "name": "Western"},
-      "division": {"abbr": "C", "name": "Central"},
-      "name": "Winnipeg Jets",
-      "common_name": "Jets",
-      "abbr": "WPG",
-      "logo": "https://assets.nhle.com/logos/nhl/svg/WPG_light.svg",
-      "franchise_id": 35
-   }
-]
+
 ```
 
 **team_roster() response:**
 ```json
-{
-   "forwards": [
-      {
-         "id": 8484145,
-         "firstName": {"default": "Zach"},
-         "lastName": {"default": "Benson"},
-         "sweaterNumber": 9,
-         "positionCode": "L",
-         "shootsCatches": "L"
-      }
-   ],
-   "defensement": [...],
-   "goalies": [...]
-}
+
 ```
 
 **franchises() response:**
 ```json
-[
-   {
-      "id": 32,
-      "fullName": "Anaheim Ducks",
-      "teamCommonName": "Ducks",
-      "teamPlaceName": "Anaheim"
-   }
-]
+
 ```
 </details>
 
@@ -271,8 +241,8 @@ from nhlpy import NHLClient
 
 client = NHLClient()
 
-# Get today's games
-games = client.schedule.daily_schedule()
+# Get games by date.  Leave date blank to get today's games
+games = client.schedule.daily_schedule(date="2024-10-08")
 
 # Show what's on tonight
 for game in games.get('games', []):
@@ -287,17 +257,7 @@ for game in games.get('games', []):
 
 **daily_schedule() response:**
 ```json
-{
-  "games": [
-    {
-      "id": 2024020001,
-      "awayTeam": {"abbrev": "TOR", "commonName": "Maple Leafs"},
-      "homeTeam": {"abbrev": "BUF", "commonName": "Sabres"},
-      "startTimeUTC": "2024-01-01T19:00:00Z",
-      "gameState": "OFF"
-    }
-  ]
-}
+
 ```
 </details>
 
@@ -335,29 +295,34 @@ team_stats = client.stats.team_summary(
 ## Get Skater Statistics
 ```python
 # Get basic skater stats
-skater_stats = client.stats.skater_stats_summary_simple(
+skater_stats = client.stats.skater_stats_summary(
     start_season="20232024", 
     end_season="20232024"
 )
 
 # Filter by franchise (team)
-skater_stats = client.stats.skater_stats_summary_simple(
+skater_stats = client.stats.skater_stats_summary(
     start_season="20232024", 
     end_season="20232024",
     franchise_id="10"  # Toronto Maple Leafs
 )
 ```
 
+## Get Advanced Skater Statistics
+See [Query Builder](#stats-with-querybuilder) for more advanced queries.
+
+
+
 ## Get Goalie Statistics
 ```python
 # Get basic goalie stats
-goalie_stats = client.stats.goalie_stats_summary_simple(
+goalie_stats = client.stats.goalie_stats_summary(
     start_season="20232024", 
     end_season="20232024"
 )
 
 # Get advanced goalie stats
-goalie_stats = client.stats.goalie_stats_summary_simple(
+goalie_stats = client.stats.goalie_stats_summary(
     start_season="20232024",
     end_season="20232024",
     stats_type="advanced"
@@ -371,13 +336,13 @@ from nhlpy import NHLClient
 client = NHLClient()
 
 # Get current season skater stats
-stats = client.stats.skater_stats_summary_simple(
+stats = client.stats.skater_stats_summary(
     start_season="20242025", 
     end_season="20242025"
 )
 
 # Show top 5 scorers
-for i, player in enumerate(stats['data'][:5]):
+for i, player in enumerate(stats[:5]):
     print(f"{i+1}. {player['skaterFullName']}: {player['points']} points")
 ```
 
@@ -386,32 +351,12 @@ for i, player in enumerate(stats['data'][:5]):
 
 **player_career_stats() response:**
 ```json
-{
-  "playerId": 8478402,
-  "isActive": true,
-  "currentTeamId": 22,
-  "currentTeamAbbrev": "EDM",
-  "firstName": {"default": "Connor"},
-  "lastName": {"default": "McDavid"},
-  "sweaterNumber": 97,
-  "position": "C"
-}
+
 ```
 
 **skater_stats_summary_simple() response:**
 ```json
-{
-  "data": [
-    {
-      "playerId": 8478550,
-      "skaterFullName": "Artemi Panarin",
-      "goals": 49,
-      "assists": 71,
-      "points": 120,
-      "gamesPlayed": 82
-    }
-  ]
-}
+
 ```
 </details>
 
@@ -468,19 +413,7 @@ for division, team in divisions.items():
 
 **league_standings() response:**
 ```json
-{
-  "standings": [
-    {
-      "teamName": {"default": "Boston Bruins"},
-      "teamAbbrev": {"default": "BOS"},
-      "divisionName": "Atlantic",
-      "points": 65,
-      "wins": 31,
-      "losses": 11,
-      "otLosses": 3
-    }
-  ]
-}
+
 ```
 </details>
 
@@ -503,7 +436,7 @@ play_by_play = client.game_center.play_by_play(game_id="2023020280")
 ## Get Game Overview
 ```python
 # Get game matchup info and key stats
-game_info = client.game_center.landing(game_id="2023020280")
+game_info = client.game_center.match_up(game_id="2023020280")
 ```
 
 ## Get Game Scores
@@ -521,7 +454,7 @@ scores = client.game_center.daily_scores(date="2024-01-01")
 shifts = client.game_center.shift_chart_data(game_id="2023020280")
 
 # Get additional game stats
-stats = client.game_center.right_rail(game_id="2023020280")
+stats = client.game_center.season_series_matchup(game_id="2023020280")
 
 # Get game story/recap
 story = client.game_center.game_story(game_id="2023020280")
@@ -550,7 +483,7 @@ print(f"Final: {away_team} {away_score} - {home_team} {home_score}")
 shots_by_period = {}
 for play in play_by_play.get('plays', []):
     if play['typeDescKey'] == 'shot-on-goal':
-        period = play['period']
+        period = play['periodDescriptor'].get('number', 'Unknown')
         if period not in shots_by_period:
             shots_by_period[period] = 0
         shots_by_period[period] += 1
@@ -564,37 +497,12 @@ for period, shots in shots_by_period.items():
 
 **boxscore() response:**
 ```json
-{
-  "awayTeam": {
-    "abbrev": "TOR",
-    "score": 3,
-    "sog": 28
-  },
-  "homeTeam": {
-    "abbrev": "BUF", 
-    "score": 2,
-    "sog": 31
-  },
-  "gameState": "OFF",
-  "gameType": 2
-}
+
 ```
 
 **play_by_play() response:**
 ```json
-{
-  "plays": [
-    {
-      "typeDescKey": "goal",
-      "period": 1,
-      "timeInPeriod": "12:34",
-      "details": {
-        "scoringPlayerId": 8478402,
-        "shootingPlayerId": 8478402
-      }
-    }
-  ]
-}
+
 ```
 </details>
 
@@ -655,32 +563,12 @@ for term in stat_terms:
 
 **glossary() response:**
 ```json
-[
-  {
-    "fullName": "PIM",
-    "definition": "Penalty Minutes - Total number of penalty minutes assessed to a player"
-  },
-  {
-    "fullName": "PPG", 
-    "definition": "Power Play Goals - Goals scored while team has a man advantage"
-  }
-]
+
 ```
 
 **countries() response:**
 ```json
-[
-  {
-    "id": 1,
-    "countryCode": "CAN",
-    "fullName": "Canada"
-  },
-  {
-    "id": 2,
-    "countryCode": "USA", 
-    "fullName": "United States"
-  }
-]
+
 ```
 </details>
 
@@ -794,7 +682,7 @@ from nhlpy.api.query.filters.season import SeasonQuery
 from nhlpy.api.query.filters.game_type import GameTypeQuery
 from nhlpy.api.query.filters.position import PositionQuery, PositionTypes
 
-client = NHLClient(verbose=True)
+client = NHLClient(debug=True)
 
 filters = [
     GameTypeQuery(game_type="2"),
