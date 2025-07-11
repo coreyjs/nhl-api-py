@@ -1,6 +1,6 @@
 from typing import List
 
-from nhlpy.http_client import HttpClient
+from nhlpy.http_client import HttpClient, Endpoint
 
 
 class Misc:
@@ -13,9 +13,7 @@ class Misc:
         Returns:
            dict: NHL API glossary data
         """
-        response = self.client.get_by_url(
-            full_resource="https://api.nhle.com/stats/rest/en/glossary?sort=fullName"
-        ).json()
+        response = self.client.get(endpoint=Endpoint.API_CORE, resource="stats/rest/en/glossary?sort=fullName").json()
         return response.get("data", [])
 
     def config(self) -> dict:
@@ -24,7 +22,7 @@ class Misc:
         Returns:
            dict: Dictionary of filter options
         """
-        return self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/config").json()
+        return self.client.get(endpoint=Endpoint.API_CORE, resource="stats/rest/en/config").json()
 
     def countries(self) -> List[dict]:
         """Get list of countries from NHL API.
@@ -32,7 +30,7 @@ class Misc:
         Returns:
            dict: Dictionary of country data
         """
-        response = self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/country").json()
+        response = self.client.get(endpoint=Endpoint.API_CORE, resource="stats/rest/en/country").json()
         return response.get("data", [])
 
     def season_specific_rules_and_info(self) -> List[dict]:
@@ -41,7 +39,7 @@ class Misc:
         Returns:
            dict: Dictionary containing season-specific rules and information
         """
-        response = self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/season").json()
+        response = self.client.get(endpoint=Endpoint.API_CORE, resource="stats/rest/en/season").json()
         return response.get("data", [])
 
     def draft_year_and_rounds(self) -> List[dict]:
@@ -50,5 +48,5 @@ class Misc:
         Returns:
            dict: Draft data containing 'id', 'draftYear', and 'rounds count'
         """
-        response = self.client.get_by_url(full_resource="https://api.nhle.com/stats/rest/en/draft").json()
+        response = self.client.get(endpoint=Endpoint.API_CORE, resource="stats/rest/en/draft").json()
         return response.get("data", [])

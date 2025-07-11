@@ -128,25 +128,3 @@ class HttpClient:
 
         self._handle_response(r, resource)
         return r
-
-    # def get_by_url(self, full_resource: str, query_params: dict = None) -> httpx.Response:
-    #     """
-    #     Private method to make a get request to any HTTP resource.  This wraps the lib httpx functionality.
-    #     :param query_params:
-    #     :param full_resource:  The full resource to get.
-    #     :return: httpx.Response
-    #     :raises:
-    #         ResourceNotFoundException: When the resource is not found
-    #         RateLimitExceededException: When rate limit is exceeded
-    #         ServerErrorException: When server returns 5xx error
-    #         BadRequestException: When request is malformed
-    #         UnauthorizedException: When authentication fails
-    #         NHLApiException: For other unexpected errors
-    #     """
-    #     with httpx.Client(
-    #         verify=self._config.ssl_verify, timeout=self._config.timeout, follow_redirects=self._config.follow_redirects
-    #     ) as client:
-    #         r: httpx.Response = client.get(url=full_resource, params=query_params)
-
-    #     self._handle_response(r, full_resource)
-    #     return r
