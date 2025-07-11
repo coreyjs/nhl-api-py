@@ -1,8 +1,8 @@
 class ClientConfig:
     def __init__(
-        self, verbose: bool = False, timeout: int = 10, ssl_verify: bool = True, follow_redirects: bool = True
+        self, debug: bool = False, timeout: int = 10, ssl_verify: bool = True, follow_redirects: bool = True
     ) -> None:
-        self.verbose = verbose
+        self.debug = debug
         self.timeout = timeout
         self.ssl_verify = ssl_verify
         self.follow_redirects = follow_redirects
