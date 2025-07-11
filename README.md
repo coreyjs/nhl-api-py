@@ -3,6 +3,22 @@
 
 # NHL API & NHL Edge Stats
 
+## Table of Contents
+- [About](#about)
+- [Installation & Quick Start](#installation--quick-start)
+- [Configuration](#configuration)
+- [API Modules](#api-modules)
+  - [Teams](#teams)
+  - [Schedule](#schedule)
+  - [Stats](#stats)
+  - [Standings](#standings)
+  - [Game Center](#game-center)
+  - [Misc](#misc)
+- [Advanced Usage](#advanced-usage)
+  - [Query Builder](#stats-with-querybuilder)
+- [Examples & Wiki](#examples--wiki)
+- [Development](#developers)
+- [Contact](#contact)
 
 ## About
 
@@ -10,36 +26,19 @@ NHL-api-py is a Python package that provides a simple wrapper around the
 NHL API, allowing you to easily access and retrieve NHL data in your Python 
 applications.
 
-
 Note: I created this to help me with some machine learning
 projects around the NHL and the NHL data sets.  Special thanks to https://github.com/erunion/sport-api-specifications/tree/master/nhl,
 https://gitlab.com/dword4/nhlapi/-/blob/master/stats-api.md and https://github.com/Zmalski/NHL-API-Reference.
 
-
 ### Developer Note: This is being updated with the new, also undocumented, NHL API.  
 
-This started as a project arounnd the old NHL API, that got deprecated in 2023(?). This project has evolved 
+This started as a project around the old NHL API, that got deprecated in 2023(?). This project has evolved 
 to adopt the new NHL API(s) which are undocumented but discoverable via the NHL platforms.  Some endpoints
 are still being added, and some are still being discovered.  The goal is to have a complete wrapper around the NHL API.
 
-
 If you find any, open a ticket or post in the discussions tab.   I would love to hear more.
 
-
----
-# Contact
-
-Im available on [Bluesky](https://bsky.app/profile/coreyjs.dev) for any questions or just general chats about enhancements.
-
----
-
-# Wiki
-
-More in depth examples can be found in the wiki, feel free to add more: [Examples](https://github.com/coreyjs/nhl-api-py/wiki/Example-Use-Cases)
-
----
-
-# Usage
+## Installation & Quick Start
 
 ```bash
 pip install nhl-api-py
@@ -48,33 +47,646 @@ pip install nhl-api-py
 ```python
 from nhlpy import NHLClient
 
+# Basic usage
 client = NHLClient()
-# Fore more verbose debug logging
-client = NHLClient(debug=True)
-# OR Other available configurations:
-client = NHLClient(debug={bool}, timeout={int}, ssl_verify={bool}, follow_redirects={bool})
+
+# Get all teams
+teams = client.teams.teams()
+
+# Get current standings
+standings = client.standings.league_standings()
+
+# Get today's games
+games = client.schedule.daily_schedule()
 ```
 
-## Endpoint Modules
+## Configuration
+
+```python
+from nhlpy import NHLClient
+
+# Default configuration
+client = NHLClient()
+
+# With debug logging
+client = NHLClient(debug=True)
+
+# All available configurations
+client = NHLClient(
+    debug=True,           # Enable debug logging
+    timeout=30,           # Request timeout in seconds
+    ssl_verify=True,      # SSL certificate verification
+    follow_redirects=True # Follow HTTP redirects
+)
+```
+
+## Examples & Wiki
+
+More in depth examples can be found in the wiki, feel free to add more: [Examples](https://github.com/coreyjs/nhl-api-py/wiki/Example-Use-Cases)
+
+## Contact
+
+Im available on [Bluesky](https://bsky.app/profile/coreyjs.dev) or the [twit](https://x.com/corey_builds) for any questions or just general chats about enhancements.
+
+## API Modules
 
 This project is organized into several sub modules, each representing a different endpoint of the NHL API.  
-They are group by function to make the library easier to navigate and use.  The main modules are:
+They are grouped by function to make the library easier to navigate and use.  The main modules are:
 
-- `stats`: Contains endpoints related to player and team statistics. This will have your basic stats, summary stats and
-  more advanced stats using the new query builder.  Which allows for more complex queries to be built up programmatically.
-- `schedule`: Contains endpoints related to the NHL schedule, including game dates, weekly schedules, and team schedules.
-- `standings`: Contains endpoints related to NHL standings, including current standings and historical standings.
-- `teams`: Contains endpoints related to NHL teams, including team information and rosters.  You can find team_id(s) here along with franchise_id(s) needed for some of the stats queries.
-- `game_center`: Contains endpoints related to game center data, including box scores, play-by-play data, and game summaries.
-- `misc`: Contains miscellaneous endpoints that don't fit into the other categories, such as glossary terms, configuration data, and country information.
+- **`teams`**: Contains endpoints related to NHL teams, including team information and rosters. You can find team_id(s) here along with franchise_id(s) needed for some of the stats queries.
+- **`schedule`**: Contains endpoints related to the NHL schedule, including game dates, weekly schedules, and team schedules.
+- **`stats`**: Contains endpoints related to player and team statistics. This will have your basic stats, summary stats and more advanced stats using the new query builder, which allows for more complex queries to be built up programmatically.
+- **`standings`**: Contains endpoints related to NHL standings, including current standings and historical standings.
+- **`game_center`**: Contains endpoints related to game center data, including box scores, play-by-play data, and game summaries.
+- **`misc`**: Contains miscellaneous endpoints that don't fit into the other categories, such as glossary terms, configuration data, and country information.
+
+### Helpers Module
+- **`helpers`**: Contains helper functions and utilities for working with the NHL API, such as getting game IDs by season or calculating player statistics. These are experimental and often times make many requests, can return DataFrames or do calculations. Stuff I find myself doing over and over I tend to move into helpers for convenience. They are often cross domain, involve many sub requests, may integrate more machine learning techniques, or just make it easier to get the data you want. These will have built in sleeping to avoid hitting the API too hard, but you can override this by setting the `sleep` parameter to `False` in the function call.
+
+# Teams
+
+Get information about NHL teams, rosters, and franchises.
+
+## Get All Teams
+```python
+# Get current teams
+teams = client.teams.teams()
+
+# Get teams from a specific date
+teams = client.teams.teams(data="2024-10-04")
+```
+
+## Get Team Roster
+```python
+# Get current season roster
+roster = client.teams.team_roster(team_abbr="BUF", season="20242025")
+```
+
+## Get Franchise Information
+```python
+# Get all franchises (current and historical)
+franchises = client.teams.franchises()
+```
+
+### Example: Finding Team Information
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+
+# Get all current teams
+teams = client.teams.teams()
+
+# Find a specific team
+for team in teams:
+    if team['abbr'] == 'TOR':
+        print(f"Team: {team['name']}")
+        print(f"Division: {team['division']['name']}")
+        print(f"Franchise ID: {team['franchise_id']}")
+        break
+
+# Get that team's roster
+roster = client.teams.team_roster(team_abbr="TOR", season="20242025")
+print(f"Forwards: {len(roster['forwards'])}")
+print(f"Defensemen: {len(roster['defensement'])}")
+print(f"Goalies: {len(roster['goalies'])}")
+```
+
+<details>
+<summary>📋 Full Response Examples</summary>
+
+**teams() response:**
+```json
+[
+   {
+      "conference": {"abbr": "W", "name": "Western"},
+      "division": {"abbr": "C", "name": "Central"},
+      "name": "Winnipeg Jets",
+      "common_name": "Jets",
+      "abbr": "WPG",
+      "logo": "https://assets.nhle.com/logos/nhl/svg/WPG_light.svg",
+      "franchise_id": 35
+   }
+]
+```
+
+**team_roster() response:**
+```json
+{
+   "forwards": [
+      {
+         "id": 8484145,
+         "firstName": {"default": "Zach"},
+         "lastName": {"default": "Benson"},
+         "sweaterNumber": 9,
+         "positionCode": "L",
+         "shootsCatches": "L"
+      }
+   ],
+   "defensement": [...],
+   "goalies": [...]
+}
+```
+
+**franchises() response:**
+```json
+[
+   {
+      "id": 32,
+      "fullName": "Anaheim Ducks",
+      "teamCommonName": "Ducks",
+      "teamPlaceName": "Anaheim"
+   }
+]
+```
+</details>
+
+# Schedule
+
+Get NHL game schedules - daily, weekly, or team-specific schedules.
+
+## Get Daily Schedule
+```python
+# Get today's games
+games = client.schedule.daily_schedule()
+
+# Get games for a specific date
+games = client.schedule.daily_schedule(date="2024-01-01")
+```
+
+## Get Weekly Schedule
+```python
+# Get this week's games
+week_games = client.schedule.weekly_schedule()
+
+# Get games for a specific week
+week_games = client.schedule.weekly_schedule(date="2024-01-01")
+```
+
+## Get Team Schedule
+```python
+# Get team's games for a specific month
+team_schedule = client.schedule.team_monthly_schedule(team_abbr="BUF", month="2024-10")
+```
+
+## Get Team Weekly Schedule
+```python
+# Defaults to 'now'
+weekly_schedule = client.schedule.team_weekly_schedule(team_abbr="BUF")
+
+weekly_schedule = client.schedule.team_weekly_schedule(team_abbr="BUF", date="2024-01-01")
+```
+
+## Get Team Season Schedule
+```python
+full_schedule = client.schedule.team_season_schedule(team_abbr="BUF", season="20242025")
+```
+
+## Get Calendar Schedule
+*Note: This is an endpoint available from the NHL but why it exists is a different story.  
+I seems to return the same data as the above endpoints*
+
+```python
+cal = client.schedule.calendar_schedule(date="2024-01-01")
+```
+
+## Playoff Schedule
+```python
+games = client.schedule.playoff_carousel(season="20242025")
+```
+
+## Playoff Schedule by Series
+```python
+series = client.schedule.playoff_series_schedule(season="20242025", series_id="20242025-1")
+```
+
+## Playoff Bracket
+```python
+bracket = client.schedule.playoff_bracket(year="2024")
+```
+
+### Example: Finding Tonight's Games
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+
+# Get today's games
+games = client.schedule.daily_schedule()
+
+# Show what's on tonight
+for game in games.get('games', []):
+    away_team = game['awayTeam']['abbrev']
+    home_team = game['homeTeam']['abbrev']
+    game_time = game['startTimeUTC']
+    print(f"{away_team} @ {home_team} - {game_time}")
+```
+
+<details>
+<summary>📋 Full Response Examples</summary>
+
+**daily_schedule() response:**
+```json
+{
+  "games": [
+    {
+      "id": 2024020001,
+      "awayTeam": {"abbrev": "TOR", "commonName": "Maple Leafs"},
+      "homeTeam": {"abbrev": "BUF", "commonName": "Sabres"},
+      "startTimeUTC": "2024-01-01T19:00:00Z",
+      "gameState": "OFF"
+    }
+  ]
+}
+```
+</details>
 
 
-- `helpers`: Contains helper functions and utilities for working with the NHL API, such as getting game IDs by season or calculating player statistics.
-These are experimental and often times make many requests, can return DFs or do calculations. Stuff I find myself doing over and over I tend to move into helpers for convenience.  They are often
-cross domain, involve many sub requests, may integrate more machine learning techniques, or just make it easier to get the data you want.  These will have built in sleeping to avoid hitting the API too hard, but you can override this by setting the `sleep` parameter to `False` in the function call.
 
+# Stats
+
+Get player and team statistics - from basic season stats to advanced analytics.
+
+## Get Player Career Stats
+```python
+# Get a player's full career statistics
+career_stats = client.stats.player_career_stats(player_id="8478402")  # Connor McDavid
+```
+
+## Get Player Game Log
+```python
+# Get game-by-game stats for a player
+game_log = client.stats.player_game_log(
+    player_id="8478402", 
+    season_id="20232024", 
+    game_type=2  # Regular season
+)
+```
+
+## Get Team Statistics
+```python
+# Get team stats for a season
+team_stats = client.stats.team_summary(
+    start_season="20232024", 
+    end_season="20232024"
+)
+```
+
+## Get Skater Statistics
+```python
+# Get basic skater stats
+skater_stats = client.stats.skater_stats_summary_simple(
+    start_season="20232024", 
+    end_season="20232024"
+)
+
+# Filter by franchise (team)
+skater_stats = client.stats.skater_stats_summary_simple(
+    start_season="20232024", 
+    end_season="20232024",
+    franchise_id="10"  # Toronto Maple Leafs
+)
+```
+
+## Get Goalie Statistics
+```python
+# Get basic goalie stats
+goalie_stats = client.stats.goalie_stats_summary_simple(
+    start_season="20232024", 
+    end_season="20232024"
+)
+
+# Get advanced goalie stats
+goalie_stats = client.stats.goalie_stats_summary_simple(
+    start_season="20232024",
+    end_season="20232024",
+    stats_type="advanced"
+)
+```
+
+### Example: Finding Top Scorers
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+
+# Get current season skater stats
+stats = client.stats.skater_stats_summary_simple(
+    start_season="20242025", 
+    end_season="20242025"
+)
+
+# Show top 5 scorers
+for i, player in enumerate(stats['data'][:5]):
+    print(f"{i+1}. {player['skaterFullName']}: {player['points']} points")
+```
+
+<details>
+<summary>📋 Full Response Examples</summary>
+
+**player_career_stats() response:**
+```json
+{
+  "playerId": 8478402,
+  "isActive": true,
+  "currentTeamId": 22,
+  "currentTeamAbbrev": "EDM",
+  "firstName": {"default": "Connor"},
+  "lastName": {"default": "McDavid"},
+  "sweaterNumber": 97,
+  "position": "C"
+}
+```
+
+**skater_stats_summary_simple() response:**
+```json
+{
+  "data": [
+    {
+      "playerId": 8478550,
+      "skaterFullName": "Artemi Panarin",
+      "goals": 49,
+      "assists": 71,
+      "points": 120,
+      "gamesPlayed": 82
+    }
+  ]
+}
+```
+</details>
+
+# Standings
+
+Get current league standings or standings from any point in NHL history.
+
+## Get Current Standings
+```python
+# Get current league standings
+standings = client.standings.league_standings()
+```
+
+## Get Historical Standings
+```python
+# Get standings from a specific date
+standings = client.standings.league_standings(date="2024-01-01")
+
+# Get final standings for a completed season
+standings = client.standings.league_standings(season="20232024")
+```
+
+## Get Season Information
+```python
+# Get metadata about seasons (dates, rules, etc.)
+season_info = client.standings.season_standing_manifest()
+```
+
+### Example: Finding Division Leaders
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+
+# Get current standings
+standings = client.standings.league_standings()
+
+# Find division leaders
+divisions = {}
+for team in standings['standings']:
+    division = team['divisionName']
+    if division not in divisions:
+        divisions[division] = team
+    elif team['points'] > divisions[division]['points']:
+        divisions[division] = team
+
+# Display division leaders
+for division, team in divisions.items():
+    print(f"{division}: {team['teamName']['default']} ({team['points']} pts)")
+```
+
+<details>
+<summary>📋 Full Response Examples</summary>
+
+**league_standings() response:**
+```json
+{
+  "standings": [
+    {
+      "teamName": {"default": "Boston Bruins"},
+      "teamAbbrev": {"default": "BOS"},
+      "divisionName": "Atlantic",
+      "points": 65,
+      "wins": 31,
+      "losses": 11,
+      "otLosses": 3
+    }
+  ]
+}
+```
+</details>
+
+# Game Center
+
+Get detailed game data - boxscores, play-by-play, and live game information.
+
+## Get Game Boxscore
+```python
+# Get complete boxscore for a game
+boxscore = client.game_center.boxscore(game_id="2023020280")
+```
+
+## Get Play-by-Play
+```python
+# Get detailed play-by-play data
+play_by_play = client.game_center.play_by_play(game_id="2023020280")
+```
+
+## Get Game Overview
+```python
+# Get game matchup info and key stats
+game_info = client.game_center.landing(game_id="2023020280")
+```
+
+## Get Game Scores
+```python
+# Get today's scores
+scores = client.game_center.daily_scores()
+
+# Get scores for a specific date
+scores = client.game_center.daily_scores(date="2024-01-01")
+```
+
+## Get Advanced Game Data
+```python
+# Get shift chart data
+shifts = client.game_center.shift_chart_data(game_id="2023020280")
+
+# Get additional game stats
+stats = client.game_center.right_rail(game_id="2023020280")
+
+# Get game story/recap
+story = client.game_center.game_story(game_id="2023020280")
+```
+
+### Example: Game Analysis
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+
+# Get a game's complete data
+game_id = "2023020280"
+boxscore = client.game_center.boxscore(game_id)
+play_by_play = client.game_center.play_by_play(game_id)
+
+# Analyze the game
+away_team = boxscore['awayTeam']['abbrev']
+home_team = boxscore['homeTeam']['abbrev']
+away_score = boxscore['awayTeam']['score']
+home_score = boxscore['homeTeam']['score']
+
+print(f"Final: {away_team} {away_score} - {home_team} {home_score}")
+
+# Count shots by period
+shots_by_period = {}
+for play in play_by_play.get('plays', []):
+    if play['typeDescKey'] == 'shot-on-goal':
+        period = play['period']
+        if period not in shots_by_period:
+            shots_by_period[period] = 0
+        shots_by_period[period] += 1
+
+for period, shots in shots_by_period.items():
+    print(f"Period {period}: {shots} shots")
+```
+
+<details>
+<summary>📋 Full Response Examples</summary>
+
+**boxscore() response:**
+```json
+{
+  "awayTeam": {
+    "abbrev": "TOR",
+    "score": 3,
+    "sog": 28
+  },
+  "homeTeam": {
+    "abbrev": "BUF", 
+    "score": 2,
+    "sog": 31
+  },
+  "gameState": "OFF",
+  "gameType": 2
+}
+```
+
+**play_by_play() response:**
+```json
+{
+  "plays": [
+    {
+      "typeDescKey": "goal",
+      "period": 1,
+      "timeInPeriod": "12:34",
+      "details": {
+        "scoringPlayerId": 8478402,
+        "shootingPlayerId": 8478402
+      }
+    }
+  ]
+}
+```
+</details>
+
+# Misc
+
+Utility endpoints for NHL reference data and configuration information.
+
+## Get NHL Glossary
+```python
+# Get definitions of NHL terms and statistics
+glossary = client.misc.glossary()
+```
+
+## Get API Configuration
+```python
+# Get available filter options and API configuration
+config = client.misc.config()
+```
+
+## Get Country Data
+```python
+# Get list of countries in NHL data
+countries = client.misc.countries()
+```
+
+## Get Season Information
+```python
+# Get season-specific rules and information
+season_info = client.misc.season_specific_rules_and_info()
+```
+
+## Get Draft Information
+```python
+# Get draft years and round information
+draft_info = client.misc.draft_year_and_rounds()
+```
+
+### Example: Understanding NHL Terms
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+
+# Get NHL glossary
+glossary = client.misc.glossary()
+
+# Find specific stats definitions
+stat_terms = ["PIM", "PPG", "SHG", "GWG"]
+for term in stat_terms:
+    for entry in glossary:
+        if entry['fullName'].upper() == term:
+            print(f"{term}: {entry['definition']}")
+            break
+```
+
+<details>
+<summary>📋 Full Response Examples</summary>
+
+**glossary() response:**
+```json
+[
+  {
+    "fullName": "PIM",
+    "definition": "Penalty Minutes - Total number of penalty minutes assessed to a player"
+  },
+  {
+    "fullName": "PPG", 
+    "definition": "Power Play Goals - Goals scored while team has a man advantage"
+  }
+]
+```
+
+**countries() response:**
+```json
+[
+  {
+    "id": 1,
+    "countryCode": "CAN",
+    "fullName": "Canada"
+  },
+  {
+    "id": 2,
+    "countryCode": "USA", 
+    "fullName": "United States"
+  }
+]
+```
+</details>
 
 ---
+# Advanced Usage
+
 ## Stats with QueryBuilder
 
 The skater stats endpoint can be accessed using the new query builder.  It should make
@@ -168,6 +780,12 @@ filters = [
 
 
 ### Example
+
+#### The Story:
+Show me all players, during the regular season (`game_type=2`), that were drafted in 2020 (`DraftQuery`)
+ for the 2020-2021 season through 2023-2024 season (`SeasonQuery`) that play forward: LW, C, RW (`PositionQuery`). Use 
+`summary` statistics and aggregate (`aggregate=True`) all the years together.
+
 ```python
 from nhlpy.api.query.builder import QueryBuilder, QueryContext
 from nhlpy.nhl_client import NHLClient
@@ -256,137 +874,6 @@ query_context.errors
 ```
 
 ---
-
-## Additional Stats Endpoints (In development)
-
-```python
-
-client.stats.gametypes_per_season_directory_by_team(team_abbr="BUF") # kinda weird endpoint.
-
-client.stats.player_career_stats(player_id="8478402")
-
-client.stats.player_game_log(player_id="8478402", season_id="20242025", game_type="2")
-
-# Team Summary Stats.
-#   These have lots of available parameters.  You can also tap into the apache cayenne expressions to build custom
-#   queries, if you have that knowledge.
-client.stats.team_summary(start_season="20202021", end_season="20212022", game_type_id=2)
-client.stats.team_summary(start_season="20202021", end_season="20212022")
-
-
-# Skater Summary Stats.
-#   Queries for skaters for year ranges, filterable down by franchise.
-client.stats.skater_stats_summary_simple(start_season="20232024", end_season="20232024")
-client.stats.skater_stats_summary_simple(franchise_id=10, start_season="20232024", end_season="20232024")
-
-# For the following query context endpoints, see the above section
-client.stats.skater_stats_with_query_context(...)
-
-# Goalies
-client.stats.goalie_stats_summary_simple(start_season="20242025", stats_type="summary")
-
-```
----
-
-
-## Schedule Endpoints
-
-```python
-
-# Returns the games for the given date.
-client.schedule.get_schedule(date="2021-01-13")
-
-# Return games for the week of (date)
-client.schedule.get_weekly_schedule(date="2021-01-13")
-
-client.schedule.get_schedule_by_team_by_month(team_abbr="BUF")
-client.schedule.get_schedule_by_team_by_month(team_abbr="BUF", month="2021-01")
-
-client.schedule.get_schedule_by_team_by_week(team_abbr="BUF")
-client.schedule.get_schedule_by_team_by_week(team_abbr="BUF", date="2024-01-01")
-
-client.schedule.get_season_schedule(team_abbr="BUF", season="20212022")
-
-client.schedule.schedule_calendar(date="2023-11-23")
-```
-
----
-
-## Standings Endpoints
-
-```python
-client.standings.get_standings()
-client.standings.get_standings(date="2021-01-13")
-client.standings.get_standings(season="20222023")
-
-# standings manifest.  This returns a ton of information for every season ever it seems like
-# This calls the API for this info, I also cache this in /data/seasonal_information_manifest.json
-# for less API calls since this only changes yearly.
-client.standings.season_standing_manifest()
-```
----
-
-## Teams Endpoints
-
-```python
-client.teams.teams_info() # returns id + abbrevation + name of all teams
-```
-
----
-
-## Game Center
-```python
-client.game_center.boxscore(game_id="2023020280")
-
-client.game_center.play_by_play(game_id="2023020280")
-
-client.game_center.landing(game_id="2023020280")
-
-client.game_center.score_now()
-
-# this is used via the website to provide additional related game information
-client.game_center.right_rail(game_id="2023020280")
-```
-
-
----
-
-## Helpers
-
-These are expieremental and often times make many requests, can return DFs or do calculations. Stuff I find myself doing over and over I tend to move into helpers for convience.
-
-```python
-# Game types 1=preseason, 2=regular season, 3 playoffs
-client.helpers.get_gameids_by_season("20242025", game_types=[2])
-```
-
-
----
-
-## Misc Endpoints
-```python
-client.misc.glossary()
-
-client.misc.config()
-
-client.misc.countries()
-
-client.misc.season_specific_rules_and_info()
-
-client.misc.draft_year_and_rounds()
-```
-
----
-## Insomnia Rest Client Export
-
-[Insomnia Rest Client](https://insomnia.rest) is a great tool for testing
-
-nhl_api-{ver}.json in the root folder is an export of the endpoints I have
-been working through using the Insomnia Rest Client.  You can import this directly
-into the client and use it to test the endpoints.  I will be updating this as I go
-
-
-- - - 
 
 
 ## Developers

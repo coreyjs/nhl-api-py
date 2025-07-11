@@ -124,7 +124,7 @@ class Teams:
         self._enrich_teams_with_franchise_ids(teams)
         return teams
 
-    def roster_by_team(self, team_abbr: str, season: str) -> Dict[str, Any]:
+    def team_roster(self, team_abbr: str, season: str) -> Dict[str, Any]:
         """Get the roster for the given team and season.
 
         Args:

@@ -39,7 +39,7 @@ def test_players_by_team_same_as_teams_roster(mock_get, nhl_client):
 
     # Call both methods with the same parameters
     players_result = nhl_client.players.players_by_team(team_abbr="TOR", season="20232024")
-    teams_result = nhl_client.teams.roster_by_team(team_abbr="TOR", season="20232024")
+    teams_result = nhl_client.teams.team_roster(team_abbr="TOR", season="20232024")
 
     # Both should make the same API call
     assert mock_get.call_count == 2

@@ -94,13 +94,14 @@ class Helpers:
         logging.warning(
             "This method will take a while to run.  In the event of rate limiting, you may need to increase the api_sleep_rate."
         )
-        # players = self.all_players(season, api_sleep_rate=api_sleep_rate)
+        players = self.all_players(season, api_sleep_rate=api_sleep_rate)
         teams = Teams(self.client).teams()
         stats_client = Stats(self.client)
 
         season_query = SeasonQuery(season_start=season, season_end=season)
         query_builder = QueryBuilder()
 
+        out_data = []
         for team in teams:
             time.sleep(api_sleep_rate)
             fran_query = FranchiseQuery(franchise_id=team["franchise_id"])
@@ -109,5 +110,21 @@ class Helpers:
             data = stats_client.skater_stats_with_query_context(
                 report_type="summary", query_context=context, aggregate=True
             )
+            out_data.extend(data.get("data", []))
 
-        return data
+        # Create a dictionary for fast player lookup by id
+        player_dict = {player["id"]: player for player in players}
+
+        # Merge player data with stats data
+        merged_data = []
+        for stat_entry in out_data:
+            player_id = stat_entry.get("playerId")
+            if player_id and player_id in player_dict:
+                # Merge player data with stats data
+                merged_entry = {**player_dict[player_id], **stat_entry}
+                merged_data.append(merged_entry)
+            else:
+                # Include stats entry even if no matching player found
+                merged_data.append(stat_entry)
+
+        return merged_data

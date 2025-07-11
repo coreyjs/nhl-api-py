@@ -8,7 +8,7 @@ class Schedule:
     def __init__(self, http_client: HttpClient) -> None:
         self.client = http_client
 
-    def daily_schedule(self, date: str = None) -> dict:
+    def daily_schedule(self, date: Optional[str] = None) -> dict:
         """Gets NHL schedule for a specific date.
 
         Args:
@@ -18,8 +18,11 @@ class Schedule:
            dict: Game schedule data for the specified date.
         """
         try:
-            # Parse and reformat the date to ensure YYYY-MM-DD
-            date = datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
+            if not date:
+                date = datetime.now().strftime("%Y-%m-%d")  # Default to today's date
+            else:
+                # Parse and reformat the date to ensure YYYY-MM-DD
+                date = datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
         except ValueError:
             raise ValueError("Invalid date format. Please use YYYY-MM-DD.")
 
