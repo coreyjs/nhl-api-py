@@ -69,10 +69,16 @@ class UnauthorizedException(NHLApiException):
 class HttpClient:
     def __init__(self, config) -> None:
         self._config = config
+        self._logger = logging.getLogger(__name__)
         if self._config.debug:
-            logging.basicConfig(level=logging.DEBUG)
+            self._logger.setLevel(logging.DEBUG)
+            if not self._logger.handlers:
+                handler = logging.StreamHandler()
+                formatter = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
+                handler.setFormatter(formatter)
+                self._logger.addHandler(handler)
         else:
-            logging.basicConfig(level=logging.WARNING)
+            self._logger.setLevel(logging.WARNING)
 
     def _handle_response(self, response: httpx.Response, url: str) -> None:
         """Handle different HTTP status codes and raise appropriate exceptions"""
@@ -108,6 +114,8 @@ class HttpClient:
     def get(self, endpoint: Endpoint, resource: str, query_params: dict = None) -> httpx.Response:
         """
         Private method to make a get request to the NHL API.  This wraps the lib httpx functionality.
+        :param query_params:
+        :param endpoint:
         :param resource:
         :return: httpx.Response
         :raises:
@@ -124,7 +132,10 @@ class HttpClient:
         with httpx.Client(
             verify=self._config.ssl_verify, timeout=self._config.timeout, follow_redirects=self._config.follow_redirects
         ) as client:
-            r: httpx.Response = client.get(url=f"{endpoint.value}{resource}", params=query_params)
+            full_url = f"{endpoint.value}{resource}"
+            if self._config.debug:
+                self._logger.debug(f"GET: {full_url}")
+            r: httpx.Response = client.get(url=full_url, params=query_params)
 
         self._handle_response(r, resource)
         return r
