@@ -11,15 +11,15 @@ class Edge:
     # SKATER ENDPOINTS
     # ========================
 
-    def skater_detail(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def skater_detail(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE skater detail statistics for a specific player.
 
         Retrieves detailed EDGE statistics including shot speed, skating speed, distance traveled,
         and zone time data for a skater.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024). Defaults to current season.
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024). Defaults to current season.
             game_type (int, optional): Type of games:
                 2: Regular season
                 3: Playoffs
@@ -37,12 +37,12 @@ class Edge:
             resource = f"edge/skater-detail/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def skater_shot_speed_detail(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def skater_shot_speed_detail(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE shot speed details for a specific skater.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -54,12 +54,12 @@ class Edge:
             resource = f"edge/skater-shot-speed-detail/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def skater_skating_speed_detail(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def skater_skating_speed_detail(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE skating speed details for a specific skater.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -71,12 +71,12 @@ class Edge:
             resource = f"edge/skater-skating-speed-detail/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def skater_shot_location_detail(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def skater_shot_location_detail(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE shot location details for a specific skater.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -89,13 +89,13 @@ class Edge:
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
     def skater_skating_distance_detail(
-        self, player_id: int, season: int = None, game_type: int = None
+        self, player_id: str, season: str = None, game_type: int = None
     ) -> Dict[str, Any]:
         """Get NHL EDGE skating distance details for a specific skater.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -107,12 +107,12 @@ class Edge:
             resource = f"edge/skater-skating-distance-detail/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def skater_comparison(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def skater_comparison(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE comparison statistics for a specific skater.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -124,12 +124,12 @@ class Edge:
             resource = f"edge/skater-comparison/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def skater_zone_time(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def skater_zone_time(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE zone time details for a specific skater.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -141,13 +141,13 @@ class Edge:
             resource = f"edge/skater-zone-time/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def skater_landing(self, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def skater_landing(self, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE skater landing page data.
 
         Retrieves league-wide skater EDGE statistics overview.
 
         Args:
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -159,12 +159,12 @@ class Edge:
             resource = f"edge/skater-landing/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def cat_skater_detail(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def cat_skater_detail(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL CAT (Catch All Tracking) EDGE skater details.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -180,15 +180,15 @@ class Edge:
     # GOALIE ENDPOINTS
     # ========================
 
-    def goalie_detail(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def goalie_detail(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE goalie detail statistics for a specific player.
 
         Retrieves detailed EDGE statistics including save percentages, shot location data,
         and 5v5 performance metrics for a goalie.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024). Defaults to current season.
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024). Defaults to current season.
             game_type (int, optional): Type of games:
                 2: Regular season
                 3: Playoffs
@@ -206,12 +206,12 @@ class Edge:
             resource = f"edge/goalie-detail/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def goalie_shot_location_detail(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def goalie_shot_location_detail(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE shot location details for a specific goalie.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -223,12 +223,12 @@ class Edge:
             resource = f"edge/goalie-shot-location-detail/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def goalie_5v5_detail(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def goalie_5v5_detail(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE 5v5 performance details for a specific goalie.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -240,12 +240,12 @@ class Edge:
             resource = f"edge/goalie-5v5-detail/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def goalie_comparison(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def goalie_comparison(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE comparison statistics for a specific goalie.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -257,12 +257,12 @@ class Edge:
             resource = f"edge/goalie-comparison/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def goalie_save_percentage_detail(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def goalie_save_percentage_detail(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE save percentage details for a specific goalie.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -274,13 +274,13 @@ class Edge:
             resource = f"edge/goalie-save-percentage-detail/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def goalie_landing(self, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def goalie_landing(self, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE goalie landing page data.
 
         Retrieves league-wide goalie EDGE statistics overview.
 
         Args:
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -292,12 +292,12 @@ class Edge:
             resource = f"edge/goalie-landing/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def cat_goalie_detail(self, player_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def cat_goalie_detail(self, player_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL CAT (Catch All Tracking) EDGE goalie details.
 
         Args:
-            player_id (int): The unique identifier for the NHL player
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            player_id (str): The unique identifier for the NHL player
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -313,15 +313,15 @@ class Edge:
     # TEAM ENDPOINTS
     # ========================
 
-    def team_detail(self, team_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def team_detail(self, team_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE team detail statistics for a specific team.
 
         Retrieves detailed EDGE statistics including team skating metrics, shot data,
         and zone time information.
 
         Args:
-            team_id (int): The unique identifier for the NHL team
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024). Defaults to current season.
+            team_id (str): The unique identifier for the NHL team
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024). Defaults to current season.
             game_type (int, optional): Type of games:
                 2: Regular season
                 3: Playoffs
@@ -339,12 +339,12 @@ class Edge:
             resource = f"edge/team-detail/{team_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def team_skating_distance_detail(self, team_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def team_skating_distance_detail(self, team_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE skating distance details for a specific team.
 
         Args:
-            team_id (int): The unique identifier for the NHL team
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            team_id (str): The unique identifier for the NHL team
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -356,12 +356,12 @@ class Edge:
             resource = f"edge/team-skating-distance-detail/{team_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def team_zone_time_details(self, team_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def team_zone_time_details(self, team_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE zone time details for a specific team.
 
         Args:
-            team_id (int): The unique identifier for the NHL team
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            team_id (str): The unique identifier for the NHL team
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -373,12 +373,12 @@ class Edge:
             resource = f"edge/team-zone-time-details/{team_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def team_shot_location_detail(self, team_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def team_shot_location_detail(self, team_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE shot location details for a specific team.
 
         Args:
-            team_id (int): The unique identifier for the NHL team
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            team_id (str): The unique identifier for the NHL team
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -390,13 +390,13 @@ class Edge:
             resource = f"edge/team-shot-location-detail/{team_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def team_landing(self, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def team_landing(self, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE team landing page data.
 
         Retrieves league-wide team EDGE statistics overview.
 
         Args:
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -408,12 +408,12 @@ class Edge:
             resource = f"edge/team-landing/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def team_shot_speed_detail(self, team_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def team_shot_speed_detail(self, team_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE shot speed details for a specific team.
 
         Args:
-            team_id (int): The unique identifier for the NHL team
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            team_id (str): The unique identifier for the NHL team
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
@@ -425,12 +425,12 @@ class Edge:
             resource = f"edge/team-shot-speed-detail/{team_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def team_skating_speed_detail(self, team_id: int, season: int = None, game_type: int = None) -> Dict[str, Any]:
+    def team_skating_speed_detail(self, team_id: str, season: str = None, game_type: int = None) -> Dict[str, Any]:
         """Get NHL EDGE skating speed details for a specific team.
 
         Args:
-            team_id (int): The unique identifier for the NHL team
-            season (int, optional): Season in YYYYYYYY format (e.g., 20232024)
+            team_id (str): The unique identifier for the NHL team
+            season (str, optional): Season in YYYYYYYY format (e.g., 20232024)
             game_type (int, optional): Type of games (2: Regular season, 3: Playoffs)
 
         Returns:
