@@ -11,6 +11,7 @@
   - [Teams](#teams)
   - [Schedule](#schedule)
   - [Stats](#stats)
+  - [Edge Data](#edge)
   - [Standings](#standings)
   - [Game Center](#game-center)
   - [Misc](#misc)
@@ -97,6 +98,7 @@ They are grouped by function to make the library easier to navigate and use.  Th
 - **`teams`**: Contains endpoints related to NHL teams, including team information and rosters. You can find team_id(s) here along with franchise_id(s) needed for some of the stats queries.
 - **`schedule`**: Contains endpoints related to the NHL schedule, including game dates, weekly schedules, and team schedules.
 - **`stats`**: Contains endpoints related to player and team statistics. This will have your basic stats, summary stats and more advanced stats using the new query builder, which allows for more complex queries to be built up programmatically.
+- **`edge`**: Contains endpoints to access EDGE related player and team data (shot speed, skate speed, etc).  These were well hidden endpoints from the NHL and behave a bit differently with their response payloads.
 - **`standings`**: Contains endpoints related to NHL standings, including current standings and historical standings.
 - **`game_center`**: Contains endpoints related to game center data, including box scores, play-by-play data, and game summaries.
 - **`misc`**: Contains miscellaneous endpoints that don't fit into the other categories, such as glossary terms, configuration data, and country information.
@@ -155,24 +157,6 @@ print(f"Defensemen: {len(roster['defensemen'])}")
 print(f"Goalies: {len(roster['goalies'])}")
 ```
 
-<details>
-<summary>📋 Full Response Examples</summary>
-
-**teams() response:**
-```json
-
-```
-
-**team_roster() response:**
-```json
-
-```
-
-**franchises() response:**
-```json
-
-```
-</details>
 
 # Schedule
 
@@ -256,11 +240,64 @@ for game in games.get('games', []):
 ```
 
 <details>
-<summary>📋 Full Response Examples</summary>
+<summary>Response Examples</summary>
 
 **daily_schedule() response:**
 ```json
 
+  'date': '2024-10-08',
+  'games': [
+  {
+      'awayTeam': {
+      'abbrev': 'STL',
+      'awaySplitSquad': False,
+      'commonName': {
+        'default': 'Blues'
+      },
+      'darkLogo': 'https://assets.nhle.com/logos/nhl/svg/STL_20082009-20242025_dark.svg',
+      'id': 19,
+      'logo': 'https://assets.nhle.com/logos/nhl/svg/STL_20082009-20242025_light.svg',
+      'placeName': {
+        'default': 'St. Louis'
+      },
+      'placeNameWithPreposition': {
+          'default': 'St. Louis',
+          'fr': 'de St. Louis'
+      },
+      'score': 3
+      },
+      'easternUTCOffset': '-04:00',
+      'gameCenterLink': '/gamecenter/stl-vs-sea/2024/10/08/2024020003',
+      'gameOutcome': {
+        'lastPeriodType': 'REG'
+      },
+      'gameScheduleState': 'OK',
+      'gameState': 'OFF',
+      'gameType': 2,
+      'homeTeam': {
+          'abbrev': 'SEA',
+          'commonName': {
+            'default': 'Kraken'
+      },
+      'darkLogo': 'https://assets.nhle.com/logos/nhl/svg/SEA_dark.svg',
+      'homeSplitSquad': False,
+      'id': 55,
+      'logo': 'https://assets.nhle.com/logos/nhl/svg/SEA_light.svg',
+      'placeName': {
+      'default': 'Seattle'
+  },
+  'placeNameWithPreposition': {
+  'default': 'Seattle',
+  'fr': 'de Seattle'
+  },
+  'score': 2
+  },
+  .....
+  }]
+
+STL @ SEA - 2024-10-08T20:30:00Z
+BOS @ FLA - 2024-10-08T23:00:00Z
+CHI @ UTA - 2024-10-09T02:00:00Z
 ```
 </details>
 
@@ -347,21 +384,143 @@ stats = client.stats.skater_stats_summary(
 # Show top 5 scorers
 for i, player in enumerate(stats[:5]):
     print(f"{i+1}. {player['skaterFullName']}: {player['points']} points")
+
+1. Nikita Kucherov: 121 points
+2. Nathan MacKinnon: 116 points
+3. Leon Draisaitl: 106 points
+4. David Pastrnak: 106 points
+5. Mitch Marner: 102 points
 ```
 
-<details>
-<summary>📋 Full Response Examples</summary>
+# Edge
 
-**player_career_stats() response:**
-```json
+Get EDGE related player and team data.  (Note, these endpoints were well hidden and behave
+a bit differently.  Their payloads are less verbose than the others.)
 
+It should be noted that these endpoints may be unstable and change often resulting in
+failed requests.  These seem to be for internal use for the NHL edge graphics, so data is often structured strangely. 
+
+```python
+client.edge.skater_detail(player_id='8478402', season='20252026')
+
+client.edge.skater_shot_speed_detail(player_id='8478402', season='20252026')
+
+client.edge.skater_skating_speed_detail(player_id='8478402', season='20252026')
+
+client.edge.skater_shot_location_detail(player_id='8478402', season='20252026')
+
+client.edge.skater_skating_distance_detail(player_id='8478402', season='20252026')
+
+client.edge.skater_comparison(player_id='8478402', season='20252026')
+
+client.edge.skater_zone_time(player_id='8478402', season='20252026')
+
+client.edge.skater_landing(season='20252026')
+
+client.edge.cat_skater_detail(player_id='8478402', season='20252026')
+
+client.edge.goalie_detail(player_id='8478402', season='20252026')
+
+client.edge.goalie_shot_location_detail(player_id='8478402', season='20252026')
+
+client.edge.goalie_5v5_detail(player_id='8478402', season='20252026')
+
+client.edge.goalie_comparison(player_id='8478402', season='20252026')
+
+client.edge.goalie_save_percentage_detail(player_id='8478402', season='20252026')
+
+client.edge.goalie_landing(season='20252026')
+
+client.edge.cat_goalie_detail(player_id='8478402', season='20252026')
+
+client.edge.team_detail(team_id='19', season='20252026')
+
+client.edge.team_skating_distance_detail(team_id='19', season='20252026')
+
+client.edge.team_zone_time_details(team_id='19', season='20252026')
+
+client.edge.team_shot_location_detail(team_id='19', season='20252026')
+
+client.edge.team_landing(team_id='19', season='20252026')
+
+client.edge.team_shot_speed_detail(team_id='19', season='20252026')
+
+client.edge.team_skating_speed_detail(team_id='19', season='20252026')
 ```
 
-**skater_stats_summary_simple() response:**
-```json
+## Skater Detail
 
+```python
+detail = client.edge.skater_detail(player_id='8478402', season="20252026")
+
+...
+'skatingSpeed': {
+        'burstsOver20': {
+          'leagueAvg': {
+            'value': 13.9179
+          },
+          'percentile': 1.0,
+          'value': 91
+        },
+        'speedMax': {
+          'imperial': 24.612,
+          'leagueAvg': {
+            'imperial': 21.7285,
+            'metric': 34.9685
+          },
+          'metric': 39.609,
+          'overlay': {
+            'awayTeam': {
+              'abbrev': 'CGY',
+              'score': 4
+            },
+            'gameDate': '2025-10-08',
+            'gameOutcome': {
+              'lastPeriodType': 'SO'
+            },
+            'gameType': 2,
+            'homeTeam': {
+              'abbrev': 'EDM',
+              'score': 3
+            },
+            'periodDescriptor': {
+              'maxRegulationPeriods': 3,
+              'number': 2,
+              'periodType': 'REG'
+            },
+            'player': {
+              'firstName': {
+                'default': 'Connor'
+              },
+              'lastName': {
+                'default': 'McDavid'
+              }
+            },
+            'timeInPeriod': '08:04'
+          },
+          'percentile': 1.0
+...
 ```
-</details>
+
+[Example Response](https://github.com/coreyjs/nhl-api-py/wiki/edge.skater_detail)
+
+
+## Skater Shot Speed Details
+
+```python
+detail = client.edge.skater_shot_speed_detail(player_id='8478402', season="20252026")
+```
+
+[Example Response](https://github.com/coreyjs/nhl-api-py/wiki/edge.skater_shot_speed_detail)
+
+
+## Skater Skating Speed Detail
+
+```python
+detail = client.edge.skater_skating_speed_detail(player_id='8478402', season='20252026')
+```
+
+---
 
 # Standings
 
@@ -411,14 +570,6 @@ for division, team in divisions.items():
     print(f"{division}: {team['teamName']['default']} ({team['points']} pts)")
 ```
 
-<details>
-<summary>📋 Full Response Examples</summary>
-
-**league_standings() response:**
-```json
-
-```
-</details>
 
 # Game Center
 
@@ -495,19 +646,6 @@ for period, shots in shots_by_period.items():
     print(f"Period {period}: {shots} shots")
 ```
 
-<details>
-<summary>📋 Full Response Examples</summary>
-
-**boxscore() response:**
-```json
-
-```
-
-**play_by_play() response:**
-```json
-
-```
-</details>
 
 # Misc
 
@@ -560,20 +698,6 @@ for term in stat_terms:
             print(f"{term}: {entry['definition']}")
             continue
 ```
-
-<details>
-<summary>📋 Full Response Examples</summary>
-
-**glossary() response:**
-```json
-
-```
-
-**countries() response:**
-```json
-
-```
-</details>
 
 ---
 # Advanced Usage
@@ -734,7 +858,6 @@ This should support the following filters:
 - `shots`
 
 ```python
-.....
 query_builder = QueryBuilder()
 query_context: QueryContext = query_builder.build(filters=filters)
 
