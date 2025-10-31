@@ -43,6 +43,8 @@ If you find any, open a ticket or post in the discussions tab.   I would love to
 
 ```bash
 pip install nhl-api-py
+# - OR -
+uv add nhl-api-py
 ```
 
 ```python
@@ -90,6 +92,8 @@ More in depth examples can be found in the wiki, feel free to add more: [Example
 
 Im available on [Bluesky](https://bsky.app/profile/coreyjs.dev) or the [twit](https://x.com/corey_builds) for any questions or just general chats about enhancements.
 
+---
+
 ## API Modules
 
 This project is organized into several sub modules, each representing a different endpoint of the NHL API.  
@@ -102,12 +106,15 @@ They are grouped by function to make the library easier to navigate and use.  Th
 - **`standings`**: Contains endpoints related to NHL standings, including current standings and historical standings.
 - **`game_center`**: Contains endpoints related to game center data, including box scores, play-by-play data, and game summaries.
 - **`misc`**: Contains miscellaneous endpoints that don't fit into the other categories, such as glossary terms, configuration data, and country information.
-
+- **`players`**: Get Players by team and prospects.
 ### Helpers Module
 - **`helpers`**: Contains helper functions and utilities for working with the NHL API, such as getting game IDs by season or calculating player statistics. These are experimental and often times make many requests, can return DataFrames or do calculations. Stuff I find myself doing over and over I tend to move into helpers for convenience. They are often cross domain, involve many sub requests, may integrate more machine learning techniques, or just make it easier to get the data you want. These will have built in sleeping to avoid hitting the API too hard, but you can override this by setting the `sleep` parameter to `False` in the function call.
 
 
 Do you have a specific use case or cool code snippet you use over and over?  If its helpful to others please open a PR and add a helper.
+
+---
+
 # Teams
 
 Get information about NHL teams, rosters, and franchises.
@@ -156,7 +163,7 @@ print(f"Forwards: {len(roster['forwards'])}")
 print(f"Defensemen: {len(roster['defensemen'])}")
 print(f"Goalies: {len(roster['goalies'])}")
 ```
-
+---
 
 # Schedule
 
@@ -301,7 +308,7 @@ CHI @ UTA - 2024-10-09T02:00:00Z
 ```
 </details>
 
-
+---
 
 # Stats
 
@@ -391,134 +398,117 @@ for i, player in enumerate(stats[:5]):
 4. David Pastrnak: 106 points
 5. Mitch Marner: 102 points
 ```
+---
 
 # Edge
 
-Get EDGE related player and team data.  (Note, these endpoints were well hidden and behave
-a bit differently.  Their payloads are less verbose than the others.)
+Access NHL EDGE statistics - advanced player and puck tracking data including shot speed, skating speed,
+distance traveled, and zone time metrics. This data provides insights beyond traditional statistics.
 
-It should be noted that these endpoints may be unstable and change often resulting in
-failed requests.  These seem to be for internal use for the NHL edge graphics, so data is often structured strangely. 
+## What are EDGE Stats?
+
+EDGE stats capture real-time tracking data from NHL games:
+- **Skater Data**: Shot velocity, skating speed, burst counts, distance covered, zone time
+- **Goalie Data**: Save locations, shot tracking, 5v5 performance breakdowns
+- **Team Data**: Aggregate team skating metrics, shot patterns, and zone possession
+
+Use EDGE endpoints when you need physical performance metrics. Use the [Stats](#stats) endpoints
+for traditional statistics like goals, assists, and points.
+
+## Usage Patterns
+
+All EDGE methods support two patterns:
+- **Current season**: Omit the `season` parameter or pass `None` to get current data
+- **Specific season**: Pass season as 8-digit string (e.g., `"20232024"`)
+
+The `game_type` parameter defaults to `2` (regular season) but can be set to `3` for playoffs.
+
+## Important Notes
+
+These endpoints may be unstable and change frequently. They appear to be designed for internal
+NHL use for broadcast graphics. Response structures can vary and data availability may be inconsistent. 
+
+## Skater Metrics
 
 ```python
+# Get comprehensive EDGE statistics for a skater
 client.edge.skater_detail(player_id='8478402', season='20252026')
 
+# Get shot speed analytics (max speed, average speed)
 client.edge.skater_shot_speed_detail(player_id='8478402', season='20252026')
 
+# Get skating speed metrics (burst counts, max speed)
 client.edge.skater_skating_speed_detail(player_id='8478402', season='20252026')
 
+# Get shot location patterns and heat maps
 client.edge.skater_shot_location_detail(player_id='8478402', season='20252026')
 
+# Get distance traveled per game and per shift
 client.edge.skater_skating_distance_detail(player_id='8478402', season='20252026')
 
+# Get comparison data vs league averages
 client.edge.skater_comparison(player_id='8478402', season='20252026')
 
+# Get time spent in each zone (offensive/defensive/neutral)
 client.edge.skater_zone_time(player_id='8478402', season='20252026')
 
+# Get league-wide skater EDGE statistics overview
 client.edge.skater_landing(season='20252026')
 
+# Get CAT (Catch All Tracking) EDGE statistics
 client.edge.cat_skater_detail(player_id='8478402', season='20252026')
+```
 
-client.edge.goalie_detail(player_id='8478402', season='20252026')
+## Goalie Metrics
 
-client.edge.goalie_shot_location_detail(player_id='8478402', season='20252026')
+```python
+# Get comprehensive EDGE statistics for a goalie
+client.edge.goalie_detail(player_id='8476945', season='20252026')
 
-client.edge.goalie_5v5_detail(player_id='8478402', season='20252026')
+# Get shot location data and save percentages by zone
+client.edge.goalie_shot_location_detail(player_id='8476945', season='20252026')
 
-client.edge.goalie_comparison(player_id='8478402', season='20252026')
+# Get 5-on-5 performance statistics
+client.edge.goalie_5v5_detail(player_id='8476945', season='20252026')
 
-client.edge.goalie_save_percentage_detail(player_id='8478402', season='20252026')
+# Get comparison data vs league averages
+client.edge.goalie_comparison(player_id='8476945', season='20252026')
 
+# Get detailed save percentage breakdowns by situation
+client.edge.goalie_save_percentage_detail(player_id='8476945', season='20252026')
+
+# Get league-wide goalie EDGE statistics overview
 client.edge.goalie_landing(season='20252026')
 
-client.edge.cat_goalie_detail(player_id='8478402', season='20252026')
+# Get CAT (Catch All Tracking) EDGE statistics
+client.edge.cat_goalie_detail(player_id='8476945', season='20252026')
+```
 
+## Team Metrics
+
+```python
+# Get comprehensive EDGE statistics for a team
 client.edge.team_detail(team_id='19', season='20252026')
 
+# Get team skating distance statistics
 client.edge.team_skating_distance_detail(team_id='19', season='20252026')
 
+# Get team zone time breakdowns
 client.edge.team_zone_time_details(team_id='19', season='20252026')
 
+# Get team shot location patterns
 client.edge.team_shot_location_detail(team_id='19', season='20252026')
 
-client.edge.team_landing(team_id='19', season='20252026')
-
+# Get team shot speed analytics
 client.edge.team_shot_speed_detail(team_id='19', season='20252026')
 
+# Get team skating speed metrics
 client.edge.team_skating_speed_detail(team_id='19', season='20252026')
+
+# Get league-wide team EDGE statistics overview
+client.edge.team_landing(season='20252026')
 ```
 
-## Skater Detail
-
-```python
-detail = client.edge.skater_detail(player_id='8478402', season="20252026")
-
-...
-'skatingSpeed': {
-        'burstsOver20': {
-          'leagueAvg': {
-            'value': 13.9179
-          },
-          'percentile': 1.0,
-          'value': 91
-        },
-        'speedMax': {
-          'imperial': 24.612,
-          'leagueAvg': {
-            'imperial': 21.7285,
-            'metric': 34.9685
-          },
-          'metric': 39.609,
-          'overlay': {
-            'awayTeam': {
-              'abbrev': 'CGY',
-              'score': 4
-            },
-            'gameDate': '2025-10-08',
-            'gameOutcome': {
-              'lastPeriodType': 'SO'
-            },
-            'gameType': 2,
-            'homeTeam': {
-              'abbrev': 'EDM',
-              'score': 3
-            },
-            'periodDescriptor': {
-              'maxRegulationPeriods': 3,
-              'number': 2,
-              'periodType': 'REG'
-            },
-            'player': {
-              'firstName': {
-                'default': 'Connor'
-              },
-              'lastName': {
-                'default': 'McDavid'
-              }
-            },
-            'timeInPeriod': '08:04'
-          },
-          'percentile': 1.0
-...
-```
-
-[Example Response](https://github.com/coreyjs/nhl-api-py/wiki/edge.skater_detail)
-
-
-## Skater Shot Speed Details
-
-```python
-detail = client.edge.skater_shot_speed_detail(player_id='8478402', season="20252026")
-```
-
-[Example Response](https://github.com/coreyjs/nhl-api-py/wiki/edge.skater_shot_speed_detail)
-
-
-## Skater Skating Speed Detail
-
-```python
-detail = client.edge.skater_skating_speed_detail(player_id='8478402', season='20252026')
-```
 
 ---
 
@@ -569,7 +559,7 @@ for team in standings['standings']:
 for division, team in divisions.items():
     print(f"{division}: {team['teamName']['default']} ({team['points']} pts)")
 ```
-
+---
 
 # Game Center
 
@@ -645,7 +635,7 @@ for play in play_by_play.get('plays', []):
 for period, shots in shots_by_period.items():
     print(f"Period {period}: {shots} shots")
 ```
-
+---
 
 # Misc
 
