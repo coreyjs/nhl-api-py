@@ -88,9 +88,7 @@ class Edge:
             resource = f"edge/skater-shot-location-detail/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
-    def skater_skating_distance_detail(
-        self, player_id: str, season: str = None, game_type: int = 2
-    ) -> Dict[str, Any]:
+    def skater_skating_distance_detail(self, player_id: str, season: str = None, game_type: int = 2) -> Dict[str, Any]:
         """Get NHL EDGE skating distance details for a specific skater.
 
         Args:
