@@ -4,12 +4,12 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "nhl-api-py"
-version = "3.1.1"
+version = "3.2.0"
 description = "NHL API (Updated for 2025/2026) and EDGE Stats.  For standings, team stats, outcomes, player information.  Contains each individual API endpoint as well as convience methods as well as pythonic query builder for more indepth EDGE stats."
 authors = ["Corey Schaf <cschaf@gmail.com>"]
 readme = "README.md"
 packages = [{include = "nhlpy"}]
-license = "GPL-3.0-or-later"
+license = "Apache-2.0"
 homepage = "https://github.com/coreyjs/nhl-api-py"
 repository = "https://github.com/coreyjs/nhl-api-py"
 keywords = ["nhl", "api", "wrapper", "hockey", "sports", "edge", "edge stats", "edge analytics", "edge sports",
