@@ -77,7 +77,7 @@ class Helpers:
         out_data = []
         for team in teams:
             time.sleep(api_sleep_rate)
-            players = teams_client.roster_by_team(team_abbr=team["abbr"], season=season)
+            players = teams_client.team_roster(team_abbr=team["abbr"], season=season)
 
             # Tweak and clean some player data
             for p in players["forwards"] + players["defensemen"] + players["goalies"]:
