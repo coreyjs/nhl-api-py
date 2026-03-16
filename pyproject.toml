@@ -47,7 +47,7 @@ pytest="^7.1.3"
 pytest-mock = "*"
 mypy = "*"
 ruff = "*"
-black = "*"
+black = {version = ">=26.3.1", python = ">=3.10"}
 ipykernel = "*"
 
 [tool.ruff]
