@@ -1,7 +1,6 @@
 from typing import List, Dict, Optional, Any
 from nhlpy.http_client import Endpoint, HttpClient
 
-
 # @dataclass
 # class TeamInfo:
 #     """Data class for team information."""

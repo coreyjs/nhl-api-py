@@ -4,7 +4,6 @@ from typing import Union
 from nhlpy.api.query import InvalidQueryValueException
 from nhlpy.api.query.filters import QueryBase
 
-
 logger = logging.getLogger(__name__)
 
 
