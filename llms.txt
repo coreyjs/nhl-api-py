@@ -1,0 +1,109 @@
+# nhl-api-py
+
+> Python wrapper for the NHL API. Access NHL data including stats, schedules, standings, teams, game center, player info, and EDGE tracking analytics.
+
+## Installation
+
+pip install nhl-api-py
+
+## Quick Start
+
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+```
+
+## Docs
+
+- [Game Center](docs/game_center.md): Boxscores, play-by-play, scores, shift charts, game stories
+- [Schedule](docs/schedule.md): Daily/weekly/monthly/season schedules, playoffs
+- [Stats](docs/stats.md): Player career stats, game logs, team/skater/goalie summaries with query builder
+- [Teams](docs/teams.md): Team info, rosters, franchises
+- [Standings](docs/standings.md): League standings, season metadata
+- [Players](docs/players.md): Prospects, team rosters by season
+- [EDGE](docs/edge.md): NHL EDGE tracking analytics — shot speed, skating speed, zone time, distance
+- [Misc](docs/misc.md): Glossary, config, countries, draft info, season rules
+- [Helpers](docs/helpers.md): Convenience methods — all game IDs, all players, bulk stats
+
+## Architecture
+
+NHLClient is the main entry point. Access modules via attributes:
+
+- `client.game_center` — Live game data, boxscores, play-by-play, scores
+- `client.schedule` — Game schedules (daily/weekly/monthly/season/playoffs)
+- `client.stats` — Player and team statistics with advanced query builder
+- `client.teams` — Team info, rosters, franchises
+- `client.standings` — League standings
+- `client.players` — Player lookup by team, prospects
+- `client.edge` — NHL EDGE tracking analytics (shot speed, skating speed, zone time)
+- `client.misc` — Reference data (glossary, countries, draft info)
+- `client.helpers` — Cross-domain convenience methods (all game IDs, all players)
+
+## Common Patterns
+
+- **Season format**: 8-digit string, start year + end year (e.g., `"20242025"`)
+- **Team abbreviation**: 3-letter code (e.g., `"BUF"`, `"TOR"`, `"EDM"`)
+- **Player ID**: Numeric string (e.g., `"8478402"` for Connor McDavid)
+- **Game ID format**: `YYYYTTNNNN` — season start year + game type + game number (e.g., `2024020641`)
+- **Game types**: `1` = Preseason, `2` = Regular Season, `3` = Playoffs
+- **Date format**: `"YYYY-MM-DD"` (e.g., `"2025-01-07"`)
+- **Localized names**: Many name fields use `{"default": "English name", "fr": "French name"}` format
+
+## Workflows
+
+### Get today's scores
+```python
+from nhlpy import NHLClient
+client = NHLClient()
+scores = client.game_center.daily_scores()
+for game in scores["games"]:
+    away = game["awayTeam"]
+    home = game["homeTeam"]
+    print(f"{away['abbrev']} {away['score']} - {home['abbrev']} {home['score']}")
+```
+
+### Get a player's career stats
+```python
+from nhlpy import NHLClient
+client = NHLClient()
+stats = client.stats.player_career_stats(player_id="8478402")
+career = stats["careerTotals"]["regularSeason"]
+print(f"{stats['firstName']['default']} {stats['lastName']['default']}: {career['goals']}G {career['assists']}A {career['points']}P")
+```
+
+### Find a team's roster
+```python
+from nhlpy import NHLClient
+client = NHLClient()
+roster = client.teams.team_roster(team_abbr="EDM", season="20242025")
+for player in roster["forwards"]:
+    print(f"#{player['sweaterNumber']} {player['firstName']['default']} {player['lastName']['default']}")
+```
+
+### Get league standings
+```python
+from nhlpy import NHLClient
+client = NHLClient()
+standings = client.standings.league_standings(season="20242025")
+for team in standings["standings"][:5]:
+    print(f"{team['teamAbbrev']['default']}: {team['points']}pts ({team['wins']}W-{team['losses']}L-{team['otLosses']}OTL)")
+```
+
+### Query advanced skater stats
+```python
+from nhlpy import NHLClient
+from nhlpy.api.query.builder import QueryBuilder
+from nhlpy.api.query.filters.season import SeasonQuery
+from nhlpy.api.query.filters.game_type import GameTypeQuery
+
+client = NHLClient()
+filters = [
+    SeasonQuery(season_start="20242025", season_end="20242025"),
+    GameTypeQuery(game_type="2"),
+]
+query = QueryBuilder.build(filters=filters)
+stats = client.stats.skater_stats_with_query_context(query_context=query, report_type="summary")
+for player in stats[:5]:
+    print(f"{player['skaterFullName']}: {player['points']}pts")
+```

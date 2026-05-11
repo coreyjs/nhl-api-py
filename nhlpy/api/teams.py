@@ -96,27 +96,45 @@ class Teams:
         return None
 
     def teams(self, date: str = "now") -> List[Dict[str, Any]]:
-        """Get a list of all NHL teams with their conference, division, and franchise information.
+        """Get a list of all NHL teams with conference, division, and franchise info.
+
+        This method transforms the raw API response by aggregating team data
+        from the standings endpoint and enriching it with franchise IDs.
 
         Args:
-            date: Date in format YYYY-MM-DD. Defaults to "now".
-                Note that while the NHL API uses "now" to default to the current date,
-                during preseason this may default to last year's season. To get accurate
-                teams for the current season, supply a date (YYYY-MM-DD) at the start of
-                the upcoming season. For example:
-                - 2024-04-18 for season 2023-2024
-                - 2024-10-04 for season 2024-2025
+            date (str): Date in ``YYYY-MM-DD`` format. Defaults to ``"now"``.
+                Note that while the NHL API uses ``"now"`` to default to the
+                current date, during preseason this may default to last year's
+                season. To get accurate teams for the current season, supply a
+                date at the start of the upcoming season. For example:
+
+                - ``"2024-04-18"`` for season 2023-2024
+                - ``"2024-10-04"`` for season 2024-2025
 
         Returns:
-            List of dictionaries containing team information including conference,
-            division, and franchise ID. Data is aggregated from the current standings
-            API and joined with franchise information.
+            List[Dict[str, Any]]: List of team dicts.
+
+        Key Response Fields (per team dict):
+            name (str): Full team name (e.g., ``"Buffalo Sabres"``).
+            common_name (str): Common team name (e.g., ``"Sabres"``).
+            abbr (str): Three-letter team abbreviation (e.g., ``"BUF"``).
+            logo (str): URL of the team logo.
+            franchise_id (int): Numeric franchise identifier.
+            conference.name (str): Conference name (e.g., ``"Eastern"``).
+            division.name (str): Division name (e.g., ``"Atlantic"``).
 
         Note:
-            Updated in 2.10.0: Now pulls from current standings API, aggregates team
-            conference/division data, and joins with franchise ID. This workaround is
-            necessary due to NHL API limitations preventing this data from being retrieved
-            in a single request.
+            Updated in 2.10.0: Now pulls from the standings API, aggregates
+            team conference/division data, and joins with franchise IDs. This
+            workaround is necessary due to NHL API limitations preventing this
+            data from being retrieved in a single request.
+
+        Response Docs:
+            https://api-web.nhle.com/v1/standings/{date}
+
+        Example:
+            client.teams.teams()
+            client.teams.teams(date="2024-10-04")
         """
         standings_data = self._fetch_standings_data(date)
         teams = self._parse_teams_from_standings(standings_data)
@@ -127,11 +145,31 @@ class Teams:
         """Get the roster for the given team and season.
 
         Args:
-            team_abbr: Team abbreviation (e.g., BUF, TOR)
-            season: Season in format YYYYYYYY (e.g., 20202021, 20212022)
+            team_abbr (str): Team abbreviation (e.g., ``"BUF"``, ``"TOR"``).
+            season (str): Season in ``YYYYYYYY`` format (e.g., ``"20202021"``).
 
         Returns:
-            Dictionary containing roster information for the specified team and season.
+            Dict[str, Any]: Dictionary keyed by position group.
+
+        Key Response Fields:
+            forwards (list): List of forward player dicts.
+            defensemen (list): List of defenseman player dicts.
+            goalies (list): List of goalie player dicts.
+
+        Key Player Fields (per player dict):
+            id (int): Unique player identifier.
+            firstName.default (str): Player's first name.
+            lastName.default (str): Player's last name.
+            sweaterNumber (int): Jersey number.
+            positionCode (str): Position code (e.g., ``"C"``, ``"D"``, ``"G"``).
+            birthDate (str): Date of birth (``YYYY-MM-DD``).
+            birthCountry (str): Three-letter country code.
+
+        Response Docs:
+            https://api-web.nhle.com/v1/roster/{team}/{season}
+
+        Example:
+            client.teams.team_roster(team_abbr="BUF", season="20232024")
         """
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"roster/{team_abbr}/{season}").json()
 
@@ -139,7 +177,21 @@ class Teams:
         """Get a list of all past and current NHL franchises.
 
         Returns:
-            List of all NHL franchises, including historical/defunct teams.
+            List[Dict[str, Any]]: List of franchise dicts, including
+            historical and defunct teams.
+
+        Key Response Fields (per franchise dict):
+            id (int): Unique franchise identifier.
+            fullName (str): Full franchise name (e.g.,
+                ``"Buffalo Sabres"``).
+            teamCommonName (str): Common name (e.g., ``"Sabres"``).
+            teamPlaceName (str): Place name (e.g., ``"Buffalo"``).
+
+        Response Docs:
+            https://api.nhle.com/stats/rest/en/franchise
+
+        Example:
+            client.teams.franchises()
         """
         # franchise_url = f"{self.NHL_STATS_API_BASE}/en/franchise"
         response = self.client.get(endpoint=Endpoint.API_STATS, resource="en/franchise").json()

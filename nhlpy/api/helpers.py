@@ -21,18 +21,31 @@ class Helpers:
         return name[ntype]["default"]
 
     def game_ids_by_season(self, season: str, game_types: List[int] = None, api_sleep_rate: float = 1) -> List[str]:
-        """Gets all game IDs for a specified season.
+        """Gets all game IDs for a specified season by querying every team's schedule.
+
+        Iterates over all 32 NHL teams and collects game IDs from each team's
+        season schedule.  Expect roughly 2,600 IDs for a full regular season
+        and approximately 32 API calls (one per team).
 
         Args:
-           season (str): Season to retrieve game IDs for in YYYYYYYY format (e.g., 20232024).
-           game_types (List[int]): List of game types to include. Valid types:
-               1: Preseason
-               2: Regular season
-               3: Playoffs
-        api_sleep_rate (float): Sleep rate in seconds between API calls to avoid hitting rate limits.
+            season (str): Season in YYYYYYYY format (e.g., "20232024").
+            game_types (List[int], optional): Game types to include. Valid values:
+
+                - ``1`` -- Preseason
+                - ``2`` -- Regular season
+                - ``3`` -- Playoffs
+
+                Defaults to ``None`` (all game types).
+            api_sleep_rate (float): Seconds to sleep between API calls to
+                avoid rate limiting. Defaults to ``1``.
 
         Returns:
-           List of game IDs for the specified season and game types.
+            List[str]: Game IDs matching the requested season and game types.
+
+        Note:
+            This method makes one API call per team (~32 calls) and respects
+            ``api_sleep_rate`` between each call. Total runtime depends on the
+            sleep rate chosen.
         """
         from nhlpy.api.teams import Teams
         from nhlpy.api.schedule import Schedule
@@ -60,13 +73,30 @@ class Helpers:
         return game_ids
 
     def all_players(self, season: str, api_sleep_rate: float = 0.5) -> List[dict[str, Any]]:
-        """Gets all player base stats.
+        """Gets every rostered player across all 32 NHL teams for a given season.
+
+        Iterates over every team roster and returns a flat list of player
+        dicts with cleaned name fields and an added ``team`` key.  Makes
+        approximately 32 API calls (one per team).
 
         Args:
-            api_sleep_rate (float): Sleep rate in seconds between API calls to avoid hitting rate limits.
+            season (str): Season in YYYYYYYY format (e.g., "20232024").
+            api_sleep_rate (float): Seconds to sleep between API calls to
+                avoid rate limiting. Defaults to ``0.5``.
 
         Returns:
-            List of player base stats.
+            List[dict[str, Any]]: List of player dicts. Key fields include:
+
+                - ``id`` (int): Player ID.
+                - ``firstName`` (str): Cleaned first name (``default`` value).
+                - ``lastName`` (str): Cleaned last name (``default`` value).
+                - ``sweaterNumber`` (int): Jersey number.
+                - ``positionCode`` (str): Position code (e.g., "C", "D", "G").
+                - ``team`` (str): Team abbreviation added by this method.
+
+        Note:
+            This method makes one API call per team (~32 calls) and respects
+            ``api_sleep_rate`` between each call.
         """
         from nhlpy.api.teams import Teams
 
@@ -90,7 +120,28 @@ class Helpers:
         return out_data
 
     def all_players_summary_statistics(self, season: str, api_sleep_rate: float = 1):
-        """Gets all player summary statistics for a specified season."""
+        """Gets summary statistics for every skater in a given season.
+
+        Combines roster data from ``all_players()`` with per-team summary
+        stats fetched through the query builder, then merges the two datasets
+        on player ID.  Makes multiple paginated API calls (one roster call
+        per team plus one stats call per team franchise).
+
+        Args:
+            season (str): Season in YYYYYYYY format (e.g., "20232024").
+            api_sleep_rate (float): Seconds to sleep between API calls to
+                avoid rate limiting. Defaults to ``1``.
+
+        Returns:
+            list[dict]: Merged player and summary-stats dicts.  Each entry
+            contains the roster fields from ``all_players()`` plus stats
+            fields such as ``goals``, ``assists``, ``points``,
+            ``gamesPlayed``, and other summary report columns.
+
+        Warning:
+            This method is slow and makes a large number of API calls.
+            Increase ``api_sleep_rate`` if you encounter rate limiting.
+        """
         logging.warning(
             "This method will take a while to run.  In the event of rate limiting, you may need to increase the api_sleep_rate."
         )
