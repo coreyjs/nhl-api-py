@@ -22,6 +22,13 @@ class Stats:
         Returns:
             dict: A mapping of seasons to game types played by the team
 
+        Key Response Fields:
+            season (int): The season identifier in YYYYYYYY format (e.g., 20242025)
+            gameTypes (list[int]): List of game type codes played that season (1=Preseason, 2=Regular, 3=Playoffs)
+
+        Response Docs:
+            docs/stats.md
+
         Example:
             https://api-web.nhle.com/v1/club-stats-season/TOR
 
@@ -47,6 +54,23 @@ class Stats:
 
         Returns:
             dict: A dictionary containing the player's career statistics and personal information
+
+        Key Response Fields:
+            playerId (int): Unique NHL player identifier
+            firstName.default (str): Player's first name
+            lastName.default (str): Player's last name
+            position (str): Player's position code (e.g., 'C', 'L', 'R', 'D', 'G')
+            currentTeamAbbrev (str): Three-letter abbreviation of the player's current team
+            careerTotals.regularSeason.goals (int): Career regular season goals
+            careerTotals.regularSeason.assists (int): Career regular season assists
+            careerTotals.regularSeason.points (int): Career regular season points
+            careerTotals.regularSeason.gamesPlayed (int): Career regular season games played
+            last5Games (list): Statistics from the player's last 5 games
+            seasonTotals (list): Per-season statistical breakdowns
+            awards (list): List of awards and trophies won
+
+        Response Docs:
+            docs/stats.md
 
         Example:
             Full Example: https://github.com/coreyjs/nhl-api-py/wiki/Player-Career-Stats-%E2%80%90-Example-Payload
@@ -85,6 +109,21 @@ class Stats:
 
         Returns:
             dict: A dictionary containing the player's game-by-game statistics for the specified parameters
+
+        Key Response Fields:
+            gameId (int): Unique game identifier
+            gameDate (str): Date of the game in YYYY-MM-DD format
+            goals (int): Goals scored in the game
+            assists (int): Assists recorded in the game
+            points (int): Total points in the game
+            plusMinus (int): Plus/minus rating for the game
+            shots (int): Shots on goal
+            toi (str): Time on ice in MM:SS format
+            opponentAbbrev (str): Three-letter abbreviation of the opposing team
+            teamAbbrev (str): Three-letter abbreviation of the player's team
+
+        Response Docs:
+            docs/stats.md
 
         Example:
             Full example here https://github.com/coreyjs/nhl-api-py/wiki/Stats.Player-Game-Log-%E2%80%90-Example-Response
@@ -161,6 +200,21 @@ class Stats:
 
         Returns:
             List[dict]: List of dictionaries containing team summary statistics
+
+        Key Response Fields:
+            teamFullName (str): Full display name of the team (e.g., 'Florida Panthers')
+            teamId (int): Unique team identifier
+            gamesPlayed (int): Total games played in the period
+            wins (int): Total wins
+            losses (int): Total losses
+            points (int): Standings points accumulated
+            goalsFor (int): Total goals scored
+            goalsAgainst (int): Total goals allowed
+            powerPlayPct (float): Power play conversion percentage
+            penaltyKillPct (float): Penalty kill success percentage
+
+        Response Docs:
+            docs/stats.md
 
         Examples:
             Full Response Example: https://github.com/coreyjs/nhl-api-py/wiki/Stats.Team-Summary-%E2%80%90-Example-Response
@@ -261,6 +315,22 @@ class Stats:
         Returns:
             List[dict]: List of dictionaries containing skater statistics
 
+        Key Response Fields:
+            skaterFullName (str): Full display name of the skater (e.g., 'Artemi Panarin')
+            playerId (int): Unique player identifier
+            teamAbbrevs (str): Three-letter team abbreviation(s)
+            gamesPlayed (int): Total games played
+            goals (int): Total goals scored
+            assists (int): Total assists
+            points (int): Total points (goals + assists)
+            plusMinus (int): Plus/minus rating
+            pointsPerGame (float): Average points per game
+            shots (int): Total shots on goal
+            shootingPct (float): Shooting percentage
+
+        Response Docs:
+            docs/stats.md
+
         Examples:
             Full Response Example: https://github.com/coreyjs/nhl-api-py/wiki/Stats.Skater-Stats-Summary-Simple
             c.stats.skater_stats_summary_simple(start_season="20232024", end_season="20232024")
@@ -355,6 +425,22 @@ class Stats:
 
         Returns:
             dict: Dictionary containing skater statistics based on the specified report type
+
+        Key Response Fields (common across all report types):
+            playerId (int): Unique player identifier.
+            skaterFullName (str): Full display name of the skater.
+            teamAbbrevs (str): Three-letter team abbreviation(s).
+            seasonId (int): Season identifier.
+            gamesPlayed (int): Total games played.
+
+        Note:
+            Response fields vary by report_type. For example, "summary" returns
+            goals/assists/points, "realtime" returns hits/blocks/giveaways,
+            "penalties" returns minorPenalties/majorPenalties. Use
+            client.misc.config() to discover available fields per report type.
+
+        Response Docs:
+            docs/stats.md
 
         Example:
             Full example here: https://github.com/coreyjs/nhl-api-py/wiki/Stats.Skater-Stats-with-Query-Context
@@ -460,6 +546,20 @@ class Stats:
 
         Returns:
             dict: Dictionary containing goalie statistics based on the specified parameters
+
+        Key Response Fields:
+            goalieFullName (str): Full display name of the goalie (e.g., 'Connor Hellebuyck')
+            playerId (int): Unique player identifier
+            teamAbbrevs (str): Three-letter team abbreviation(s)
+            gamesPlayed (int): Total games played
+            wins (int): Total wins
+            losses (int): Total losses
+            savePct (float): Save percentage (e.g., 0.92612)
+            goalsAgainstAverage (float): Goals against average per game
+            shutouts (int): Total shutouts
+
+        Response Docs:
+            docs/stats.md
 
         Example:
             client.stats.goalie_stats_summary_simple(start_season="20242025", stats_type="summary")

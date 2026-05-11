@@ -1,0 +1,16 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "nhl-api-py",
+  "description": "Python wrapper for the NHL API — stats, schedules, standings, teams, game data, and EDGE analytics",
+  "folders": ["docs"],
+  "excludeFolders": ["tests", ".github"],
+  "excludeFiles": ["CONTRIBUTING.md"],
+  "rules": [
+    "Always import from nhlpy: from nhlpy import NHLClient",
+    "Game IDs format: YYYYTTNNNN (e.g., 2023020280 = 2023 season, regular season game 280)",
+    "Season format: YYYYYYYY (e.g., 20242025)",
+    "Method names have no get_ prefix (e.g., boxscore() not get_boxscore())",
+    "Team abbreviations are 3 letters (e.g., BUF, TOR, EDM)",
+    "Many name fields use localized format: {\"default\": \"English\", \"fr\": \"French\"}"
+  ]
+}
