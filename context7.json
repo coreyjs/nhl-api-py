@@ -5,6 +5,8 @@
   "folders": ["docs"],
   "excludeFolders": ["tests", ".github"],
   "excludeFiles": ["CONTRIBUTING.md"],
+  "url": "https://context7.com/coreyjs/nhl-api-py",
+  "public_key": "pk_F4KgKQz15Rp4c9f4G3uEa",
   "rules": [
     "Always import from nhlpy: from nhlpy import NHLClient",
     "Game IDs format: YYYYTTNNNN (e.g., 2023020280 = 2023 season, regular season game 280)",
