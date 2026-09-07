@@ -31,6 +31,12 @@ Note: I created this to help me with some machine learning
 projects around the NHL and the NHL data sets.  Special thanks to https://github.com/erunion/sport-api-specifications/tree/master/nhl,
 https://gitlab.com/dword4/nhlapi/-/blob/master/stats-api.md and https://github.com/Zmalski/NHL-API-Reference.
 
+### AI Note:
+
+This library was written by hand before the advent of agentic coding.  Going forward this repo will continue to be 
+developed with an engineer first approach.  Any agentic tools will be used for architectural reviews or general code reviews.  
+AI heavy PRs will not be accepted, but we are open to any discussion that makes this library better for the user.
+
 ### Developer Note: This is being updated with the new, also undocumented, NHL API.  
 
 This started as a project around the old NHL API, that got deprecated in 2023(?). This project has evolved 
