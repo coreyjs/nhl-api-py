@@ -4,6 +4,8 @@ The helpers module provides convenience methods that aggregate data from multipl
 
 **Performance warning:** Every method in this module makes multiple API calls internally (typically 32, one per NHL team) with built-in sleep delays between requests to avoid rate limiting. These methods are significantly slower than individual API calls. Expect execution times of 30 seconds to several minutes depending on the method and sleep rate.
 
+**Historical seasons:** Every method in this module gets its team list from `client.teams.teams()`, which returns the current teams. For a historical season it iterates today's teams, so relocated or defunct teams (for example the Quebec Nordiques in 1990-91) are missed. For a season-accurate team list, use `client.stats.team_summary()` for the season's team IDs and `client.teams.all_time_teams()` for their abbreviations and franchise IDs.
+
 ## Get All Game IDs for a Season with game_ids_by_season
 
 Retrieves all unique game IDs for an entire NHL season by iterating through each team's schedule. Makes 32 API calls (one per team) with a configurable sleep delay between each call. Returns approximately 2600 unique game IDs for a standard regular season.

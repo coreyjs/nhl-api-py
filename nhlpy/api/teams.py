@@ -129,6 +129,10 @@ class Teams:
             workaround is necessary due to NHL API limitations preventing this
             data from being retrieved in a single request.
 
+        See Also:
+            ``all_time_teams()`` for every team past and present (including
+            relocated and defunct teams) with team and franchise IDs.
+
         Response Docs:
             https://api-web.nhle.com/v1/standings/{date}
 
@@ -195,4 +199,39 @@ class Teams:
         """
         # franchise_url = f"{self.NHL_STATS_API_BASE}/en/franchise"
         response = self.client.get(endpoint=Endpoint.API_STATS, resource="en/franchise").json()
+        return response.get("data", [])
+
+    def all_time_teams(self) -> List[Dict[str, Any]]:
+        """Get every NHL team past and present, including relocated and defunct teams, with its franchise ID.
+
+        A franchise can have several teams over time (e.g., the Quebec Nordiques
+        and Colorado Avalanche are both franchise 27). Team IDs are the ``teamId``
+        values used by game feeds and the stats API. Unlike ``teams()``, the
+        response uses the NHL's raw field names and has no conference or
+        division data.
+
+        Returns:
+            List[Dict[str, Any]]: List of team dicts (about 60), returned as the
+            NHL publishes them. Placeholder entries such as ``"To be determined"``
+            (id 70) and ``"NHL"`` (id 99) have no franchise.
+
+        Key Response Fields (per team dict):
+            id (int): Unique team identifier (e.g., ``32`` for the Quebec Nordiques).
+            franchiseId (int | None): Franchise identifier, or ``None`` for
+                placeholder entries.
+            fullName (str): Full team name (e.g., ``"Quebec Nordiques"``).
+            triCode (str): Three-letter abbreviation (e.g., ``"QUE"``).
+            rawTricode (str): Raw three-letter abbreviation.
+            leagueId (int): League identifier.
+
+        See Also:
+            ``teams()`` for the current 32 teams with conference and division.
+
+        Response Docs:
+            docs/teams.md
+
+        Example:
+            client.teams.all_time_teams()
+        """
+        response = self.client.get(endpoint=Endpoint.API_STATS, resource="en/team").json()
         return response.get("data", [])
