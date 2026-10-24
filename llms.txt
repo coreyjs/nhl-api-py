@@ -19,7 +19,7 @@ client = NHLClient()
 - [Game Center](docs/game_center.md): Boxscores, play-by-play, scores, shift charts, game stories
 - [Schedule](docs/schedule.md): Daily/weekly/monthly/season schedules, playoffs
 - [Stats](docs/stats.md): Player career stats, game logs, team/skater/goalie summaries with query builder
-- [Teams](docs/teams.md): Team info, rosters, franchises
+- [Teams](docs/teams.md): Team info, rosters, franchises, all-time teams with franchise IDs
 - [Standings](docs/standings.md): League standings, season metadata
 - [Players](docs/players.md): Prospects, team rosters by season
 - [EDGE](docs/edge.md): NHL EDGE tracking analytics — shot speed, skating speed, zone time, distance
@@ -34,7 +34,7 @@ NHLClient is the main entry point. Access modules via attributes:
 - `client.game_center` — Live game data, boxscores, play-by-play, scores
 - `client.schedule` — Game schedules (daily/weekly/monthly/season/playoffs)
 - `client.stats` — Player and team statistics with advanced query builder
-- `client.teams` — Team info, rosters, franchises
+- `client.teams` — Team info, rosters, franchises, team ID to franchise ID lookup (`all_time_teams()`)
 - `client.standings` — League standings
 - `client.players` — Player lookup by team, prospects
 - `client.edge` — NHL EDGE tracking analytics (shot speed, skating speed, zone time)

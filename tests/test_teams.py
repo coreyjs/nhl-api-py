@@ -10,6 +10,21 @@ def test_roster(h_m, nhl_client):
 
 
 @mock.patch("httpx.Client.get")
+def test_all_time_teams(h_m, nhl_client):
+    h_m.return_value.json.return_value = {
+        "data": [
+            {"id": 32, "franchiseId": 27, "fullName": "Quebec Nordiques", "triCode": "QUE"},
+            {"id": 70, "franchiseId": None, "fullName": "To be determined", "triCode": "TBD"},
+        ],
+        "total": 2,
+    }
+    teams = nhl_client.teams.all_time_teams()
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api.nhle.com/stats/rest/en/team"
+    assert teams == h_m.return_value.json.return_value["data"]
+
+
+@mock.patch("httpx.Client.get")
 def test_all_teams(mock_get, nhl_client):
     # Create mock responses for the two API calls
 

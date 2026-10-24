@@ -4,7 +4,7 @@ The Teams module provides access to NHL team information, rosters, and franchise
 
 ## Teams: List All Current NHL Teams
 
-Returns a list of all 32 current NHL teams with conference, division, and franchise information. This method transforms the raw API response into a clean, standardized format by combining standings data with franchise metadata.
+Returns a list of all 32 current NHL teams with conference, division, and franchise information. For every team past and present (Quebec Nordiques, Hartford Whalers, ...) use `all_time_teams()`. This method transforms the raw API response into a clean, standardized format by combining standings data with franchise metadata.
 
 ```python
 from nhlpy import NHLClient
@@ -95,3 +95,35 @@ franchises = client.teams.franchises()
   - `fullName` (str): Full franchise name (e.g., "Toronto Maple Leafs", "Montreal Wanderers")
   - `teamCommonName` (str): Common name (e.g., "Maple Leafs", "Wanderers")
   - `teamPlaceName` (str): Place name (e.g., "Toronto", "Montreal")
+
+## Teams: List All-Time NHL Teams with Franchise IDs
+
+Returns every NHL team past and present, including relocated and defunct teams, with the franchise it belongs to. Use `teams()` instead for the current 32 teams with conference and division. Unlike `teams()`, this returns the NHL's raw field names (`triCode`, `franchiseId`). A franchise can have several teams over time: the Quebec Nordiques (team 32) and Colorado Avalanche (team 21) are both franchise 27. Team IDs are the `teamId` values used by game feeds and the stats API, so this is the lookup from a team ID or abbreviation in a given season to its franchise.
+
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+teams = client.teams.all_time_teams()
+
+# Team ID -> franchise ID
+franchise_by_team = {t["id"]: t["franchiseId"] for t in teams}
+franchise_by_team[32]  # 27 (Quebec Nordiques)
+```
+
+- **Parameters**: None
+- **Returns**: list of dicts, one per team (about 60 entries), returned as the NHL publishes them
+  - `id` (int): Team identifier (e.g., 32 for the Quebec Nordiques)
+  - `franchiseId` (int or None): Franchise identifier. `None` for placeholder entries such as "To be determined" (id 70) and "NHL" (id 99)
+  - `fullName` (str): Full team name (e.g., "Quebec Nordiques")
+  - `triCode` (str): Three-letter abbreviation (e.g., "QUE"). Abbreviations are reused over time (e.g., "UTA" is both team 59 and team 68), so match them within one season's teams
+  - `rawTricode` (str): Raw three-letter abbreviation
+  - `leagueId` (int): League identifier
+
+Example response entry:
+
+```json
+{"id": 32, "franchiseId": 27, "fullName": "Quebec Nordiques", "leagueId": 133, "rawTricode": "QUE", "triCode": "QUE"}
+```
+
+To list the teams that played in a specific season, combine it with `client.stats.team_summary(start_season="19901991", end_season="19901991")`, which returns that season's `teamId`s.

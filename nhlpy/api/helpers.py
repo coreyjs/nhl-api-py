@@ -46,6 +46,12 @@ class Helpers:
             This method makes one API call per team (~32 calls) and respects
             ``api_sleep_rate`` between each call. Total runtime depends on the
             sleep rate chosen.
+
+            Teams come from ``teams.teams()``, which returns the current
+            teams. For historical seasons this iterates today's teams, so
+            relocated or defunct teams are missed. For a season-accurate team
+            list, use ``stats.team_summary()`` for the season's team IDs and
+            ``teams.all_time_teams()`` for their abbreviations.
         """
         from nhlpy.api.teams import Teams
         from nhlpy.api.schedule import Schedule
@@ -97,6 +103,12 @@ class Helpers:
         Note:
             This method makes one API call per team (~32 calls) and respects
             ``api_sleep_rate`` between each call.
+
+            Teams come from ``teams.teams()``, which returns the current
+            teams. For historical seasons this iterates today's teams, so
+            relocated or defunct teams are missed. For a season-accurate team
+            list, use ``stats.team_summary()`` for the season's team IDs and
+            ``teams.all_time_teams()`` for their abbreviations.
         """
         from nhlpy.api.teams import Teams
 
@@ -141,6 +153,11 @@ class Helpers:
         Warning:
             This method is slow and makes a large number of API calls.
             Increase ``api_sleep_rate`` if you encounter rate limiting.
+
+        Note:
+            Teams and their franchise IDs come from ``teams.teams()``, which
+            returns the current teams, so historical seasons only cover
+            franchises that are active today. See ``game_ids_by_season()``.
         """
         logging.warning(
             "This method will take a while to run.  In the event of rate limiting, you may need to increase the api_sleep_rate."
