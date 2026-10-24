@@ -15,6 +15,7 @@
   - [Standings](#standings)
   - [Game Center](#game-center)
   - [Misc](#misc)
+  - [Records](#records)
 - [Advanced Usage](#advanced-usage)
   - [Query Builder](#stats-with-querybuilder)
 - [Examples & Wiki](#examples--wiki)
@@ -113,6 +114,7 @@ They are grouped by function to make the library easier to navigate and use.  Th
 - **`game_center`**: Contains endpoints related to game center data, including box scores, play-by-play data, and game summaries.
 - **`misc`**: Contains miscellaneous endpoints that don't fit into the other categories, such as glossary terms, configuration data, and country information.
 - **`players`**: Get Players by team and prospects.
+- **`records`**: Historical data from the NHL Records API: franchise history, the full draft history, attendance, venues, and hundreds of record lists (streaks, fastest goals, etc.).
 ### Helpers Module
 - **`helpers`**: Contains helper functions and utilities for working with the NHL API, such as getting game IDs by season or calculating player statistics. These are experimental and often times make many requests, can return DataFrames or do calculations. Stuff I find myself doing over and over I tend to move into helpers for convenience. They are often cross domain, involve many sub requests, may integrate more machine learning techniques, or just make it easier to get the data you want. These will have built in sleeping to avoid hitting the API too hard, but you can override this by setting the `sleep` parameter to `False` in the function call.
 
@@ -694,6 +696,32 @@ for term in stat_terms:
             print(f"{term}: {entry['definition']}")
             continue
 ```
+
+---
+
+# Records
+
+Historical data from the NHL Records API (`records.nhl.com`). Curated methods return a list of rows; `query()` reaches any of the ~445 records endpoints by name. See [docs/records.md](docs/records.md) for every method and the full endpoint catalog.
+
+```python
+# Franchise history
+franchises = client.records.franchises()
+sabres = client.records.franchise_detail(team_id=7)
+totals = client.records.franchise_totals(game_type_id=2, sort="wins")
+seasons = client.records.franchise_season_results(franchise_id=19, game_type_id=2)
+
+# Draft history (back to 1963)
+first_round = client.records.draft(draft_year=2024, round_number=1, sort=[("overallPickNumber", "ASC")])
+sabres_picks = client.records.draft_by_team(team_id=7)
+
+# Any records endpoint, with Cayenne filters, sorting and pagination
+top_scorers = client.records.query(
+    "skater-career-scoring-regular-season", cayenne_exp="franchiseId=19", sort="points", limit=10
+)
+streaks = client.records.query("goalie-shutout-streak", limit=10)
+```
+
+Note: without a `limit`, records endpoints return every row, which can be large (e.g. the full draft is ~8 MB).
 
 ---
 # Advanced Usage
