@@ -24,6 +24,7 @@ client = NHLClient()
 - [Players](docs/players.md): Prospects, team rosters by season
 - [EDGE](docs/edge.md): NHL EDGE tracking analytics — shot speed, skating speed, zone time, distance
 - [Misc](docs/misc.md): Glossary, config, countries, draft info, season rules
+- [Records](docs/records.md): Historical records — franchise history, draft history (1963+), attendance, venues, plus generic access to ~445 record endpoints
 - [Helpers](docs/helpers.md): Convenience methods — all game IDs, all players, bulk stats
 
 ## Architecture
@@ -38,6 +39,7 @@ NHLClient is the main entry point. Access modules via attributes:
 - `client.players` — Player lookup by team, prospects
 - `client.edge` — NHL EDGE tracking analytics (shot speed, skating speed, zone time)
 - `client.misc` — Reference data (glossary, countries, draft info)
+- `client.records` — NHL Records API (franchise history, draft history, record lists); `query()` reaches any records endpoint
 - `client.helpers` — Cross-domain convenience methods (all game IDs, all players)
 
 ## Common Patterns
@@ -106,4 +108,25 @@ query = QueryBuilder.build(filters=filters)
 stats = client.stats.skater_stats_with_query_context(query_context=query, report_type="summary")
 for player in stats[:5]:
     print(f"{player['skaterFullName']}: {player['points']}pts")
+```
+
+### Get a franchise's all-time top scorers
+```python
+from nhlpy import NHLClient
+client = NHLClient()
+sabres = client.records.franchise_detail(team_id=7)[0]
+top = client.records.query(
+    "skater-career-scoring-regular-season", cayenne_exp=f"franchiseId={sabres['id']}", sort="points", limit=10
+)
+for p in top["data"]:
+    print(f"{p['firstName']} {p['lastName']}: {p['points']}pts in {p['gamesPlayed']}GP")
+```
+
+### Get a draft's first round
+```python
+from nhlpy import NHLClient
+client = NHLClient()
+picks = client.records.draft(draft_year=2024, round_number=1, sort=[("overallPickNumber", "ASC")])
+for p in picks:
+    print(f"{p['overallPickNumber']}. {p['triCode']} - {p['playerName']} ({p['position']})")
 ```
