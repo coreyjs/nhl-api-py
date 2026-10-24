@@ -1,4 +1,4 @@
-from nhlpy.api import teams, standings, schedule, game_center, stats, misc, helpers, players, edge
+from nhlpy.api import teams, standings, schedule, game_center, stats, misc, helpers, players, edge, records
 from nhlpy.http_client import HttpClient
 from nhlpy.config import ClientConfig
 
@@ -38,3 +38,4 @@ class NHLClient:
         self.helpers = helpers.Helpers(http_client=self._http_client)
         self.players = players.Players(http_client=self._http_client)
         self.edge = edge.Edge(http_client=self._http_client)
+        self.records = records.Records(http_client=self._http_client)
