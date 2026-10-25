@@ -40,7 +40,9 @@ def test_all_teams(mock_get, nhl_client):
                 "teamName": {"default": "Boston Bruins"},
                 "teamCommonName": {"default": "Bruins"},
                 "teamAbbrev": {"default": "BOS"},
+                "placeName": {"default": "Boston"},
                 "teamLogo": "https://assets.nhle.com/logos/nhl/svg/BOS_light.svg",
+                "teamLogoDark": "https://assets.nhle.com/logos/nhl/svg/BOS_dark.svg",
             },
             {
                 "conferenceAbbrev": "W",
@@ -116,6 +118,9 @@ def test_all_teams(mock_get, nhl_client):
     assert teams[0]["name"] == "Boston Bruins"
     assert teams[0]["common_name"] == "Bruins"
     assert teams[0]["abbr"] == "BOS"
+    assert teams[0]["place_name"] == "Boston"
+    assert teams[0]["logo"] == "https://assets.nhle.com/logos/nhl/svg/BOS_light.svg"
+    assert teams[0]["dark_logo"] == "https://assets.nhle.com/logos/nhl/svg/BOS_dark.svg"
     assert teams[0]["conference"]["abbr"] == "E"
     assert teams[0]["conference"]["name"] == "Eastern"
     assert teams[0]["division"]["abbr"] == "A"
@@ -146,6 +151,8 @@ def test_all_teams(mock_get, nhl_client):
     assert teams[3]["name"] == "New Team"
     assert teams[3]["common_name"] == "New Team"
     assert teams[3]["abbr"] == "NEW"
+    assert teams[3]["place_name"] == ""  # missing fields default to empty strings
+    assert teams[3]["dark_logo"] == ""
     assert teams[3]["conference"]["abbr"] == "E"
     assert teams[3]["conference"]["name"] == "Eastern"
     assert teams[3]["division"]["abbr"] == "M"

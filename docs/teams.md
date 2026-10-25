@@ -24,7 +24,9 @@ teams = client.teams.teams(date="2024-10-04")
   - `name` (str): Full team name (e.g., "Toronto Maple Leafs")
   - `common_name` (str): Common team name (e.g., "Maple Leafs")
   - `abbr` (str): Three-letter abbreviation (e.g., "TOR")
+  - `place_name` (str): Team location (e.g., "Toronto")
   - `logo` (str): URL to the team logo SVG
+  - `dark_logo` (str): URL to the dark-mode team logo SVG
   - `franchise_id` (int): Franchise identifier, joined from the franchises endpoint
   - `conference` (object): Conference details
     - `abbr` (str): Conference abbreviation (e.g., "E", "W")

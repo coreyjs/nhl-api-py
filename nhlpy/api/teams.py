@@ -49,7 +49,9 @@ class Teams:
             "name": self._extract_nested_default(team_data, "teamName"),
             "common_name": self._extract_nested_default(team_data, "teamCommonName"),
             "abbr": self._extract_nested_default(team_data, "teamAbbrev"),
+            "place_name": self._extract_nested_default(team_data, "placeName"),
             "logo": team_data.get("teamLogo", ""),
+            "dark_logo": team_data.get("teamLogoDark", ""),
         }
 
     def _extract_nested_default(self, data: Dict[str, Any], key: str) -> str:
@@ -118,7 +120,9 @@ class Teams:
             name (str): Full team name (e.g., ``"Buffalo Sabres"``).
             common_name (str): Common team name (e.g., ``"Sabres"``).
             abbr (str): Three-letter team abbreviation (e.g., ``"BUF"``).
+            place_name (str): Team location (e.g., ``"Buffalo"``).
             logo (str): URL of the team logo.
+            dark_logo (str): URL of the dark-mode team logo.
             franchise_id (int): Numeric franchise identifier.
             conference.name (str): Conference name (e.g., ``"Eastern"``).
             division.name (str): Division name (e.g., ``"Atlantic"``).
