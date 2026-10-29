@@ -1,6 +1,32 @@
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional, Sequence
 
 from nhlpy.http_client import HttpClient, Endpoint
+
+# Allowed values for the top-10 leaderboard endpoints, taken from nhl.com's EDGE pages.
+# The API answers an unknown sort with a 404 and an unknown position group with an empty list,
+# so these are validated before any request is made.
+POSITION_GROUPS = ("all", "forwards", "defense")
+STRENGTHS = ("all", "es", "pp", "pk")
+SHOT_SPEED_SORTS = ("max", "over-100", "90-99", "80-89", "70-79")
+SKATING_SPEED_SORTS = ("max", "over-22", "20-22", "18-20")
+SKATING_DISTANCE_SORTS = ("total", "per-60", "max-game", "max-period")
+ZONE_TIME_SORTS = ("offensive", "neutral", "defensive")
+SHOT_LOCATION_AREAS = ("all", "high", "mid", "long")
+SHOT_LOCATION_CATEGORIES = ("sog", "goals", "shooting-pctg")
+GOALIE_SHOT_LOCATION_CATEGORIES = ("save-pctg", "saves", "goals-against", "shots-against")
+GOALIE_5V5_SORTS = ("save-pctg", "save-pctg-close", "shots", "shots-per-60")
+GOALIE_SAVE_PCTG_SORTS = ("pctg", "games")
+
+
+def _check(name: str, value: str, allowed: Sequence[str]) -> str:
+    if value not in allowed:
+        raise ValueError(f"Invalid {name} '{value}'. Valid values: {', '.join(allowed)}")
+    return value
+
+
+def _with_period(resource: str, season: Optional[str], game_type: int) -> str:
+    """Appends ``/now`` or ``/{season}/{game_type}`` to an EDGE resource path."""
+    return f"{resource}/now" if season is None else f"{resource}/{season}/{game_type}"
 
 
 class Edge:
@@ -251,6 +277,226 @@ class Edge:
             resource = f"cat/edge/skater-detail/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
 
+    def skater_skating_speed_top_10(
+        self, position_group: str = "all", sort: str = "max", season: str = None, game_type: int = 2
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 skaters by NHL EDGE skating speed.
+
+        Args:
+            position_group (str, optional): "all", "forwards" or "defense". Defaults to "all".
+            sort (str, optional): "max" (top speed), or speed-burst counts "over-22", "20-22", "18-20" (mph).
+                Defaults to "max".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten skaters, ranked by ``sort``
+
+        Key Response Fields:
+            player.firstName.default (str): Player first name
+            player.lastName.default (str): Player last name
+            player.team.abbrev (str): Player's team abbreviation
+            maxSpeed.imperial (float): Top skating speed in mph (``metric`` for km/h)
+            maxSpeed.overlay (dict): The game the top speed happened in
+            burstsOver22 (int): Bursts over 22 mph
+            bursts20To22 (int): Bursts between 20 and 22 mph
+            bursts18To20 (int): Bursts between 18 and 20 mph
+
+        Raises:
+            ValueError: If ``position_group`` or ``sort`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.skater_skating_speed_top_10()
+            client.edge.skater_skating_speed_top_10(position_group="defense", sort="over-22", season="20242025")
+        """
+        resource = (
+            f"edge/skater-speed-top-10/{_check('position_group', position_group, POSITION_GROUPS)}"
+            f"/{_check('sort', sort, SKATING_SPEED_SORTS)}"
+        )
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
+
+    def skater_shot_speed_top_10(
+        self, position_group: str = "all", sort: str = "max", season: str = None, game_type: int = 2
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 skaters by NHL EDGE shot speed.
+
+        Args:
+            position_group (str, optional): "all", "forwards" or "defense". Defaults to "all".
+            sort (str, optional): "max" (hardest shot), or shot-attempt counts "over-100", "90-99", "80-89",
+                "70-79" (mph). Defaults to "max".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten skaters, ranked by ``sort``
+
+        Key Response Fields:
+            player.firstName.default (str): Player first name
+            player.lastName.default (str): Player last name
+            player.team.abbrev (str): Player's team abbreviation
+            hardestShot.imperial (float): Hardest shot in mph (``metric`` for km/h)
+            hardestShot.overlay (dict): The game the hardest shot happened in
+            shotAttemptsOver100 (int): Shot attempts over 100 mph
+            shotAttempts90To100 (int): Shot attempts between 90 and 100 mph
+            shotAttempts80To90 (int): Shot attempts between 80 and 90 mph
+
+        Raises:
+            ValueError: If ``position_group`` or ``sort`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.skater_shot_speed_top_10()
+            client.edge.skater_shot_speed_top_10(position_group="forwards", sort="over-100")
+        """
+        resource = (
+            f"edge/skater-shot-speed-top-10/{_check('position_group', position_group, POSITION_GROUPS)}"
+            f"/{_check('sort', sort, SHOT_SPEED_SORTS)}"
+        )
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
+
+    def skater_skating_distance_top_10(
+        self,
+        position_group: str = "all",
+        strength: str = "all",
+        sort: str = "total",
+        season: str = None,
+        game_type: int = 2,
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 skaters by NHL EDGE distance skated.
+
+        Args:
+            position_group (str, optional): "all", "forwards" or "defense". Defaults to "all".
+            strength (str, optional): "all", "es" (even strength), "pp" (power play) or "pk" (penalty kill).
+                Defaults to "all".
+            sort (str, optional): "total", "per-60", "max-game" or "max-period". Defaults to "total".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten skaters, ranked by ``sort``
+
+        Key Response Fields:
+            player.firstName.default (str): Player first name
+            player.lastName.default (str): Player last name
+            player.team.abbrev (str): Player's team abbreviation
+            distanceTotal.imperial (float): Total distance skated in miles (``metric`` for km)
+            distancePer60.imperial (float): Distance per 60 minutes in miles
+            distanceMaxPerGame.imperial (float): Most distance in a single game, with ``overlay`` game info
+            distanceMaxPerPeriod.imperial (float): Most distance in a single period, with ``overlay`` game info
+
+        Raises:
+            ValueError: If ``position_group``, ``strength`` or ``sort`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.skater_skating_distance_top_10()
+            client.edge.skater_skating_distance_top_10(position_group="defense", strength="pk", sort="per-60")
+        """
+        resource = (
+            f"edge/skater-distance-top-10/{_check('position_group', position_group, POSITION_GROUPS)}"
+            f"/{_check('strength', strength, STRENGTHS)}/{_check('sort', sort, SKATING_DISTANCE_SORTS)}"
+        )
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
+
+    def skater_zone_time_top_10(
+        self,
+        position_group: str = "all",
+        strength: str = "all",
+        sort: str = "offensive",
+        season: str = None,
+        game_type: int = 2,
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 skaters by NHL EDGE zone time percentage.
+
+        Args:
+            position_group (str, optional): "all", "forwards" or "defense". Defaults to "all".
+            strength (str, optional): "all", "es" (even strength), "pp" (power play) or "pk" (penalty kill).
+                Defaults to "all".
+            sort (str, optional): "offensive", "neutral" or "defensive". Defaults to "offensive".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten skaters, ranked by ``sort``
+
+        Key Response Fields:
+            player.firstName.default (str): Player first name
+            player.lastName.default (str): Player last name
+            player.team.abbrev (str): Player's team abbreviation
+            offensiveZoneTime (float): Share of time in the offensive zone (0-1)
+            neutralZoneTime (float): Share of time in the neutral zone (0-1)
+            defensiveZoneTime (float): Share of time in the defensive zone (0-1)
+
+        Raises:
+            ValueError: If ``position_group``, ``strength`` or ``sort`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.skater_zone_time_top_10()
+            client.edge.skater_zone_time_top_10(position_group="forwards", strength="es", sort="defensive")
+        """
+        resource = (
+            f"edge/skater-zone-time-top-10/{_check('position_group', position_group, POSITION_GROUPS)}"
+            f"/{_check('strength', strength, STRENGTHS)}/{_check('sort', sort, ZONE_TIME_SORTS)}"
+        )
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
+
+    def skater_shot_location_top_10(
+        self,
+        position_group: str = "all",
+        category: str = "sog",
+        area: str = "all",
+        season: str = None,
+        game_type: int = 2,
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 skaters by NHL EDGE shot location stats.
+
+        Args:
+            position_group (str, optional): "all", "forwards" or "defense". Defaults to "all".
+            category (str, optional): Stat to rank by: "sog" (shots on goal), "goals" or "shooting-pctg".
+                Defaults to "sog".
+            area (str, optional): Rink area to rank by: "all", "high" (high danger), "mid" (mid range) or
+                "long" (long range). Defaults to "all".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten skaters, ranked by ``category`` in ``area``
+
+        Key Response Fields:
+            player.firstName.default (str): Player first name
+            player.lastName.default (str): Player last name
+            player.team.abbrev (str): Player's team abbreviation
+            all (int | float): ``category`` value from all areas
+            highDanger (int | float): ``category`` value from high-danger areas
+            midRange (int | float): ``category`` value from mid range
+            longRange (int | float): ``category`` value from long range
+
+        Raises:
+            ValueError: If ``position_group``, ``category`` or ``area`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.skater_shot_location_top_10()
+            client.edge.skater_shot_location_top_10(category="goals", area="high")
+        """
+        resource = (
+            f"edge/skater-shot-location-top-10/{_check('position_group', position_group, POSITION_GROUPS)}"
+            f"/{_check('category', category, SHOT_LOCATION_CATEGORIES)}/{_check('area', area, SHOT_LOCATION_AREAS)}"
+        )
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
+
     # ========================
     # GOALIE ENDPOINTS
     # ========================
@@ -441,6 +687,115 @@ class Edge:
         else:
             resource = f"cat/edge/goalie-detail/{player_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
+
+    def goalie_5v5_top_10(self, sort: str = "save-pctg", season: str = None, game_type: int = 2) -> List[Dict[str, Any]]:
+        """Get the league's top 10 goalies by NHL EDGE 5-on-5 stats.
+
+        Args:
+            sort (str, optional): "save-pctg", "save-pctg-close" (close-game save %), "shots" or "shots-per-60".
+                Defaults to "save-pctg".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten goalies, ranked by ``sort``
+
+        Key Response Fields:
+            player.firstName.default (str): Goalie first name
+            player.lastName.default (str): Goalie last name
+            player.team.abbrev (str): Goalie's team abbreviation
+            savePctg (float): 5-on-5 save percentage
+            savePctgClose (float): 5-on-5 save percentage in close games
+            shots (int): 5-on-5 shots faced
+            shotsPer60 (float): 5-on-5 shots faced per 60 minutes
+
+        Raises:
+            ValueError: If ``sort`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.goalie_5v5_top_10()
+            client.edge.goalie_5v5_top_10(sort="shots-per-60", season="20242025")
+        """
+        resource = f"edge/goalie-5v5-top-10/{_check('sort', sort, GOALIE_5V5_SORTS)}"
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
+
+    def goalie_save_percentage_top_10(
+        self, sort: str = "pctg", season: str = None, game_type: int = 2
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 goalies by games with a .900+ save percentage.
+
+        Args:
+            sort (str, optional): "pctg" (share of games over .900) or "games" (number of games over .900).
+                Defaults to "pctg".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten goalies, ranked by ``sort``
+
+        Key Response Fields:
+            player.firstName.default (str): Goalie first name
+            player.lastName.default (str): Goalie last name
+            player.team.abbrev (str): Goalie's team abbreviation
+            gamesOver900 (int): Games with a save percentage over .900
+            pctgGamesOver900 (float): Share of games with a save percentage over .900
+
+        Raises:
+            ValueError: If ``sort`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.goalie_save_percentage_top_10()
+            client.edge.goalie_save_percentage_top_10(sort="games")
+        """
+        resource = f"edge/goalie-edge-save-pctg-top-10/{_check('sort', sort, GOALIE_SAVE_PCTG_SORTS)}"
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
+
+    def goalie_shot_location_top_10(
+        self, category: str = "save-pctg", area: str = "all", season: str = None, game_type: int = 2
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 goalies by NHL EDGE shot location stats.
+
+        Args:
+            category (str, optional): Stat to rank by: "save-pctg", "saves", "goals-against" or "shots-against".
+                Defaults to "save-pctg".
+            area (str, optional): Rink area to rank by: "all", "high" (high danger), "mid" (mid range) or
+                "long" (long range). Defaults to "all".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten goalies, ranked by ``category`` in ``area``
+
+        Key Response Fields:
+            player.id (int): Goalie player ID
+            player.firstName.default (str): Goalie first name
+            player.lastName.default (str): Goalie last name
+            all (int | float): ``category`` value from all areas
+            highDanger (int | float): ``category`` value from high-danger areas
+            midRange (int | float): ``category`` value from mid range
+            longRange (int | float): ``category`` value from long range
+
+        Raises:
+            ValueError: If ``category`` or ``area`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.goalie_shot_location_top_10()
+            client.edge.goalie_shot_location_top_10(category="saves", area="high")
+        """
+        resource = (
+            f"edge/goalie-shot-location-top-10/{_check('category', category, GOALIE_SHOT_LOCATION_CATEGORIES)}"
+            f"/{_check('area', area, SHOT_LOCATION_AREAS)}"
+        )
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
 
     # ========================
     # TEAM ENDPOINTS
@@ -634,3 +989,247 @@ class Edge:
         else:
             resource = f"edge/team-skating-speed-detail/{team_id}/{season}/{game_type}"
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
+
+    def team_comparison(self, team_id: str, season: str = None, game_type: int = 2) -> Dict[str, Any]:
+        """Get NHL EDGE comparison statistics for a specific team.
+
+        This is the data behind the team view of the EDGE comparison tool on nhl.com.
+
+        Args:
+            team_id (str): The unique identifier for the NHL team (e.g., "22" for Edmonton)
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            dict: Team EDGE stats for side-by-side comparison
+
+        Key Response Fields:
+            team.abbrev (str): Team abbreviation
+            shotSpeedDetails.topShotSpeed (dict): Hardest team shot
+            skatingSpeedDetails.maxSkatingSpeed (dict): Fastest team skating speed
+            skatingDistanceDetails.distanceTotal (dict): Total team distance skated
+            skatingDistanceLast10 (list): Distance skated in each of the last 10 games
+            shotLocationTotals (list): Shot totals by rink area
+            zoneTimeDetails.offensiveZonePctg (float): Offensive zone time share, with league average
+            shotDifferential.shotAttemptDifferential (float): Shot attempt differential
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.team_comparison(team_id="22")
+            client.edge.team_comparison(team_id="22", season="20242025", game_type=3)
+        """
+        resource = _with_period(f"edge/team-comparison/{team_id}", season, game_type)
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
+
+    def team_skating_speed_top_10(
+        self, position_group: str = "all", sort: str = "max", season: str = None, game_type: int = 2
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 teams by NHL EDGE skating speed.
+
+        Args:
+            position_group (str, optional): Which of the team's skaters count: "all", "forwards" or "defense".
+                Defaults to "all".
+            sort (str, optional): "max" (top speed), or speed-burst counts "over-22", "20-22", "18-20" (mph).
+                Defaults to "max".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten teams, ranked by ``sort``
+
+        Key Response Fields:
+            team.abbrev (str): Team abbreviation
+            team.commonName.default (str): Team name
+            maxSkatingSpeed.imperial (float): Team's top skating speed in mph, with ``overlay`` player/game info
+            burstsOver22 (int): Bursts over 22 mph
+            bursts20To22 (int): Bursts between 20 and 22 mph
+            bursts18To20 (int): Bursts between 18 and 20 mph
+
+        Raises:
+            ValueError: If ``position_group`` or ``sort`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.team_skating_speed_top_10()
+            client.edge.team_skating_speed_top_10(sort="over-22")
+        """
+        resource = (
+            f"edge/team-skating-speed-top-10/{_check('position_group', position_group, POSITION_GROUPS)}"
+            f"/{_check('sort', sort, SKATING_SPEED_SORTS)}"
+        )
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
+
+    def team_shot_speed_top_10(
+        self, position_group: str = "all", sort: str = "max", season: str = None, game_type: int = 2
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 teams by NHL EDGE shot speed.
+
+        Args:
+            position_group (str, optional): Which of the team's skaters count: "all", "forwards" or "defense".
+                Defaults to "all".
+            sort (str, optional): "max" (hardest shot), or shot-attempt counts "over-100", "90-99", "80-89",
+                "70-79" (mph). Defaults to "max".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten teams, ranked by ``sort``
+
+        Key Response Fields:
+            team.abbrev (str): Team abbreviation
+            team.commonName.default (str): Team name
+            hardestShot.imperial (float): Team's hardest shot in mph, with ``overlay`` player/game info
+            shotAttemptsOver100 (int): Shot attempts over 100 mph
+            shotAttempts90To100 (int): Shot attempts between 90 and 100 mph
+            shotAttempts80To90 (int): Shot attempts between 80 and 90 mph
+
+        Raises:
+            ValueError: If ``position_group`` or ``sort`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.team_shot_speed_top_10()
+            client.edge.team_shot_speed_top_10(position_group="defense", sort="90-99")
+        """
+        resource = (
+            f"edge/team-shot-speed-top-10/{_check('position_group', position_group, POSITION_GROUPS)}"
+            f"/{_check('sort', sort, SHOT_SPEED_SORTS)}"
+        )
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
+
+    def team_skating_distance_top_10(
+        self,
+        position_group: str = "all",
+        strength: str = "all",
+        sort: str = "total",
+        season: str = None,
+        game_type: int = 2,
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 teams by NHL EDGE distance skated.
+
+        Args:
+            position_group (str, optional): Which of the team's skaters count: "all", "forwards" or "defense".
+                Defaults to "all".
+            strength (str, optional): "all", "es" (even strength), "pp" (power play) or "pk" (penalty kill).
+                Defaults to "all".
+            sort (str, optional): "total", "per-60", "max-game" or "max-period". Defaults to "total".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten teams, ranked by ``sort``
+
+        Key Response Fields:
+            team.abbrev (str): Team abbreviation
+            team.commonName.default (str): Team name
+            distanceTotal.imperial (float): Total distance skated in miles (``metric`` for km)
+            distancePer60.imperial (float): Distance per 60 minutes in miles
+            distanceMaxPerGame.imperial (float): Most distance in a single game, with ``overlay`` game info
+            distanceMaxPerPeriod.imperial (float): Most distance in a single period, with ``overlay`` game info
+
+        Raises:
+            ValueError: If ``position_group``, ``strength`` or ``sort`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.team_skating_distance_top_10()
+            client.edge.team_skating_distance_top_10(strength="pp", sort="per-60")
+        """
+        resource = (
+            f"edge/team-skating-distance-top-10/{_check('position_group', position_group, POSITION_GROUPS)}"
+            f"/{_check('strength', strength, STRENGTHS)}/{_check('sort', sort, SKATING_DISTANCE_SORTS)}"
+        )
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
+
+    def team_zone_time_top_10(
+        self, strength: str = "all", sort: str = "offensive", season: str = None, game_type: int = 2
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 teams by NHL EDGE zone time percentage.
+
+        Args:
+            strength (str, optional): "all", "es" (even strength), "pp" (power play) or "pk" (penalty kill).
+                Defaults to "all".
+            sort (str, optional): "offensive", "neutral" or "defensive". Defaults to "offensive".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten teams, ranked by ``sort``
+
+        Key Response Fields:
+            team.abbrev (str): Team abbreviation
+            team.commonName.default (str): Team name
+            offensiveZoneTime (float): Share of time in the offensive zone (0-1)
+            neutralZoneTime (float): Share of time in the neutral zone (0-1)
+            defensiveZoneTime (float): Share of time in the defensive zone (0-1)
+
+        Raises:
+            ValueError: If ``strength`` or ``sort`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.team_zone_time_top_10()
+            client.edge.team_zone_time_top_10(strength="pk", sort="defensive")
+        """
+        resource = (
+            f"edge/team-zone-time-top-10/{_check('strength', strength, STRENGTHS)}"
+            f"/{_check('sort', sort, ZONE_TIME_SORTS)}"
+        )
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()
+
+    def team_shot_location_top_10(
+        self,
+        position_group: str = "all",
+        category: str = "sog",
+        area: str = "all",
+        season: str = None,
+        game_type: int = 2,
+    ) -> List[Dict[str, Any]]:
+        """Get the league's top 10 teams by NHL EDGE shot location stats.
+
+        Args:
+            position_group (str, optional): Which of the team's skaters count: "all", "forwards" or "defense".
+                Defaults to "all".
+            category (str, optional): Stat to rank by: "sog" (shots on goal), "goals" or "shooting-pctg".
+                Defaults to "sog".
+            area (str, optional): Rink area to rank by: "all", "high" (high danger), "mid" (mid range) or
+                "long" (long range). Defaults to "all".
+            season (str, optional): Season in YYYYYYYY format (e.g., 20242025). Defaults to current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Defaults to 2.
+
+        Returns:
+            List[Dict[str, Any]]: Ten teams, ranked by ``category`` in ``area``
+
+        Key Response Fields:
+            team.id (int): Team ID
+            team.abbrev (str): Team abbreviation
+            all (int | float): ``category`` value from all areas
+            highDanger (int | float): ``category`` value from high-danger areas
+            midRange (int | float): ``category`` value from mid range
+            longRange (int | float): ``category`` value from long range
+
+        Raises:
+            ValueError: If ``position_group``, ``category`` or ``area`` is not an allowed value
+
+        Response Docs:
+            docs/edge.md
+
+        Example:
+            client.edge.team_shot_location_top_10()
+            client.edge.team_shot_location_top_10(category="goals", area="high")
+        """
+        resource = (
+            f"edge/team-shot-location-top-10/{_check('position_group', position_group, POSITION_GROUPS)}"
+            f"/{_check('category', category, SHOT_LOCATION_CATEGORIES)}/{_check('area', area, SHOT_LOCATION_AREAS)}"
+        )
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=_with_period(resource, season, game_type)).json()

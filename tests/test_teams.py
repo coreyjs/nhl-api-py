@@ -158,3 +158,17 @@ def test_all_teams(mock_get, nhl_client):
     assert teams[3]["division"]["abbr"] == "M"
     assert teams[3]["division"]["name"] == "Metropolitan"
     assert "franchise_id" not in teams[3]  # Should not have a franchise_id
+
+
+@mock.patch("httpx.Client.get")
+def test_club_stats_now(h_m, nhl_client):
+    nhl_client.teams.club_stats(team_abbr="EDM")
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/club-stats/EDM/now"
+
+
+@mock.patch("httpx.Client.get")
+def test_club_stats_season_and_game_type(h_m, nhl_client):
+    nhl_client.teams.club_stats(team_abbr="EDM", season="20242025", game_type=3)
+    h_m.assert_called_once()
+    assert h_m.call_args[1]["url"] == "https://api-web.nhle.com/v1/club-stats/EDM/20242025/3"

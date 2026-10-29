@@ -7,6 +7,7 @@ import logging
 
 class Endpoint(Enum):
     API_WEB_V1 = "https://api-web.nhle.com/v1/"
+    API_WEB_V2 = "https://api-web.nhle.com/v2/"
     API_CORE = "https://api.nhle.com/"
     API_STATS = "https://api.nhle.com/stats/rest/"
     API_RECORDS = "https://records.nhl.com/site/api/"

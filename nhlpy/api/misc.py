@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Dict, List
 
 from nhlpy.http_client import HttpClient, Endpoint
 
@@ -106,3 +106,114 @@ class Misc:
         """
         response = self.client.get(endpoint=Endpoint.API_CORE, resource="stats/rest/en/draft").json()
         return response.get("data", [])
+
+    def how_to_watch(self, game_id: str) -> Dict[str, Any]:
+        """Gets where a game can be watched, by country and market.
+
+        This is the data behind the "How to Watch" modal on nhl.com game pages.
+
+        Args:
+            game_id (str): Game ID (e.g., "2024020641").
+
+        Returns:
+            Dict[str, Any]: Viewing guide for the game.
+
+        Key Response Fields:
+            title.default (str): Matchup title (e.g., "Oilers @ Islanders")
+            countries (list): Countries with a viewing guide, each with ``id``, ``abbr`` and localized ``name``
+            panels (list): One panel per market
+            panels[].market (str): Market name (e.g., "All Other Countries")
+            panels[].countries (list[str]): Country codes the panel applies to
+            panels[].broadcasters (list, optional): Broadcasters and streaming options; regional panels use homeTeam/awayTeam
+
+        Response Docs:
+            docs/misc.md
+
+        Example:
+            client.misc.how_to_watch(game_id="2026020220")
+        """
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"how-to-watch/{game_id}").json()
+
+    def tv_schedule(self, date: str = "now") -> Dict[str, Any]:
+        """Gets the NHL Network TV schedule for a window of dates around ``date``.
+
+        Args:
+            date (str, optional): Date in YYYY-MM-DD format. Defaults to "now".
+
+        Returns:
+            Dict[str, Any]: NHL Network programming for the window ``startDate``..``endDate``.
+
+        Key Response Fields:
+            date (str): Requested date
+            startDate (str): First date in the returned window
+            endDate (str): Last date in the returned window
+            broadcasts (list): Programs in the window
+            broadcasts[].title (str): Program title
+            broadcasts[].startTime / endTime (str): Start and end time (ISO 8601)
+            broadcasts[].durationSeconds (int): Length in seconds
+            broadcasts[].broadcastStatus (str): "LIVE" for live programs, otherwise empty
+
+        Response Docs:
+            docs/misc.md
+
+        Example:
+            client.misc.tv_schedule()
+            client.misc.tv_schedule(date="2025-01-07")
+        """
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"network/tv-schedule/{date}").json()
+
+    def player_spotlight(self) -> List[Dict[str, Any]]:
+        """Gets the players currently featured in the nhl.com player spotlight.
+
+        Returns:
+            List[Dict[str, Any]]: Featured players, in display order.
+
+        Key Response Fields:
+            playerId (int): Player ID
+            name.default (str): Player name
+            position (str): Position code
+            sweaterNumber (int): Jersey number
+            teamTriCode (str): Team abbreviation
+            headshot (str): Headshot image URL
+            sortId (int): Display order
+
+        Response Docs:
+            docs/misc.md
+
+        Example:
+            client.misc.player_spotlight()
+        """
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource="player-spotlight").json()
+
+    def goal_replay(self, game_id: str, event_id: str) -> Dict[str, Any]:
+        """Gets the puck and player tracking (PPT) replay details for a goal.
+
+        ``event_id`` is the play-by-play ``eventId`` of a goal. For an event that isn't a goal, the
+        response only contains the game details and has no ``goal`` key.
+
+        Args:
+            game_id (str): Game ID (e.g., "2024020641").
+            event_id (str): Play-by-play event ID of the goal.
+
+        Returns:
+            Dict[str, Any]: Game details plus the goal and its replay links.
+
+        Key Response Fields:
+            id (int): Game ID
+            gameDate (str): Game date, YYYY-MM-DD
+            awayTeam / homeTeam (dict): Teams in the game
+            goal.firstName.default / goal.lastName.default (str): Goal scorer
+            goal.timeInPeriod (str): Time of the goal in the period
+            goal.shotType (str): Shot type (e.g., "wrist")
+            goal.assists (list): Assisting players
+            goal.pptReplayUrl (str): URL of the tracking replay data
+
+        Response Docs:
+            docs/misc.md
+
+        Example:
+            pbp = client.game_center.play_by_play(game_id="2024020641")
+            goal = next(p for p in pbp["plays"] if p["typeDescKey"] == "goal")
+            client.misc.goal_replay(game_id="2024020641", event_id=goal["eventId"])
+        """
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"ppt-replay/goal/{game_id}/{event_id}").json()

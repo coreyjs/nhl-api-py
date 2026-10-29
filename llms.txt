@@ -19,11 +19,12 @@ client = NHLClient()
 - [Game Center](docs/game_center.md): Boxscores, play-by-play, scores, shift charts, game stories
 - [Schedule](docs/schedule.md): Daily/weekly/monthly/season schedules, playoffs
 - [Stats](docs/stats.md): Player career stats, game logs, team/skater/goalie summaries with query builder
-- [Teams](docs/teams.md): Team info, rosters, franchises, all-time teams with franchise IDs
+- [Teams](docs/teams.md): Team info, rosters, per-player team stats (`club_stats`), franchises, all-time teams with franchise IDs
 - [Standings](docs/standings.md): League standings, season metadata
-- [Players](docs/players.md): Prospects, team rosters by season
-- [EDGE](docs/edge.md): NHL EDGE tracking analytics — shot speed, skating speed, zone time, distance
-- [Misc](docs/misc.md): Glossary, config, countries, draft info, season rules
+- [Players](docs/players.md): Player pages (header, bio, last/next game, stats, v2 game log), prospects, team rosters by season
+- [EDGE](docs/edge.md): NHL EDGE tracking analytics — shot speed, skating speed, zone time, distance, team comparison, plus top 10 leaderboards for skaters, goalies and teams
+- [Misc](docs/misc.md): Glossary, config, countries, draft info, season rules, how to watch a game, NHL Network TV schedule, player spotlight, goal tracking replays
+- [Draft](docs/draft.md): Central Scouting prospect rankings, draft picks by year and round, live draft tracker
 - [Records](docs/records.md): Historical records — franchise history, draft history (1963+), attendance, venues, plus generic access to ~445 record endpoints
 - [Helpers](docs/helpers.md): Convenience methods — all game IDs, all players, bulk stats
 
@@ -34,11 +35,12 @@ NHLClient is the main entry point. Access modules via attributes:
 - `client.game_center` — Live game data, boxscores, play-by-play, scores
 - `client.schedule` — Game schedules (daily/weekly/monthly/season/playoffs)
 - `client.stats` — Player and team statistics with advanced query builder
-- `client.teams` — Team info, rosters, franchises, team ID to franchise ID lookup (`all_time_teams()`)
+- `client.teams` — Team info, rosters, per-player team stats (`club_stats()`), franchises, team ID to franchise ID lookup (`all_time_teams()`)
 - `client.standings` — League standings
-- `client.players` — Player lookup by team, prospects
-- `client.edge` — NHL EDGE tracking analytics (shot speed, skating speed, zone time)
-- `client.misc` — Reference data (glossary, countries, draft info)
+- `client.players` — Player pages (header, bio, home, stats, game log via the v2 API), player lookup by team, prospects
+- `client.edge` — NHL EDGE tracking analytics (shot speed, skating speed, zone time) and `*_top_10` leaderboards
+- `client.misc` — Reference data (glossary, countries, draft info) and media (how to watch, TV schedule, spotlight, goal replays)
+- `client.draft` — Draft prospect rankings, picks and live draft tracker
 - `client.records` — NHL Records API (franchise history, draft history, record lists); `query()` reaches any records endpoint
 - `client.helpers` — Cross-domain convenience methods (all game IDs, all players)
 
@@ -72,6 +74,15 @@ client = NHLClient()
 stats = client.stats.player_career_stats(player_id="8478402")
 career = stats["careerTotals"]["regularSeason"]
 print(f"{stats['firstName']['default']} {stats['lastName']['default']}: {career['goals']}G {career['assists']}A {career['points']}P")
+```
+
+### Get a player's bio
+```python
+from nhlpy import NHLClient
+client = NHLClient()
+bio = client.players.player_bio(player_id="8478402")
+vitals = bio["vitals"]
+print(f"{bio['bio']['firstName']['default']} {bio['bio']['lastName']['default']}: born {vitals['birthDate']}, {vitals['heightInches']}in {vitals['weightPounds']}lb")
 ```
 
 ### Find a team's roster
@@ -130,3 +141,26 @@ picks = client.records.draft(draft_year=2024, round_number=1, sort=[("overallPic
 for p in picks:
     print(f"{p['overallPickNumber']}. {p['triCode']} - {p['playerName']} ({p['position']})")
 ```
+
+### Get EDGE leaderboards
+```python
+from nhlpy import NHLClient
+client = NHLClient()
+# Fastest defensemen this season; invalid filter values raise ValueError
+for row in client.edge.skater_skating_speed_top_10(position_group="defense", sort="max"):
+    p = row["player"]
+    print(f"{p['firstName']['default']} {p['lastName']['default']} ({p['team']['abbrev']}): {row['maxSpeed']['imperial']:.2f} mph")
+# Teams spending the most time in the offensive zone on the power play, 2024-25
+top_pp = client.edge.team_zone_time_top_10(strength="pp", sort="offensive", season="20242025")
+```
+
+### Get draft prospect rankings and picks
+```python
+from nhlpy import NHLClient
+client = NHLClient()
+rankings = client.draft.rankings(year="2025", category=1)  # 1-4: NA skater, Intl skater, NA goalie, Intl goalie
+first_round = client.draft.picks(year="2024", draft_round=1)
+for pick in first_round["picks"][:3]:
+    print(f"{pick['overallPick']}. {pick['teamAbbrev']} - {pick['firstName']['default']} {pick['lastName']['default']}")
+```
+
