@@ -1,82 +1,74 @@
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry]
+[project]
 name = "nhl-api-py"
 version = "3.7.0"
-description = "NHL API (Updated for 2026/2027) and EDGE Stats.  For standings, team stats, outcomes, player information.  Contains each individual API endpoint as well as convience methods as well as pythonic query builder for more indepth EDGE stats."
-authors = ["Corey Schaf <cschaf@gmail.com>"]
+description = "Python wrapper for the NHL API: stats, schedules, standings, teams, players, game center, NHL EDGE tracking, and records. Hockey data for fans, analytics, and machine learning."
+authors = [{ name = "Corey Schaf", email = "cschaf@gmail.com" }]
 readme = "README.md"
-packages = [{include = "nhlpy"}]
 license = "Apache-2.0"
-homepage = "https://github.com/coreyjs/nhl-api-py"
-repository = "https://github.com/coreyjs/nhl-api-py"
-keywords = ["nhl", "api", "wrapper", "hockey", "sports", "edge", "edge stats", "edge analytics", "edge sports",
-    "edge hockey", "edge nhl", "edge nhl stats", "edge nhl analytics", "edge nhl sports", "edge nhl hockey",
-    "edge nhl data", "edge nhl data analytics", "edge nhl data stats", "edge nhl data sports", "edge nhl data hockey",
-    "edge nhl data stats analytics", "edge nhl data stats sports", "edge nhl data stats hockey", "hockey ai", "hockey machine learning", "nhl ML", "nhl AI",
-    "nhl machine learning", "nhl stats", "nhl analytics", "nhl sports", "nhl hockey", "nhl nhl", "nhl nhl stats", "nhl nhl analytics", "nhl nhl sports",
-    "edge nhl data hockey stats"]
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = ["httpx>=0.23"]
+keywords = [
+    # fans
+    "nhl", "hockey", "ice-hockey", "nhl-api", "nhl-stats", "nhl-schedule", "nhl-standings",
+    # data / analytics
+    "nhl-edge", "player-tracking", "hockey-analytics", "sports-analytics", "sports-data", "statistics",
+    # ML / AI
+    "data-science", "machine-learning",
+    # developers
+    "sports", "api-wrapper", "api-client",
+]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
-    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Natural Language :: English",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Software Development :: Libraries",
-    "Topic :: Software Development :: Libraries :: Application Frameworks",
-    "Topic :: Software Development :: Libraries :: Python Modules"
-]
-include = [
-    "nhlpy/data/*",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Typing :: Typed",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-httpx = "*"
+[project.urls]
+Homepage = "https://github.com/coreyjs/nhl-api-py"
+Repository = "https://github.com/coreyjs/nhl-api-py"
+Documentation = "https://github.com/coreyjs/nhl-api-py/tree/main/docs"
+Issues = "https://github.com/coreyjs/nhl-api-py/issues"
+Changelog = "https://github.com/coreyjs/nhl-api-py/releases"
+Funding = "https://buymeacoffee.com/coreyjs"
+
+[tool.poetry]
+requires-poetry = ">=2.0"
+packages = [{ include = "nhlpy" }]
 
 [tool.poetry.group.dev.dependencies]
-pytest="^7.1.3"
-pytest-mock = "*"
+pytest = ">=8"
 mypy = "*"
 ruff = "*"
-black = {version = ">=26.3.1", python = ">=3.10"}
-ipykernel = "*"
+black = ">=26.3.1"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
 
 [tool.ruff]
-exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "venv",
-]
 line-length = 121
-
-
 
 [tool.black]
 line-length = 121

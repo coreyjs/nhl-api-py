@@ -16,6 +16,7 @@
   - [Standings](#standings)
   - [Game Center](#game-center)
   - [Misc](#misc)
+  - [Draft](#draft)
   - [Records](#records)
 - [Advanced Usage](#advanced-usage)
   - [Query Builder](#stats-with-querybuilder)
@@ -115,6 +116,7 @@ They are grouped by function to make the library easier to navigate and use.  Th
 - **`game_center`**: Contains endpoints related to game center data, including box scores, play-by-play data, and game summaries.
 - **`misc`**: Contains miscellaneous endpoints that don't fit into the other categories, such as glossary terms, configuration data, and country information.
 - **`players`**: Individual player pages (header, bio, last/next game, stats, game log) plus players by team and prospects.
+- **`draft`**: NHL Central Scouting prospect rankings, draft picks by year and round, and the live draft tracker.
 - **`records`**: Historical data from the NHL Records API: franchise history, the full draft history, attendance, venues, and hundreds of record lists (streaks, fastest goals, etc.).
 ### Helpers Module
 - **`helpers`**: Contains helper functions and utilities for working with the NHL API, such as getting game IDs by season or calculating player statistics. These are experimental and often times make many requests, can return DataFrames or do calculations. Stuff I find myself doing over and over I tend to move into helpers for convenience. They are often cross domain, involve many sub requests, may integrate more machine learning techniques, or just make it easier to get the data you want. These will have built in sleeping to avoid hitting the API too hard, but you can override this by setting the `sleep` parameter to `False` in the function call.
@@ -141,6 +143,13 @@ teams = client.teams.teams(data="2024-10-04")
 ```python
 # Get current season roster
 roster = client.teams.team_roster(team_abbr="BUF", season="20242025")
+```
+
+## Get Team Player Stats
+```python
+# Every skater's and goalie's stat line for a team (defaults to the current season)
+club_stats = client.teams.club_stats(team_abbr="EDM")
+club_stats = client.teams.club_stats(team_abbr="EDM", season="20242025", game_type=3)  # playoffs
 ```
 
 ## Get Franchise Information
@@ -587,6 +596,42 @@ client.edge.team_skating_speed_detail(team_id='19', season='20252026')
 
 # Get league-wide team EDGE statistics overview
 client.edge.team_landing(season='20252026')
+
+# Get comparison data vs league averages
+client.edge.team_comparison(team_id='19', season='20252026')
+```
+
+## Top 10 Leaderboards
+
+The leaderboards from nhl.com's EDGE pages are available for skaters, goalies and teams. Each returns a list of 10 rows.
+Every method takes `season` and `game_type` like the methods above, and invalid filter values raise `ValueError`.
+The allowed values are listed in [docs/edge.md](docs/edge.md#top-10-leaderboards-shared-parameters-and-allowed-values).
+
+```python
+# Skaters: position_group = 'all' | 'forwards' | 'defense'
+client.edge.skater_skating_speed_top_10(position_group='defense', sort='max')        # or 'over-22', '20-22', '18-20'
+client.edge.skater_shot_speed_top_10(sort='max')                                     # or 'over-100', '90-99', ...
+client.edge.skater_skating_distance_top_10(strength='pk', sort='per-60')             # strength: 'all' | 'es' | 'pp' | 'pk'
+client.edge.skater_zone_time_top_10(strength='es', sort='offensive')                 # or 'neutral', 'defensive'
+client.edge.skater_shot_location_top_10(category='goals', area='high')               # category: 'sog' | 'goals' | 'shooting-pctg'
+
+# Goalies
+client.edge.goalie_5v5_top_10(sort='save-pctg')                                      # or 'save-pctg-close', 'shots', 'shots-per-60'
+client.edge.goalie_save_percentage_top_10(sort='pctg')                               # games with a .900+ save %; or 'games'
+client.edge.goalie_shot_location_top_10(category='save-pctg', area='high')
+
+# Teams
+client.edge.team_skating_speed_top_10(sort='max')
+client.edge.team_shot_speed_top_10(sort='max')
+client.edge.team_skating_distance_top_10(strength='all', sort='total')
+client.edge.team_zone_time_top_10(strength='pp', sort='offensive', season='20242025')
+client.edge.team_shot_location_top_10(category='sog', area='all')
+```
+
+```python
+for row in client.edge.skater_skating_speed_top_10(position_group='defense'):
+    p = row['player']
+    print(f"{p['firstName']['default']} {p['lastName']['default']}: {row['maxSpeed']['imperial']:.2f} mph")
 ```
 
 
@@ -751,6 +796,32 @@ season_info = client.misc.season_specific_rules_and_info()
 draft_info = client.misc.draft_year_and_rounds()
 ```
 
+## Get How to Watch a Game
+```python
+# Broadcasters and streaming options for a game, by country/market
+guide = client.misc.how_to_watch(game_id="2026020220")
+```
+
+## Get the NHL Network TV Schedule
+```python
+# Programming for about two weeks either side of the date (defaults to today)
+tv = client.misc.tv_schedule(date="2025-01-07")
+```
+
+## Get Featured Players
+```python
+# Players featured in the nhl.com player spotlight
+spotlight = client.misc.player_spotlight()
+```
+
+## Get a Goal's Tracking Replay
+```python
+# Puck and player tracking replay details for a goal; event_id is the goal's play-by-play eventId
+pbp = client.game_center.play_by_play(game_id="2024020641")
+goal = next(p for p in pbp["plays"] if p["typeDescKey"] == "goal")
+replay = client.misc.goal_replay(game_id="2024020641", event_id=goal["eventId"])
+```
+
 ### Example: Understanding NHL Terms
 ```python
 from nhlpy import NHLClient
@@ -767,6 +838,36 @@ for term in stat_terms:
         if entry['abbreviation'].upper() == term:
             print(f"{term}: {entry['definition']}")
             continue
+```
+
+---
+
+# Draft
+
+NHL draft data from nhl.com's draft pages. See [docs/draft.md](docs/draft.md) for response shapes.
+For the full historical draft (every pick since 1963) use `client.records.draft()`.
+
+## Get Prospect Rankings
+```python
+# NHL Central Scouting rankings; defaults to the upcoming draft, North American skaters
+rankings = client.draft.rankings()
+
+# category: 1 = NA skater, 2 = International skater, 3 = NA goalie, 4 = International goalie
+rankings = client.draft.rankings(year="2025", category=2)
+```
+
+## Get Draft Picks
+```python
+picks = client.draft.picks()                               # most recent draft
+picks = client.draft.picks(year="2024")                    # every round
+first_round = client.draft.picks(year="2024", draft_round=1)
+```
+
+## Get the Live Draft Tracker
+```python
+# Picks in the draft's current round (round 1 once the draft is over)
+tracker = client.draft.tracker()
+tracker = client.draft.tracker(year="2025")
 ```
 
 ---
@@ -988,6 +1089,8 @@ query_context.errors
 
 ## Developers
 
+Requires Python 3.10+ and Poetry 2.x.
+
 1) Install [Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer)
 
 `curl -sSL https://install.python-poetry.org | python3 -`
@@ -999,7 +1102,7 @@ or using pipx
 
 2) `poetry install --with dev`
 
-3) `poetry shell`
+3) Run tools with `poetry run …`, or activate the environment with `eval $(poetry env activate)`
 
 
 ### Discovering New Endpoints
@@ -1016,15 +1119,10 @@ poetry run python scripts/discover_endpoints.py --save-sources /tmp/nhl-src   # 
 ### Build Pipeline
 The build pipeline will run `black`, `ruff`, and `pytest`.  Please make sure these are passing before submitting a PR.
 
-```python
-
-$ poetry shell
-
-# You can then run the following
-$ pytest
-$ ruff .
-$ black .
-
+```bash
+poetry run pytest
+poetry run ruff check .
+poetry run black .
 ```
 
 
