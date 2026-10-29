@@ -11,6 +11,7 @@
   - [Teams](#teams)
   - [Schedule](#schedule)
   - [Stats](#stats)
+  - [Players](#players)
   - [Edge Data](#edge)
   - [Standings](#standings)
   - [Game Center](#game-center)
@@ -113,7 +114,7 @@ They are grouped by function to make the library easier to navigate and use.  Th
 - **`standings`**: Contains endpoints related to NHL standings, including current standings and historical standings.
 - **`game_center`**: Contains endpoints related to game center data, including box scores, play-by-play data, and game summaries.
 - **`misc`**: Contains miscellaneous endpoints that don't fit into the other categories, such as glossary terms, configuration data, and country information.
-- **`players`**: Get Players by team and prospects.
+- **`players`**: Individual player pages (header, bio, last/next game, stats, game log) plus players by team and prospects.
 - **`records`**: Historical data from the NHL Records API: franchise history, the full draft history, attendance, venues, and hundreds of record lists (streaks, fastest goals, etc.).
 ### Helpers Module
 - **`helpers`**: Contains helper functions and utilities for working with the NHL API, such as getting game IDs by season or calculating player statistics. These are experimental and often times make many requests, can return DataFrames or do calculations. Stuff I find myself doing over and over I tend to move into helpers for convenience. They are often cross domain, involve many sub requests, may integrate more machine learning techniques, or just make it easier to get the data you want. These will have built in sleeping to avoid hitting the API too hard, but you can override this by setting the `sleep` parameter to `False` in the function call.
@@ -406,6 +407,77 @@ for i, player in enumerate(stats[:5]):
 4. David Pastrnak: 106 points
 5. Mitch Marner: 102 points
 ```
+---
+
+# Players
+
+Get everything nhl.com shows on a player's page, plus rosters and prospects by team.
+The player page endpoints (`player_header`, `player_home`, `player_bio`, `player_stats`, `player_game_log`)
+come from the NHL's newer **v2** web API (`https://api-web.nhle.com/v2/`).
+
+## Get Player Header
+```python
+# Name, number, position, size, captaincy and current team
+header = client.players.player_header(player_id="8478402")  # Connor McDavid
+```
+
+## Get Player Bio
+```python
+# Vitals, transaction notes, draft details, awards and badges
+bio = client.players.player_bio(player_id="8478402")
+```
+
+## Get Player Last and Next Game
+```python
+# Most recent game (with the player's stat line) and next scheduled game
+home = client.players.player_home(player_id="8478402")
+```
+
+## Get Player Stats
+```python
+# Ranked stat line, last 5 games, career totals and season-by-season totals
+stats = client.players.player_stats(player_id="8478402")
+```
+
+## Get Player Game Log (v2)
+```python
+# Current season
+game_log = client.players.player_game_log(player_id="8478402")
+
+# Specific season and game type (2 = regular season, 3 = playoffs)
+game_log = client.players.player_game_log(player_id="8478402", season="20242025", game_type=3)
+```
+Unlike `client.stats.player_game_log()`, each game includes both teams, the final score and the result,
+and the full response (including `playerStatsSeasons`) is returned.
+
+## Get Team Prospects and Players by Team
+```python
+prospects = client.players.prospects_by_team(team_abbr="BUF")
+roster = client.players.players_by_team(team_abbr="BUF", season="20242025")
+```
+
+### Example: Player Snapshot
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+player_id = "8478402"
+
+header = client.players.player_header(player_id=player_id)
+stats = client.players.player_stats(player_id=player_id)
+home = client.players.player_home(player_id=player_id)
+
+career = stats["careerTotals"]["regularSeason"]
+print(f"{header['firstName']['default']} {header['lastName']['default']} #{header['sweaterNumber']}")
+print(f"Career: {career['gamesPlayed']}GP {career['goals']}G {career['assists']}A {career['points']}P")
+
+if last := home.get("lastGame"):
+    line = last["playerStats"]
+    print(f"Last game ({last['gameDate']}): {line['goals']}G {line['assists']}A")
+```
+
+Response shapes for every method are in [docs/players.md](docs/players.md).
+
 ---
 
 # Edge
@@ -929,6 +1001,17 @@ or using pipx
 
 3) `poetry shell`
 
+
+### Discovering New Endpoints
+`scripts/discover_endpoints.py` reads nhl.com's public source maps, lists every `api-web.nhle.com` endpoint the
+site calls (including which API version), and flags the ones this library doesn't wrap yet. It is a maintainer
+tool and is not included in the PyPI package.
+
+```bash
+poetry run python scripts/discover_endpoints.py          # endpoints not yet in nhlpy
+poetry run python scripts/discover_endpoints.py --all    # everything the site uses
+poetry run python scripts/discover_endpoints.py --save-sources /tmp/nhl-src   # dump site source (handy for response types)
+```
 
 ### Build Pipeline
 The build pipeline will run `black`, `ruff`, and `pytest`.  Please make sure these are passing before submitting a PR.

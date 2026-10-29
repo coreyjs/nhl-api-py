@@ -129,3 +129,45 @@ Example response entry:
 ```
 
 To list the teams that played in a specific season, combine it with `client.stats.team_summary(start_season="19901991", end_season="19901991")`, which returns that season's `teamId`s.
+
+## Teams: Get Per-Player Team Stats with club_stats
+
+Returns the stat line of every skater and goalie who played for a team in a season. This is the data behind a team's stats page on nhl.com. To see which seasons and game types a team has stats for, use `client.stats.gametypes_per_season_directory_by_team(team_abbr=...)`.
+
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+
+# Current season
+stats = client.teams.club_stats(team_abbr="EDM")
+
+# 2024-25 playoffs
+stats = client.teams.club_stats(team_abbr="EDM", season="20242025", game_type=3)
+
+for s in sorted(stats["skaters"], key=lambda s: s["points"], reverse=True)[:5]:
+    print(f"{s['firstName']['default']} {s['lastName']['default']}: {s['points']} pts")
+```
+
+- **Parameters**:
+  - `team_abbr` (str): Three-letter team abbreviation (e.g., "EDM")
+  - `season` (str, optional): Season in YYYYYYYY format. Defaults to the current season.
+  - `game_type` (int, optional): `2` = regular season (default), `3` = playoffs. Ignored when `season` is not given.
+- **Returns**: dict
+  - `season` (str): Season in YYYYYYYY format
+  - `gameType` (int): Game type
+  - `skaters` (list): One entry per skater
+    - `playerId` (int), `headshot` (str), `firstName` / `lastName` (object, `default`), `positionCode` (str)
+    - `gamesPlayed`, `goals`, `assists`, `points`, `plusMinus`, `penaltyMinutes` (int)
+    - `powerPlayGoals`, `shorthandedGoals`, `gameWinningGoals`, `overtimeGoals`, `shots` (int)
+    - `shootingPctg`, `faceoffWinPctg` (float, 0-1)
+    - `avgTimeOnIcePerGame` (float): Average time on ice per game, in seconds
+    - `avgShiftsPerGame` (float): Average shifts per game
+  - `goalies` (list): One entry per goalie
+    - `playerId` (int), `headshot` (str), `firstName` / `lastName` (object, `default`)
+    - `gamesPlayed`, `gamesStarted`, `wins`, `losses`, `overtimeLosses`, `shutouts` (int)
+    - `goalsAgainst`, `saves`, `shotsAgainst` (int)
+    - `savePercentage` (float, 0-1), `goalsAgainstAverage` (float)
+    - `timeOnIce` (int): Total time on ice, in seconds
+    - `goals`, `assists`, `points` (int)
+

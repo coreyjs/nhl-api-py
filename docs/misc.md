@@ -152,3 +152,137 @@ for draft in drafts:
 - `id` (int): Unique identifier for the draft year record
 - `draftYear` (int): The calendar year of the draft (e.g., 2024)
 - `rounds` (int): Number of rounds held in that draft
+
+## Get Where to Watch a Game with how_to_watch
+
+Returns the viewing guide for a game: which broadcasters and streaming services carry it in each country or market. This is the data behind the "How to Watch" modal on nhl.com.
+
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+guide = client.misc.how_to_watch(game_id="2026020220")
+print(guide["title"]["default"])
+for panel in guide["panels"]:
+    # Regional Sports Network panels list broadcasters under homeTeam/awayTeam instead
+    print(panel["market"], [b["title"]["default"] for b in panel.get("broadcasters", [])])
+```
+
+**Parameters:** `game_id` (str): Game ID. Unknown games return 404 (`ResourceNotFoundException`).
+
+**Response structure:**
+
+- `title` (object): Matchup title (e.g., `{"default": "Oilers @ Islanders"}`)
+- `countrySelector` (object): Localized label for the country picker
+- `countries` (list): Countries with a viewing guide, each with `id`, `abbr` and localized `name`
+- `panels` (list): One panel per market
+  - `categoryId` (int): Panel category
+  - `market` (str): Market name (e.g., "All Other Countries")
+  - `countries` (list[str]): Country codes the panel applies to
+  - `title` / `description` (object): Localized text
+  - `broadcasters` (list, optional): Broadcasters and streaming options, each with `id`, `desc`, localized `title`, `countryCode` and `weblink`
+  - `homeTeam` / `awayTeam` (object, optional): Present on "Regional Sports Network" panels instead of `broadcasters`; each team's regional broadcasters
+
+## Get the NHL Network TV Schedule with tv_schedule
+
+Returns NHL Network programming for a window of dates around the requested date (about two weeks either side).
+
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+schedule = client.misc.tv_schedule()               # around today
+schedule = client.misc.tv_schedule(date="2025-01-07")
+for show in schedule["broadcasts"][:5]:
+    print(show["startTime"], show["title"])
+```
+
+**Parameters:** `date` (str, optional): Date in YYYY-MM-DD format. Defaults to `"now"`.
+
+**Response structure:**
+
+- `date` (str): Requested date
+- `startDate` / `endDate` (str): First and last date in the returned window
+- `broadcasts` (list): Programs
+  - `title` (str): Program title
+  - `description` (str): Program description
+  - `startTime` / `endTime` (str): Start and end time (ISO 8601, no time zone)
+  - `durationSeconds` (int): Length in seconds
+  - `broadcastStatus` (str): `"LIVE"` for live programs, otherwise empty
+  - `broadcastType` (str): Program type
+  - `broadcastImageUrl` (str): Program image
+  - `houseNumber` (str): Network program ID
+
+## Get Featured Players with player_spotlight
+
+Returns the players currently featured in the nhl.com player spotlight (the player search landing page).
+
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+for player in client.misc.player_spotlight():
+    print(f"{player['name']['default']} ({player['teamTriCode']})")
+```
+
+**Parameters:** None
+
+**Returns:** `List[dict]`, in display order:
+
+- `playerId` (int): Player ID
+- `name` (object): `default` player name
+- `playerSlug` (str): URL slug
+- `position` (str): Position code
+- `sweaterNumber` (int): Jersey number
+- `teamId` (int) / `teamTriCode` (str): Team
+- `headshot` (str): Headshot image URL
+- `teamLogo` (str): Team logo URL
+- `sortId` (int): Display order
+
+## Get a Goal's Tracking Replay with goal_replay
+
+Returns the puck and player tracking (PPT) replay details for a goal: scorer, assists, situation and links to the replay data and highlight clip. `event_id` is the play-by-play `eventId` of a goal. For an event that isn't a goal, the response only contains the game details and has no `goal` key.
+
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+pbp = client.game_center.play_by_play(game_id="2024020641")
+goal_event = next(p for p in pbp["plays"] if p["typeDescKey"] == "goal")
+
+replay = client.misc.goal_replay(game_id="2024020641", event_id=goal_event["eventId"])
+goal = replay["goal"]
+print(f"{goal['firstName']['default']} {goal['lastName']['default']} at {goal['timeInPeriod']} ({goal['shotType']})")
+```
+
+**Parameters:**
+
+- `game_id` (str): Game ID
+- `event_id` (str): Play-by-play `eventId` of the goal
+
+**Response structure:**
+
+- `id` (int): Game ID
+- `gameDate` (str): Game date, YYYY-MM-DD
+- `gameState` (str) / `gameType` (int): Game state and type
+- `awayTeam` / `homeTeam` (object): Teams, with `id`, `abbrev`, localized `name` and `placeName`
+- `goal` (object, only for goal events):
+  - `eventId` (int): Play-by-play event ID
+  - `playerId` (int), `firstName` / `lastName` / `name` (object), `sweaterNumber` (int), `headshot` (str): Scorer
+  - `teamAbbrev` (object): Scoring team
+  - `periodDescriptor` (object): Period of the goal
+  - `timeInPeriod` (str): Time of the goal, MM:SS
+  - `situationCode` (str) / `strength` (str): Game situation (e.g., "ev")
+  - `shotType` (str): Shot type (e.g., "wrist")
+  - `goalModifier` (str): Goal modifier (e.g., "none", "empty-net")
+  - `goalsToDate` (int): Scorer's goals this season
+  - `assists` (list): Assisting players
+  - `awayScore` / `homeScore` (int): Score after the goal
+  - `leadingTeamAbbrev` (object): Team leading after the goal
+  - `isHome` (bool): Whether the scorer's team is at home
+  - `homeTeamDefendingSide` (str): Side the home team defends
+  - `pptReplayUrl` (str): URL of the tracking replay data
+  - `highlightClip` / `highlightClipFr` (int): Highlight video IDs
+  - `highlightClipSharingUrl` / `highlightClipSharingUrlFr` (str): Highlight share URLs
+  - `logoUrl` (str): Scoring team logo
+

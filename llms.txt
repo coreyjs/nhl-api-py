@@ -21,7 +21,7 @@ client = NHLClient()
 - [Stats](docs/stats.md): Player career stats, game logs, team/skater/goalie summaries with query builder
 - [Teams](docs/teams.md): Team info, rosters, franchises, all-time teams with franchise IDs
 - [Standings](docs/standings.md): League standings, season metadata
-- [Players](docs/players.md): Prospects, team rosters by season
+- [Players](docs/players.md): Player pages (header, bio, last/next game, stats, v2 game log), prospects, team rosters by season
 - [EDGE](docs/edge.md): NHL EDGE tracking analytics — shot speed, skating speed, zone time, distance
 - [Misc](docs/misc.md): Glossary, config, countries, draft info, season rules
 - [Records](docs/records.md): Historical records — franchise history, draft history (1963+), attendance, venues, plus generic access to ~445 record endpoints
@@ -36,7 +36,7 @@ NHLClient is the main entry point. Access modules via attributes:
 - `client.stats` — Player and team statistics with advanced query builder
 - `client.teams` — Team info, rosters, franchises, team ID to franchise ID lookup (`all_time_teams()`)
 - `client.standings` — League standings
-- `client.players` — Player lookup by team, prospects
+- `client.players` — Player pages (header, bio, home, stats, game log via the v2 API), player lookup by team, prospects
 - `client.edge` — NHL EDGE tracking analytics (shot speed, skating speed, zone time)
 - `client.misc` — Reference data (glossary, countries, draft info)
 - `client.records` — NHL Records API (franchise history, draft history, record lists); `query()` reaches any records endpoint
@@ -72,6 +72,15 @@ client = NHLClient()
 stats = client.stats.player_career_stats(player_id="8478402")
 career = stats["careerTotals"]["regularSeason"]
 print(f"{stats['firstName']['default']} {stats['lastName']['default']}: {career['goals']}G {career['assists']}A {career['points']}P")
+```
+
+### Get a player's bio
+```python
+from nhlpy import NHLClient
+client = NHLClient()
+bio = client.players.player_bio(player_id="8478402")
+vitals = bio["vitals"]
+print(f"{bio['bio']['firstName']['default']} {bio['bio']['lastName']['default']}: born {vitals['birthDate']}, {vitals['heightInches']}in {vitals['weightPounds']}lb")
 ```
 
 ### Find a team's roster

@@ -16,6 +16,8 @@ All EDGE methods share a consistent set of parameters. Player methods accept `pl
 
 All responses include a `seasonsWithEdgeStats` field listing the seasons that have EDGE data available for the given player or team.
 
+The top 10 leaderboard methods (`*_top_10`) take extra filter arguments. They return a list of 10 rows instead of a dict with `seasonsWithEdgeStats`. See [Top 10 Leaderboards](#top-10-leaderboards-shared-parameters-and-allowed-values).
+
 ## Get Comprehensive Skater EDGE Profile with skater_detail
 
 Returns the full EDGE tracking profile for a skater, including shot speed, skating speed, distance traveled, shot locations, and zone time data. Every stat includes a league-average comparison and percentile ranking.
@@ -477,3 +479,163 @@ skating_speed = client.edge.team_skating_speed_detail(team_id="10")
 ```
 
 **Parameters:** `team_id` (str), `season` (str, optional), `game_type` (int, default 2)
+
+## Compare Team Against League with team_comparison
+
+Returns a team's EDGE stats in the shape used by the team view of nhl.com's EDGE comparison tool: shot speed, skating speed, distance skated (including the last 10 games), shot locations, zone time against league average, and shot differential.
+
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+comparison = client.edge.team_comparison(team_id="22")  # Edmonton
+zone = comparison["zoneTimeDetails"]
+print(f"OZ time {zone['offensiveZonePctg']:.1%} (league {zone['offensiveZoneLeagueAvg']:.1%})")
+```
+
+**Parameters:** `team_id` (str), `season` (str, optional), `game_type` (int, default 2)
+
+**Response structure:**
+
+- `team` (object): `id`, `abbrev`, `commonName{default}`, `placeNameWithPreposition{default}`, `teamLogo`, `slug`
+- `seasonsWithEdgeStats` (list): Seasons with EDGE data
+- `shotSpeedDetails` (object): `topShotSpeed`, `avgShotSpeed`, `shotAttemptsOver100`, `shotAttempts90To100`, `shotAttempts80To90`, `shotAttempts70To80`
+- `skatingSpeedDetails` (object): `maxSkatingSpeed`, `burstsOver22`, `bursts20To22`, `bursts18To20`
+- `skatingDistanceDetails` (object): `distanceTotal`, `distancePer60`, `distanceMaxGame`, `distanceMaxPeriod`
+- `skatingDistanceLast10` (list): Distance skated in each of the last 10 games
+- `shotLocationDetails` (list): Shot stats for each rink area
+- `shotLocationTotals` (list): Shot totals by area group (all, high danger, mid range, long range)
+- `zoneTimeDetails` (object): `offensiveZonePctg`, `neutralZonePctg` and `defensiveZonePctg`, each with a matching `...LeagueAvg`
+- `shotDifferential` (object): `shotAttemptDifferential`, `sogDifferential`
+
+## Top 10 Leaderboards: Shared Parameters and Allowed Values
+
+The `*_top_10` methods return the league's top 10 skaters, goalies, or teams for an EDGE metric. They are the leaderboards on nhl.com's EDGE pages.
+
+- Each method returns `List[dict]` with 10 rows.
+- Skater and goalie rows have a `player` object; team rows have a `team` object. The metric fields are listed in each method's section.
+- Every method also accepts `season` (str, optional; defaults to the current season) and `game_type` (int, default 2).
+- Invalid values raise `ValueError` before any request is made. The API itself would return a 404 for an unknown sort, or an empty list for an unknown position group.
+- The allowed values are importable from `nhlpy.api.edge` (for example `from nhlpy.api.edge import SKATING_SPEED_SORTS`).
+
+| Argument | Allowed values | Constant |
+|---|---|---|
+| `position_group` | `"all"`, `"forwards"`, `"defense"` | `POSITION_GROUPS` |
+| `strength` | `"all"`, `"es"` (even strength), `"pp"` (power play), `"pk"` (penalty kill) | `STRENGTHS` |
+| `sort` (skating speed) | `"max"`, `"over-22"`, `"20-22"`, `"18-20"` (mph bursts) | `SKATING_SPEED_SORTS` |
+| `sort` (shot speed) | `"max"`, `"over-100"`, `"90-99"`, `"80-89"`, `"70-79"` (mph attempts) | `SHOT_SPEED_SORTS` |
+| `sort` (skating distance) | `"total"`, `"per-60"`, `"max-game"`, `"max-period"` | `SKATING_DISTANCE_SORTS` |
+| `sort` (zone time) | `"offensive"`, `"neutral"`, `"defensive"` | `ZONE_TIME_SORTS` |
+| `category` (skater/team shot location) | `"sog"`, `"goals"`, `"shooting-pctg"` | `SHOT_LOCATION_CATEGORIES` |
+| `category` (goalie shot location) | `"save-pctg"`, `"saves"`, `"goals-against"`, `"shots-against"` | `GOALIE_SHOT_LOCATION_CATEGORIES` |
+| `area` (shot location) | `"all"`, `"high"` (high danger), `"mid"` (mid range), `"long"` (long range) | `SHOT_LOCATION_AREAS` |
+| `sort` (goalie 5v5) | `"save-pctg"`, `"save-pctg-close"`, `"shots"`, `"shots-per-60"` | `GOALIE_5V5_SORTS` |
+| `sort` (goalie save %) | `"pctg"`, `"games"` | `GOALIE_SAVE_PCTG_SORTS` |
+
+The first value listed is each argument's default.
+
+**`player` object (skater and goalie rows):**
+
+- `firstName` / `lastName` (object): `default` name
+- `slug` (str): URL slug (e.g., "philip-broberg-8481598")
+- `headshot` (str): Headshot image URL
+- `position` (str): Position code
+- `sweaterNumber` (int): Jersey number
+- `team` (object): `abbrev`, `commonName{default}`, `placeNameWithPreposition{default}`, `teamLogo{light,dark}`
+- `id` (int, `goalie_shot_location_top_10` only): Player ID. Other leaderboards don't include a player ID; use `slug`, which ends in the ID
+
+**`team` object (team rows):** `abbrev`, `commonName{default}`, `placeNameWithPreposition{default}`, `slug`, `teamLogo{light,dark}`, and on some leaderboards `id`
+
+Speed and distance metrics are objects with `imperial` (mph or miles) and `metric` (km/h or km) values. Single-best metrics (top speed, hardest shot, max per game or period) also have an `overlay` object describing the game, and the player for team rows, where it happened.
+
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+fastest = client.edge.skater_skating_speed_top_10(position_group="defense")
+for row in fastest:
+    p = row["player"]
+    print(f"{p['firstName']['default']} {p['lastName']['default']} ({p['team']['abbrev']}): {row['maxSpeed']['imperial']:.2f} mph")
+```
+
+## Get Top 10 Skaters by Skating Speed with skater_skating_speed_top_10
+
+**Parameters:** `position_group` (default "all"), `sort` (skating speed, default "max"), `season`, `game_type`
+
+**Row fields:** `player`, `maxSpeed` (`imperial`/`metric`/`overlay`), `burstsOver22`, `bursts20To22`, `bursts18To20` (int)
+
+## Get Top 10 Skaters by Shot Speed with skater_shot_speed_top_10
+
+**Parameters:** `position_group` (default "all"), `sort` (shot speed, default "max"), `season`, `game_type`
+
+**Row fields:** `player`, `hardestShot` (`imperial`/`metric`/`overlay`), `shotAttemptsOver100`, `shotAttempts90To100`, `shotAttempts80To90`, `shotAttempts70To80` (int)
+
+## Get Top 10 Skaters by Distance Skated with skater_skating_distance_top_10
+
+**Parameters:** `position_group` (default "all"), `strength` (default "all"), `sort` (skating distance, default "total"), `season`, `game_type`
+
+**Row fields:** `player`, `distanceTotal`, `distancePer60` (`imperial`/`metric`), `distanceMaxPerGame`, `distanceMaxPerPeriod` (`imperial`/`metric`/`overlay`)
+
+## Get Top 10 Skaters by Zone Time with skater_zone_time_top_10
+
+**Parameters:** `position_group` (default "all"), `strength` (default "all"), `sort` (zone time, default "offensive"), `season`, `game_type`
+
+**Row fields:** `player`, `offensiveZoneTime`, `neutralZoneTime`, `defensiveZoneTime` (float, 0-1 share of ice time)
+
+## Get Top 10 Skaters by Shot Location with skater_shot_location_top_10
+
+**Parameters:** `position_group` (default "all"), `category` (default "sog"), `area` (default "all"), `season`, `game_type`
+
+**Row fields:** `player`, `all`, `highDanger`, `midRange`, `longRange`. Each is the `category` value from that area: counts for `"sog"` and `"goals"`, fractions for `"shooting-pctg"`. Rows are ranked by the `area` column.
+
+```python
+client.edge.skater_shot_location_top_10(category="goals", area="high")  # most high-danger goals
+```
+
+## Get Top 10 Goalies by 5v5 Stats with goalie_5v5_top_10
+
+**Parameters:** `sort` (goalie 5v5, default "save-pctg"), `season`, `game_type`
+
+**Row fields:** `player`, `savePctg` (float), `savePctgClose` (float, close games), `shots` (int), `shotsPer60` (float)
+
+## Get Top 10 Goalies by .900+ Games with goalie_save_percentage_top_10
+
+**Parameters:** `sort` (goalie save %, default "pctg"), `season`, `game_type`
+
+**Row fields:** `player`, `gamesOver900` (int, games with a save percentage over .900), `pctgGamesOver900` (float, share of games)
+
+## Get Top 10 Goalies by Shot Location with goalie_shot_location_top_10
+
+**Parameters:** `category` (goalie shot location, default "save-pctg"), `area` (default "all"), `season`, `game_type`
+
+**Row fields:** `player`, `all`, `highDanger`, `midRange`, `longRange`. Each is the `category` value from that area: fractions for `"save-pctg"`, counts otherwise.
+
+## Get Top 10 Teams by Skating Speed with team_skating_speed_top_10
+
+**Parameters:** `position_group` (default "all"), `sort` (skating speed, default "max"), `season`, `game_type`
+
+**Row fields:** `team`, `maxSkatingSpeed` (`imperial`/`metric`/`overlay`), `burstsOver22`, `bursts20To22`, `bursts18To20` (int)
+
+## Get Top 10 Teams by Shot Speed with team_shot_speed_top_10
+
+**Parameters:** `position_group` (default "all"), `sort` (shot speed, default "max"), `season`, `game_type`
+
+**Row fields:** `team`, `hardestShot` (`imperial`/`metric`/`overlay`), `shotAttemptsOver100`, `shotAttempts90To100`, `shotAttempts80To90`, `shotAttempts70To80` (int)
+
+## Get Top 10 Teams by Distance Skated with team_skating_distance_top_10
+
+**Parameters:** `position_group` (default "all"), `strength` (default "all"), `sort` (skating distance, default "total"), `season`, `game_type`
+
+**Row fields:** `team`, `distanceTotal`, `distancePer60` (`imperial`/`metric`), `distanceMaxPerGame`, `distanceMaxPerPeriod` (`imperial`/`metric`/`overlay`)
+
+## Get Top 10 Teams by Zone Time with team_zone_time_top_10
+
+**Parameters:** `strength` (default "all"), `sort` (zone time, default "offensive"), `season`, `game_type`. There is no position group.
+
+**Row fields:** `team`, `offensiveZoneTime`, `neutralZoneTime`, `defensiveZoneTime` (float, 0-1 share of ice time)
+
+## Get Top 10 Teams by Shot Location with team_shot_location_top_10
+
+**Parameters:** `position_group` (default "all"), `category` (default "sog"), `area` (default "all"), `season`, `game_type`
+
+**Row fields:** `team`, `all`, `highDanger`, `midRange`, `longRange`. Each is the `category` value from that area.

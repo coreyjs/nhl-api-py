@@ -181,6 +181,46 @@ class Teams:
         """
         return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"roster/{team_abbr}/{season}").json()
 
+    def club_stats(self, team_abbr: str, season: str = None, game_type: int = 2) -> Dict[str, Any]:
+        """Get per-player skater and goalie stats for a team's season.
+
+        This is the data behind a team's stats page on nhl.com. Use
+        ``client.stats.gametypes_per_season_directory_by_team()`` to find which seasons and game types
+        a team has stats for.
+
+        Args:
+            team_abbr (str): Team abbreviation (e.g., ``"EDM"``, ``"TOR"``).
+            season (str, optional): Season in ``YYYYYYYY`` format (e.g., ``"20242025"``). Defaults to the
+                current season.
+            game_type (int, optional): Type of games (2: Regular season, 3: Playoffs). Ignored when ``season``
+                is not given. Defaults to 2.
+
+        Returns:
+            Dict[str, Any]: Stat lines for every skater and goalie who played for the team.
+
+        Key Response Fields:
+            season (str): Season in ``YYYYYYYY`` format.
+            gameType (int): Game type.
+            skaters (list): Skater stat lines.
+            skaters[].playerId (int): Player ID.
+            skaters[].goals / assists / points / plusMinus (int): Scoring totals.
+            skaters[].avgTimeOnIcePerGame (float): Average time on ice per game, in seconds.
+            goalies (list): Goalie stat lines.
+            goalies[].wins / savePercentage / goalsAgainstAverage: Goaltending totals.
+
+        Response Docs:
+            docs/teams.md
+
+        Example:
+            client.teams.club_stats(team_abbr="EDM")
+            client.teams.club_stats(team_abbr="EDM", season="20242025", game_type=3)
+        """
+        if season is None:
+            resource = f"club-stats/{team_abbr}/now"
+        else:
+            resource = f"club-stats/{team_abbr}/{season}/{game_type}"
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=resource).json()
+
     def franchises(self) -> List[Dict[str, Any]]:
         """Get a list of all past and current NHL franchises.
 
