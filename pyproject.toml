@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "nhl-api-py"
-version = "3.7.0"
+version = "3.7.1"
 description = "Python wrapper for the NHL API: stats, schedules, standings, teams, players, game center, NHL EDGE tracking, and records. Hockey data for fans, analytics, and machine learning."
 authors = [{ name = "Corey Schaf", email = "cschaf@gmail.com" }]
 readme = "README.md"
