@@ -1,13 +1,134 @@
 import logging
+import re
 import time
-from typing import List, Any
+from typing import Any, Dict, List, Optional, Tuple
 
+from nhlpy.api.game_center import GameCenter
 from nhlpy.api.query.builder import QueryBuilder
 from nhlpy.api.query.filters.franchise import FranchiseQuery
 from nhlpy.api.query.filters.season import SeasonQuery
 from nhlpy.api.stats import Stats
 from nhlpy.api.teams import Teams
 from nhlpy.http_client import HttpClient
+
+SHIFT_TYPE_CODE = 517  # shift-chart rows that are shifts (505 rows are goals)
+POSITION_ORDER = {"C": 0, "L": 1, "R": 2, "D": 3, "G": 4}
+
+
+def _clock_to_seconds(clock: Optional[str]) -> Optional[int]:
+    """Converts a "MM:SS" game clock to seconds. Returns None if the value can't be parsed."""
+    try:
+        minutes, seconds = clock.split(":")
+        return int(minutes) * 60 + int(seconds)
+    except (AttributeError, ValueError):
+        return None
+
+
+def _default(name: Any) -> Optional[str]:
+    """Returns the English value of a localized name ({"default": ...}), or the value itself if it's a plain string."""
+    return name.get("default") if isinstance(name, dict) else name
+
+
+def _team(team: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "id": team.get("id"),
+        "abbr": team.get("abbrev"),
+        "logo": team.get("logo"),
+        "dark_logo": team.get("darkLogo"),
+    }
+
+
+def _build_game_goals(pbp: Dict[str, Any], shifts: Optional[List[Dict[str, Any]]]) -> Dict[str, Any]:
+    """Reshapes a play-by-play feed, plus optional shift-chart rows, into the ``game_goals()`` result."""
+    home, away = pbp.get("homeTeam") or {}, pbp.get("awayTeam") or {}
+    abbr_by_team_id = {home.get("id"): home.get("abbrev"), away.get("id"): away.get("abbrev")}
+    roster = {spot.get("playerId"): spot for spot in pbp.get("rosterSpots") or []}
+
+    def player(player_id: Optional[int], shift: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+        if player_id is None:
+            return None
+        spot = roster.get(player_id)
+        if spot is None:
+            # Not in the play-by-play roster: keep the ID, and use the shift row's name and team if there is one.
+            shift = shift or {}
+            spot = {"firstName": shift.get("firstName"), "lastName": shift.get("lastName")}
+            team_abbr = shift.get("teamAbbrev")
+        else:
+            team_abbr = abbr_by_team_id.get(spot.get("teamId"))
+        return {
+            "player_id": player_id,
+            "first_name": _default(spot.get("firstName")),
+            "last_name": _default(spot.get("lastName")),
+            "sweater_number": spot.get("sweaterNumber"),
+            "position": spot.get("positionCode"),
+            "team_abbr": team_abbr,
+            "headshot": spot.get("headshot"),
+        }
+
+    shifts_by_period: Dict[int, List[Tuple[int, int, Dict[str, Any]]]] = {}
+    for row in shifts or []:
+        start, end = _clock_to_seconds(row.get("startTime")), _clock_to_seconds(row.get("endTime"))
+        if row.get("typeCode") == SHIFT_TYPE_CODE and row.get("playerId") is not None and None not in (start, end):
+            shifts_by_period.setdefault(row.get("period"), []).append((start, end, row))
+
+    def on_ice(period: Optional[int], goal_time: Optional[int]) -> Optional[List[Dict[str, Any]]]:
+        period_shifts = shifts_by_period.get(period)
+        if not period_shifts or goal_time is None:
+            return None  # no shift data: unknown, not "nobody on the ice"
+        # A shift that ends at the goal second was on the ice for it; one that starts then is the faceoff after it.
+        players = {}
+        for start, end, row in period_shifts:
+            if start < goal_time <= end and row["playerId"] not in players:
+                players[row["playerId"]] = player(row["playerId"], row)
+        return sorted(
+            players.values(),
+            key=lambda p: (
+                p["team_abbr"] or "",
+                POSITION_ORDER.get(p["position"], len(POSITION_ORDER)),
+                p["sweater_number"] or 0,
+            ),
+        )
+
+    goals = []
+    for play in pbp.get("plays") or []:
+        period = play.get("periodDescriptor") or {}
+        if play.get("typeDescKey") != "goal" or period.get("periodType") == "SO":
+            continue
+        details = play.get("details") or {}
+        team_id = details.get("eventOwnerTeamId")
+        assist_ids = (details.get("assist1PlayerId"), details.get("assist2PlayerId"))
+        goals.append(
+            {
+                "event_id": play.get("eventId"),
+                "period": period.get("number"),
+                "period_type": period.get("periodType"),
+                "time_in_period": play.get("timeInPeriod"),
+                "situation_code": play.get("situationCode"),
+                "team_abbr": abbr_by_team_id.get(team_id),
+                "is_home": None if team_id is None else team_id == home.get("id"),
+                "home_team_defending_side": play.get("homeTeamDefendingSide"),
+                "x": details.get("xCoord"),
+                "y": details.get("yCoord"),
+                "zone": details.get("zoneCode"),
+                "shot_type": details.get("shotType"),
+                "scorer": player(details.get("scoringPlayerId")),
+                "assists": [player(pid) for pid in assist_ids if pid is not None],
+                "goalie": player(details.get("goalieInNetId")),
+                "away_score": details.get("awayScore"),
+                "home_score": details.get("homeScore"),
+                "highlight_clip_url": details.get("highlightClipSharingUrl"),
+                "ppt_replay_url": play.get("pptReplayUrl"),
+                "on_ice": on_ice(period.get("number"), _clock_to_seconds(play.get("timeInPeriod"))),
+            }
+        )
+
+    return {
+        "game_id": pbp.get("id"),
+        "game_state": pbp.get("gameState"),
+        "home_team": _team(home),
+        "away_team": _team(away),
+        "goals": goals,
+    }
 
 
 class Helpers:
@@ -196,3 +317,71 @@ class Helpers:
                 merged_data.append(stat_entry)
 
         return merged_data
+
+    def game_goals(self, game_id: str, include_on_ice: bool = True) -> Dict[str, Any]:
+        """Gets every goal in a game with both teams, named players, rink coordinates and who was on the ice.
+
+        Joins the play-by-play feed with the shift chart (2 API calls, about 400 KB) into one
+        result that's ready to plot. Shootout attempts are left out; they're still in
+        ``game_center.play_by_play()`` as plays with ``periodType`` "SO".
+
+        Args:
+            game_id (str): 10-digit game ID (e.g., "2024020500").
+            include_on_ice (bool): Also fetch the shift chart to fill ``on_ice``. Defaults to
+                ``True``. Pass ``False`` to make one API call instead of two.
+
+        Returns:
+            Dict[str, Any]: ``game_id``, ``game_state``, ``home_team`` and ``away_team`` (each
+            ``{id, abbr, logo, dark_logo}``), and ``goals`` in game order. ``scorer``,
+            ``assists``, ``goalie`` and ``on_ice`` share one player shape: ``{player_id,
+            first_name, last_name, sweater_number, position, team_abbr, headshot}``.
+
+        Key Response Fields:
+            goals[].event_id (int): Play-by-play eventId. Pass it to ``misc.goal_replay()`` for the
+                NHL's official ``strength`` and ``goalModifier``.
+            goals[].situation_code (str): Four digits: away goalie (1 in net, 0 pulled), away
+                skaters, home skaters, home goalie. "1451" is a home power play, "0651" the away
+                team with its goalie pulled, "1331" 3-on-3 overtime.
+            goals[].x, goals[].y (int): Shot location in feet, (0, 0) at center ice; x runs -100 to
+                100 and y -42.5 to 42.5. Teams switch ends each period (see Note).
+            goals[].goalie (dict): Goalie scored on. ``None`` for an empty-net goal.
+            goals[].away_score, goals[].home_score (int): Score after the goal.
+            goals[].highlight_clip_url (str): Public video of the goal.
+            goals[].on_ice (list): Skaters and goalies on the ice for the goal, sorted by team, then
+                position. ``None`` when ``include_on_ice=False`` or the shift chart has no data for
+                that period yet (common while a game is live).
+            goals[].ppt_replay_url (str): The NHL's puck and player tracking file for the goal,
+                2023-24 onward (``None`` before). The NHL only serves these files to nhl.com, so
+                nhlpy doesn't download them.
+
+        Response Docs:
+            See ``docs/helpers.md`` for every field and when it's ``None``.
+
+        Note:
+            To draw every goal attacking the same end, flip the coordinates when the scoring team
+            attacks left::
+
+                attacks_right = (goal["home_team_defending_side"] == "left") == goal["is_home"]
+                x, y = (goal["x"], goal["y"]) if attacks_right else (-goal["x"], -goal["y"])
+
+            ``on_ice`` comes from shift times. A player whose shift ends at the goal second is
+            included; one whose shift starts then is not, because they came on for the next faceoff.
+            For a penalty-shot goal (``situation_code`` "1010" or "0101") it lists the lines from
+            the shift chart, not just the shooter and goalie.
+
+        Raises:
+            ValueError: If ``game_id`` isn't a 10-digit game ID.
+
+        Example:
+            game = client.helpers.game_goals(game_id="2024020500")
+            for goal in game["goals"]:
+                scorer = goal["scorer"]
+                print(goal["time_in_period"], goal["team_abbr"], scorer["first_name"], scorer["last_name"])
+        """
+        if not re.fullmatch(r"\d{10}", str(game_id)):
+            raise ValueError(f"Invalid game_id '{game_id}'. Expected a 10-digit game ID, e.g. '2024020500'.")
+
+        game_center = GameCenter(self.client)
+        pbp = game_center.play_by_play(game_id)
+        shifts = game_center.shift_chart_data(game_id).get("data", []) if include_on_ice else None
+        return _build_game_goals(pbp, shifts)

@@ -243,6 +243,8 @@ for player in client.misc.player_spotlight():
 
 Returns the puck and player tracking (PPT) replay details for a goal: scorer, assists, situation and links to the replay data and highlight clip. `event_id` is the play-by-play `eventId` of a goal. For an event that isn't a goal, the response only contains the game details and has no `goal` key.
 
+To get every goal in a game at once, with names, coordinates and who was on the ice, use `client.helpers.game_goals()` (see [Helpers](helpers.md#get-every-goal-in-a-game-with-game_goals)).
+
 ```python
 from nhlpy import NHLClient
 

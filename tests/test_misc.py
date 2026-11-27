@@ -38,4 +38,4 @@ def test_player_spotlight(mock_get, nhl_client):
 def test_goal_replay(mock_get, nhl_client):
     nhl_client.misc.goal_replay(game_id="2024020641", event_id="121")
     mock_get.assert_called_once()
-    assert mock_get.call_args[1]["url"] == "https://api-web.nhle.com/v1/ppt-replay/goal/2024020641/121"
+    assert mock_get.call_args[1]["url"] == "https://api-web.nhle.com/v1/ppt-replay/2024020641/121"

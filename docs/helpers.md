@@ -2,9 +2,9 @@
 
 The helpers module provides convenience methods that aggregate data from multiple NHL API calls into single results. Access it via `client.helpers` on an `NHLClient` instance.
 
-**Performance warning:** Every method in this module makes multiple API calls internally (typically 32, one per NHL team) with built-in sleep delays between requests to avoid rate limiting. These methods are significantly slower than individual API calls. Expect execution times of 30 seconds to several minutes depending on the method and sleep rate.
+**Performance warning:** The season-wide methods (`game_ids_by_season`, `all_players`, `all_players_summary_statistics`) make multiple API calls internally (typically 32, one per NHL team) with built-in sleep delays between requests to avoid rate limiting. They are significantly slower than individual API calls. Expect execution times of 30 seconds to several minutes depending on the method and sleep rate. `game_goals` covers one game and makes 2 calls.
 
-**Historical seasons:** Every method in this module gets its team list from `client.teams.teams()`, which returns the current teams. For a historical season it iterates today's teams, so relocated or defunct teams (for example the Quebec Nordiques in 1990-91) are missed. For a season-accurate team list, use `client.stats.team_summary()` for the season's team IDs and `client.teams.all_time_teams()` for their abbreviations and franchise IDs.
+**Historical seasons:** The season-wide methods get their team list from `client.teams.teams()`, which returns the current teams. For a historical season it iterates today's teams, so relocated or defunct teams (for example the Quebec Nordiques in 1990-91) are missed. For a season-accurate team list, use `client.stats.team_summary()` for the season's team IDs and `client.teams.all_time_teams()` for their abbreviations and franchise IDs.
 
 ## Get All Game IDs for a Season with game_ids_by_season
 
@@ -125,3 +125,107 @@ for player in stats:
 - Additional summary stat columns depending on the report type
 
 **Performance note:** This is the slowest helper method. With the default 1-second sleep rate, expect a minimum of 64 seconds (32 roster calls + 32 stats calls). A logging warning is emitted when the method starts. Increase `api_sleep_rate` if you encounter rate limiting.
+
+## Get Every Goal in a Game with game_goals
+
+Returns every goal in one game, ready to plot: both teams, the scorer, assists and goalie by name, rink coordinates, the score after the goal, and who was on the ice. It joins the play-by-play feed with the shift chart, so it makes 2 API calls (about 400 KB). Unlike the season-wide helpers it covers one game and doesn't sleep between calls.
+
+```python
+from nhlpy import NHLClient
+
+client = NHLClient()
+game = client.helpers.game_goals(game_id="2024020500")
+
+print(f"{game['away_team']['abbr']} @ {game['home_team']['abbr']}")
+for goal in game["goals"]:
+    scorer = goal["scorer"]
+    on_ice = " ".join(f"{p['team_abbr']}#{p['sweater_number']}" for p in goal["on_ice"] or [])
+    print(f"P{goal['period']} {goal['time_in_period']} {goal['team_abbr']} #{scorer['sweater_number']} {scorer['last_name']} | {on_ice}")
+```
+
+**Parameters:**
+
+- `game_id` (str, required): 10-digit game ID (e.g., "2024020500"). Anything else raises `ValueError`.
+- `include_on_ice` (bool, optional): Also fetch the shift chart to fill `on_ice`. Defaults to `True`. Pass `False` to make one API call instead of two.
+
+**Returns:** `dict` with snake_case keys. Unlike the season-wide helpers, which return NHL fields as they come, this helper builds its own shape.
+
+- `game_id` (int): Game ID
+- `game_state` (str): `"FUT"`, `"LIVE"`, `"CRIT"`, `"OFF"` or `"FINAL"`. While a game is live, `goals` and `on_ice` can be incomplete.
+- `home_team` / `away_team` (dict): `id` (int), `abbr` (str), `logo` (str), `dark_logo` (str)
+- `goals` (list): One entry per goal, in game order. Shootout attempts are left out; they're in `client.game_center.play_by_play()` as plays with `periodDescriptor.periodType == "SO"`.
+
+**Goal fields** (any value is `None` when the NHL feed leaves it out):
+
+- `event_id` (int): Play-by-play `eventId`. Pass it to `client.misc.goal_replay()` for the NHL's official `strength` and `goalModifier` (e.g., `"empty-net"`, `"penalty-shot"`).
+- `period` (int), `period_type` (str): Period number, and `"REG"` or `"OT"`. Check `period_type` rather than the number: playoff overtime can be period 5 or later.
+- `time_in_period` (str): Time elapsed in the period, MM:SS
+- `situation_code` (str): Four digits: away goalie (1 in net, 0 pulled), away skaters, home skaters, home goalie. `"1551"` is 5-on-5, `"1451"` a home power play, `"0651"` the away team with its goalie pulled, `"1331"` 3-on-3 overtime, `"1010"` or `"0101"` a penalty shot.
+- `team_abbr` (str), `is_home` (bool): Scoring team, and whether it's the home team
+- `home_team_defending_side` (str): `"left"` or `"right"`, the end the home team defends in this period
+- `x`, `y` (int): Shot location in feet, with (0, 0) at center ice; `x` runs -100 to 100 and `y` -42.5 to 42.5. Teams switch ends each period (see below).
+- `zone` (str): `"O"`, `"D"` or `"N"`, from the scoring team's point of view
+- `shot_type` (str): e.g., `"wrist"`, `"snap"`, `"tip-in"`
+- `scorer` (player): Goal scorer
+- `assists` (list of player): 0 to 2 assisting players
+- `goalie` (player): Goalie scored on. `None` for an empty-net goal.
+- `away_score`, `home_score` (int): Score after the goal
+- `highlight_clip_url` (str): Public video of the goal. `None` for older games.
+- `ppt_replay_url` (str): The NHL's puck and player tracking file for the goal, 2023-24 onward (`None` before). The NHL only serves these files to nhl.com, so nhlpy doesn't download them.
+- `on_ice` (list of player): Skaters and goalies on the ice for the goal, sorted by team, then position. `None` when `include_on_ice=False` or the shift chart has no data for that period yet (common while a game is live).
+
+**Player fields** (shared by `scorer`, `assists`, `goalie` and `on_ice`):
+
+- `player_id` (int): NHL player ID
+- `first_name`, `last_name` (str)
+- `sweater_number` (int)
+- `position` (str): `"C"`, `"L"`, `"R"`, `"D"` or `"G"`
+- `team_abbr` (str)
+- `headshot` (str): Headshot image URL
+
+A player missing from the game's roster still gets a record with `player_id`. The other fields are `None`, except in `on_ice`, where the name and team come from the shift chart.
+
+**How `on_ice` is worked out:** a player counts as on the ice if their shift started before the goal and ended at or after it. A shift that starts at the goal second is for the faceoff after the goal. For a penalty-shot goal the shift chart still lists the full lines, so `on_ice` shows them rather than just the shooter and goalie.
+
+### Draw every goal toward the same end
+
+Teams switch ends each period. To plot every goal attacking the right end, rotate the ones that attack left:
+
+```python
+for goal in game["goals"]:
+    if goal["x"] is None:
+        continue
+    attacks_right = (goal["home_team_defending_side"] == "left") == goal["is_home"]
+    x, y = (goal["x"], goal["y"]) if attacks_right else (-goal["x"], -goal["y"])
+```
+
+### Get the plays before a goal
+
+`game_goals` doesn't include the build-up to a goal. The play-by-play has it: walk back from the goal to the last faceoff in the same period.
+
+```python
+plays = client.game_center.play_by_play(game_id="2024020500")["plays"]
+for i, play in enumerate(plays):
+    if play["typeDescKey"] != "goal":
+        continue
+    start = i
+    while start > 0 and plays[start - 1]["periodDescriptor"]["number"] == play["periodDescriptor"]["number"]:
+        start -= 1
+        if plays[start]["typeDescKey"] == "faceoff":
+            break
+    build_up = plays[start:i]  # faceoff, shots, hits, giveaways... with details.xCoord / details.yCoord
+```
+
+### Every goal in a season
+
+`game_goals` fetches one game per call, so pace any loop yourself. A regular season is about 1,300 games: roughly 2,600 requests and 0.5 GB of downloads. `game_ids_by_season` can return the same game ID twice, so dedupe first:
+
+```python
+import time
+
+game_ids = sorted(set(client.helpers.game_ids_by_season(season="20242025", game_types=[2])))
+games = []
+for game_id in game_ids:
+    games.append(client.helpers.game_goals(game_id=str(game_id)))
+    time.sleep(1)
+```

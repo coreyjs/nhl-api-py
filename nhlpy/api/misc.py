@@ -216,4 +216,4 @@ class Misc:
             goal = next(p for p in pbp["plays"] if p["typeDescKey"] == "goal")
             client.misc.goal_replay(game_id="2024020641", event_id=goal["eventId"])
         """
-        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"ppt-replay/goal/{game_id}/{event_id}").json()
+        return self.client.get(endpoint=Endpoint.API_WEB_V1, resource=f"ppt-replay/{game_id}/{event_id}").json()
