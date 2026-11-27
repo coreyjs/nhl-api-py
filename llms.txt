@@ -26,7 +26,7 @@ client = NHLClient()
 - [Misc](docs/misc.md): Glossary, config, countries, draft info, season rules, how to watch a game, NHL Network TV schedule, player spotlight, goal tracking replays
 - [Draft](docs/draft.md): Central Scouting prospect rankings, draft picks by year and round, live draft tracker
 - [Records](docs/records.md): Historical records — franchise history, draft history (1963+), attendance, venues, plus generic access to ~445 record endpoints
-- [Helpers](docs/helpers.md): Convenience methods — all game IDs, all players, bulk stats
+- [Helpers](docs/helpers.md): Convenience methods — all game IDs, all players, bulk stats, every goal in a game with who was on the ice
 
 ## Architecture
 
@@ -42,7 +42,7 @@ NHLClient is the main entry point. Access modules via attributes:
 - `client.misc` — Reference data (glossary, countries, draft info) and media (how to watch, TV schedule, spotlight, goal replays)
 - `client.draft` — Draft prospect rankings, picks and live draft tracker
 - `client.records` — NHL Records API (franchise history, draft history, record lists); `query()` reaches any records endpoint
-- `client.helpers` — Cross-domain convenience methods (all game IDs, all players)
+- `client.helpers` — Cross-domain convenience methods (all game IDs, all players, `game_goals()` for every goal in a game)
 
 ## Common Patterns
 
@@ -164,3 +164,14 @@ for pick in first_round["picks"][:3]:
     print(f"{pick['overallPick']}. {pick['teamAbbrev']} - {pick['firstName']['default']} {pick['lastName']['default']}")
 ```
 
+
+### Plot a game's goals
+```python
+from nhlpy import NHLClient
+client = NHLClient()
+game = client.helpers.game_goals(game_id="2024020500")  # play-by-play + shift chart, 2 API calls
+for goal in game["goals"]:  # shootout attempts excluded
+    s = goal["scorer"]
+    on_ice = " ".join(f"{p['team_abbr']}#{p['sweater_number']}" for p in goal["on_ice"] or [])
+    print(f"P{goal['period']} {goal['time_in_period']} {goal['team_abbr']} #{s['sweater_number']} {s['last_name']} at ({goal['x']}, {goal['y']}) | {on_ice}")
+```
